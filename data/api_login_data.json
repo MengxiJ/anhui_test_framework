@@ -1,0 +1,77 @@
+[
+  {
+    "keywords": "18800002008",
+    "password": "Aa123456",
+    "expect": 200
+  },
+  {
+    "keywords": "18800002008",
+    "password": "wrong",
+    "expect": 100
+  },
+  {
+    "keywords": "18800003000",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "",
+    "expect": 100
+  },
+  {
+    "keywords": "123",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "1880000200888888888",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "123",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "Aa123456789",
+    "expect": 100
+  },
+  {
+    "keywords": "18800004000",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "!@#$%",
+    "password": "Aa123456",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "!@#$%",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "AA123456",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008",
+    "password": "abcdefg",
+    "expect": 100
+  },
+  {
+    "keywords": "18800002008 ",
+    "password": "Aa123456",
+    "expect": 200
+  }
+]

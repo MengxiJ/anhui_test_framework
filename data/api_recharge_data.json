@@ -1,0 +1,107 @@
+[
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "100",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 200
+  },
+  {
+    "payment_type": "",
+    "amount": "100",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "0",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "-100",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "99999999",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "abc",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "wrongType",
+    "amount": "100",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "50",
+    "form_str": "reForm",
+    "valicode": "",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "200",
+    "form_str": "",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "1",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 200
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "500",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 200
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "1000",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 200
+  },
+  {
+    "payment_type": "alipay",
+    "amount": "100",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 100
+  },
+  {
+    "payment_type": "chinapnrTrust",
+    "amount": "100.5",
+    "form_str": "reForm",
+    "valicode": "8888",
+    "expect": 200
+  }
+]

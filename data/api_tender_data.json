@@ -1,0 +1,98 @@
+[
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "100",
+    "expect": 100
+  },
+  {
+    "loan_id": "",
+    "deposit_certificate": "cert001",
+    "amount": "100",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "0",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "-50",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "999999999",
+    "expect": 100
+  },
+  {
+    "loan_id": "999999",
+    "deposit_certificate": "cert001",
+    "amount": "100",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "abc",
+    "expect": 100
+  },
+  {
+    "loan_id": "-1",
+    "deposit_certificate": "cert001",
+    "amount": "100",
+    "expect": 100
+  },
+  {
+    "loan_id": "2",
+    "deposit_certificate": "cert002",
+    "amount": "50",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "1",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "500",
+    "expect": 100
+  },
+  {
+    "loan_id": "3",
+    "deposit_certificate": "cert003",
+    "amount": "200",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "cert001",
+    "amount": "100.5",
+    "expect": 100
+  },
+  {
+    "loan_id": "abc",
+    "deposit_certificate": "cert001",
+    "amount": "100",
+    "expect": 100
+  },
+  {
+    "loan_id": "1",
+    "deposit_certificate": "-1",
+    "amount": "100",
+    "expect": 200
+  }
+]

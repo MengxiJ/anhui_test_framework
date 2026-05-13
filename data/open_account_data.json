@@ -1,0 +1,68 @@
+[
+  {
+    "real_name": "",
+    "card": "{{CARD}}",
+    "expect": "不能为空",
+    "img": "open_account_fail_name_empty.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "",
+    "expect": "不能为空",
+    "img": "open_account_fail_card_empty.png"
+  },
+  {
+    "real_name": "张",
+    "card": "{{CARD}}",
+    "expect": "输入姓名格式有误",
+    "img": "open_account_fail_name_short.png"
+  },
+  {
+    "real_name": "张三李四王五赵六钱七",
+    "card": "{{CARD}}",
+    "expect": "输入姓名格式有误",
+    "img": "open_account_fail_name_long.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "123456",
+    "expect": "输入身份证号格式有误",
+    "img": "open_account_fail_card_short.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "110101199001011234567",
+    "expect": "输入身份证号格式有误",   
+    "img": "open_account_fail_card_long.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "11010119900101123",
+    "expect": "输入身份证号格式有误",   
+    "img": "open_account_fail_card_17.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "1101011990010112345",
+    "expect": "输入身份证号格式有误",   
+    "img": "open_account_fail_card_19.png"
+  },
+  {
+    "real_name": "!@#$%",
+    "card": "{{CARD}}",
+    "expect": "输入姓名格式有误",
+    "img": "open_account_fail_name_special.png"
+  },
+  {
+    "real_name": "{{NAME}}",
+    "card": "abcdefghijklmnopqr",
+    "expect": "输入身份证号格式有误",   
+    "img": "open_account_fail_card_alpha.png"
+  },
+  {
+    "real_name": "李四",
+    "card": "11010119900101123X",
+    "expect": "OK",
+    "img": "open_account_success_x.png"
+  }
+]

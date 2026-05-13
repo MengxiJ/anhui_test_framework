@@ -1,0 +1,107 @@
+[
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "100,000.00",
+    "img": "credit_success.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "100,000.00",
+    "img": "credit_success.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "100,000.00",
+    "img": "credit_success.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "100,000.00",
+    "img": "credit_success.png"
+  },
+  {
+    "amount": "",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请额度不能为空",
+    "img": "credit_fail_amount_empty.png"
+  },
+  {
+    "amount": "0",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请金额必须大于0",
+    "img": "credit_fail_amount_zero.png"
+  },
+  {
+    "amount": "-50000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请金额不能为负数",
+    "img": "credit_fail_amount_negative.png"
+  },
+  {
+    "amount": "50",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请金额低于最小限额",
+    "img": "credit_fail_amount_min.png"
+  },
+  {
+    "amount": "9999999999",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请额度不能超过1亿",
+    "img": "credit_fail_amount_max.png"
+  },
+  {
+    "amount": "abc",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "8888",
+    "expect": "申请金额格式错误",
+    "img": "credit_fail_amount_format.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "",
+    "img_code": "8888",
+    "expect": "详情说明不能为空",
+    "img": "credit_fail_detail_empty.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "",
+    "expect": "验证码不能为空",
+    "img": "credit_fail_code_empty.png"
+  },
+  {
+    "amount": "100000",
+    "detail_msg": "额度申请详情信息",
+    "img_code": "9999",
+    "expect": "验证码错误",
+    "img": "credit_fail_code_error.png"
+  },
+  {
+    "amount": "50000",
+    "detail_msg": "测试额度申请50000",
+    "img_code": "8888",
+    "expect": "50,000.00",
+    "img": "credit_success_50k.png"
+  },
+  {
+    "amount": "200000",
+    "detail_msg": "测试额度申请200000",
+    "img_code": "8888",
+    "expect": "200,000.00",
+    "img": "credit_success_200k.png"
+  }
+]

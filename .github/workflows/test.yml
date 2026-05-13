@@ -1,0 +1,179 @@
+name: 自动化测试流水线
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: 运行自动化测试
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: 运行 API 测试
+      run: |
+        pytest scripts/test_api_*.py -v --alluredir=output/allure/results --clean-alluredir
+      continue-on-error: true
+    
+    - name: 安装 Allure
+      if: always()
+      run: |
+        wget -q https://github.com/allure-framework/allure2/releases/download/2.30.0/allure-2.30.0.tgz
+        tar -xzf allure-2.30.0.tgz
+        echo "$PWD/allure-2.30.0/bin" >> $GITHUB_PATH
+    
+    - name: 生成 Allure 报告
+      if: always()
+      run: allure generate output/allure/results --clean --output output/allure/report
+    
+    - name: 发布测试报告到 GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: output/allure/report
+    
+    - name: 上传测试报告
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-${{ matrix.python-version }}
+        path: output/allure/report
+        retention-days: 30
+    
+    - name: 测试结果通知
+      if: always()
+      run: |
+        echo "测试执行完成！"
+        echo "查看测试报告: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+
+  ui-test:
+    name: UI自动化测试
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: 安装 Chrome 浏览器
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: stable
+    
+    - name: 运行 UI 测试
+      run: |
+        pytest scripts/test_0*.py -v --alluredir=output/allure/results-ui --clean-alluredir
+      continue-on-error: true
+    
+    - name: 上传 UI 测试报告
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-ui
+        path: output/allure/results-ui
+        retention-days: 30
+
+  performance-test:
+    name: 性能测试
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    
+    - name: 安装 JMeter
+      run: |
+        wget -q https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+        tar -xzf apache-jmeter-5.6.3.tgz
+        echo "$PWD/apache-jmeter-5.6.3/bin" >> $GITHUB_PATH
+    
+    - name: 验证 JMeter 安装
+      run: jmeter --version
+    
+    - name: 运行性能测试
+      run: |
+        mkdir -p output/performance
+        jmeter -n -t performance/performance_test.jmx -l output/performance/result.jtl -e -o output/performance/report
+      continue-on-error: true
+    
+    - name: 上传性能测试报告
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-report
+        path: output/performance
+        retention-days: 30
+    
+    - name: 性能测试结果通知
+      if: always()
+      run: |
+        echo "性能测试执行完成！"
+        echo "查看性能测试报告: output/performance/report/index.html"
+
+  code-quality:
+    name: 代码质量检查
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: 安装代码质量工具
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pylint black
+    
+    - name: 运行 Black 格式检查
+      run: black --check .
+      continue-on-error: true
+    
+    - name: 运行 Flake8 检查
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      continue-on-error: true
+    
+    - name: 运行 Pylint 检查
+      run: pylint --disable=all --enable=E,F **/*.py
+      continue-on-error: true

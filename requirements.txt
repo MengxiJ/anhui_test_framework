@@ -1,0 +1,12 @@
+# 自动化测试框架核心依赖
+pytest>=9.0.0
+selenium>=4.0.0
+allure-pytest>=2.13.0
+Faker>=40.0.0
+requests>=2.30.0      # HTTP请求库
+webdriver-manager>=4.0.0  # 浏览器驱动自动管理
+python-dotenv>=1.0.0  # 环境变量管理
+
+# 可选依赖
+pytest-html>=4.0.0    # HTML测试报告
+pytest-xdist>=3.0.0   # 并行测试

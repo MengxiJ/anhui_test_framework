@@ -1,0 +1,79 @@
+[
+  {
+    "phone": "18800002008",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800003000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800004000",
+    "password": "Aa123456",
+    "verifycode": "9999",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "123",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800005000",
+    "password": "",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800006000",
+    "password": "123",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800007000",
+    "password": "Aa12345678901234567890",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800008000",
+    "password": "Aa123456",
+    "verifycode": "",
+    "phone_code": "666666",
+    "expect": 100
+  },
+  {
+    "phone": "18800009000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "",
+    "expect": 100
+  },
+  {
+    "phone": "18800010000",
+    "password": "Aa12345678",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": 200
+  }
+]

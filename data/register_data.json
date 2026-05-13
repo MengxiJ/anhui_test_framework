@@ -1,0 +1,234 @@
+[
+  {
+    "phone": "18800026001",
+    "password": "Aa12345678",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册成功",
+    "img": "reg_success.png"
+  },
+  {
+    "phone": "18800028001",
+    "password": "Aa12345678!",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册成功",
+    "img": "reg_success_special.png"
+  },
+  {
+    "phone": "18800027001",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册成功",
+    "img": "reg_success_len20.png"
+  },
+  {
+    "phone": "18800002008",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_exist.png"
+  },
+  {
+    "phone": "38800003000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_first.png"
+  },
+  {
+    "phone": "11800004000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_second.png"
+  },
+  {
+    "phone": "188000050",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_short.png"
+  },
+  {
+    "phone": "1880000600000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_long.png"
+  },
+  {
+    "phone": "1880000abcd",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_char.png"
+  },
+  {
+    "phone": "",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_empty.png"
+  },
+  {
+    "phone": "1",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phone_format.png"
+  },
+  {
+    "phone": "18800007000",
+    "password": "",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_empty.png"
+  },
+  {
+    "phone": "18800008000",
+    "password": "123",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_short.png"
+  },
+  {
+    "phone": "18800009000",
+    "password": "12345678",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_number.png"
+  },
+  {
+    "phone": "18800010000",
+    "password": "abcdefgh",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_letter.png"
+  },
+  {
+    "phone": "18800011000",
+    "password": "Aa1234",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_simple.png"
+  },
+  {
+    "phone": "18800013000",
+    "password": "Aa12345678901234567890",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_long.png"
+  },
+  {
+    "phone": "18800014000",
+    "password": "Aa123456!",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_special.png"
+  },
+  {
+    "phone": "18800015000",
+    "password": "Aa123456<>",
+    "verifycode": "8888",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_pwd_risk.png"
+  },
+  {
+    "phone": "18800016000",
+    "password": "Aa123456",
+    "verifycode": "",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_verify_empty.png"
+  },
+  {
+    "phone": "18800017000",
+    "password": "Aa123456",
+    "verifycode": "123",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_verify_short.png"
+  },
+  {
+    "phone": "18800018000",
+    "password": "Aa123456",
+    "verifycode": "12345",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_verify_long.png"
+  },
+  {
+    "phone": "18800019000",
+    "password": "Aa123456",
+    "verifycode": "aaaa",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_verify_lower.png"
+  },
+  {
+    "phone": "18800020000",
+    "password": "Aa123456",
+    "verifycode": "9999",
+    "phone_code": "666666",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_code.png"
+  },
+  {
+    "phone": "18800021000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phonecode_empty.png"
+  },
+  {
+    "phone": "18800022000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "12345",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phonecode_short.png"
+  },
+  {
+    "phone": "18800023000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "1234567",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phonecode_long.png"
+  },
+  {
+    "phone": "18800024000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "abcdef",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phonecode_char.png"
+  },
+  {
+    "phone": "18800025000",
+    "password": "Aa123456",
+    "verifycode": "8888",
+    "phone_code": "111111",
+    "expect": "注册抢88现金",
+    "img": "reg_fail_phonecode_wrong.png"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "username": "admin",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "欢迎光临",
+    "img": "back_login_success.png"
+  },
+  {
+    "username": "",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "用户名不能为空",
+    "img": "back_login_fail_user_empty.png"
+  },
+  {
+    "username": "admin",
+    "password": "",
+    "img_code": "8888",
+    "expect": "密码不能为空",
+    "img": "back_login_fail_pwd_empty.png"
+  },
+  {
+    "username": "admin",
+    "password": "HM_2023_test",
+    "img_code": "",
+    "expect": "验证码不能为空",
+    "img": "back_login_fail_code_empty.png"
+  },
+  {
+    "username": "wronguser",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "用户名/密码错误",
+    "img": "back_login_fail_user_not_exist.png"
+  },
+  {
+    "username": "admin",
+    "password": "wrongpassword",
+    "img_code": "8888",
+    "expect": "密码错误",
+    "img": "back_login_fail_pwd_error.png"
+  },
+  {
+    "username": "admin",
+    "password": "HM_2023_test",
+    "img_code": "9999",
+    "expect": "验证码错误",
+    "img": "back_login_fail_code_error.png"
+  },
+  {
+    "username": "Admin",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "用户名/密码错误",
+    "img": "back_login_fail_user_case.png"
+  },
+  {
+    "username": "admin",
+    "password": "hm_2023_test",
+    "img_code": "8888",
+    "expect": "密码错误",
+    "img": "back_login_fail_pwd_case.png"
+  },
+  {
+    "username": "admin123",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "用户名/密码错误",
+    "img": "back_login_fail_user_num.png"
+  },
+  {
+    "username": "!@#$%",
+    "password": "HM_2023_test",
+    "img_code": "8888",
+    "expect": "用户名/密码错误",
+    "img": "back_login_fail_user_special.png"
+  },
+  {
+    "username": "admin",
+    "password": "!@#$%",
+    "img_code": "8888",
+    "expect": "密码错误",
+    "img": "back_login_fail_pwd_special.png"
+  }
+]

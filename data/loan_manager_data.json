@@ -1,0 +1,79 @@
+[
+  {
+    "phone": "18800002008",
+    "note": "审核OK",
+    "img_code": "",
+    "expect": "审核",
+    "img": "loan_fail_code_empty.png"
+  },
+    {
+    "phone": "18800002008",
+    "note": "审核OK",
+    "img_code": "8888",
+    "expect": "通过",
+    "img": "loan_pass.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "",
+    "img_code": "8888",
+    "expect": "通过",
+    "img": "loan_pass_note_empty.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "审核OK",
+    "img_code": "9999",
+    "expect": "验证码错误",
+    "img": "loan_fail_code_error.png"
+  },
+  {
+    "phone": "123",
+    "note": "审核OK",
+    "img_code": "8888",
+    "expect": "手机号格式错误",
+    "img": "loan_fail_phone_format.png"
+  },
+  {
+    "phone": "18800009999",
+    "note": "审核OK",
+    "img_code": "8888",
+    "expect": "用户不存在",
+    "img": "loan_fail_phone_not_exist.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "资料不完整，请补充",
+    "img_code": "8888",
+    "expect": "拒绝",
+    "img": "loan_reject.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "信用记录良好，批准申请",
+    "img_code": "8888",
+    "expect": "通过",
+    "img": "loan_pass_good.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "需要进一步核实",
+    "img_code": "8888",
+    "expect": "待定",
+    "img": "loan_pending.png"
+  },
+  {
+    "phone": "18800002008",
+    "note": "!@#$%",
+    "img_code": "8888",
+    "expect": "审核意见包含非法字符",
+    "img": "loan_fail_note_special.png"
+  },
+  {
+    "phone": "1880000200888888888",
+    "note": "审核OK",
+    "img_code": "8888",
+    "expect": "手机号格式错误",
+    "img": "loan_fail_phone_long.png"
+  }
+]

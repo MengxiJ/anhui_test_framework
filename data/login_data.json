@@ -1,0 +1,86 @@
+[
+  {
+    "username": "18800002008",
+    "password": "Aa123456",
+    "expect": "18800002008",
+    "img": "login_success.png"
+  },
+  {
+    "username": "19900002002",
+    "password": "Aa123456",
+    "expect": "用户不存在",
+    "img": "login_fail_phone_not_exist.png"
+  },
+  {
+    "username": "18800002001",
+    "password": "aa123456",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_error.png"
+  },
+  {
+    "username": "18800002001",
+    "password": "",
+    "expect": "用户名或密码不能为空",
+    "img": "login_fail_pwd_is_none.png"
+  },
+  {
+    "username": "",
+    "password": "Aa123456",
+    "expect": "用户名或密码不能为空",
+    "img": "login_fail_username_empty.png"
+  },
+  {
+    "username": "123",
+    "password": "Aa123456",
+    "expect": "用户不存在",
+    "img": "login_fail_phone_format.png"
+  },
+  {
+    "username": "1880000200888888888",
+    "password": "Aa123456",
+    "expect": "用户不存在",
+    "img": "login_fail_phone_long.png"
+  },
+  {
+    "username": "18800002008",
+    "password": "123",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_short.png"
+  },
+  {
+    "username": "18800002008",
+    "password": "Aa12345678901234567890",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_long.png"
+  },
+  {
+    "username": "!@#$%",
+    "password": "Aa123456",
+    "expect": "密码错误",
+    "img": "login_fail_username_special.png"
+  },
+  {
+    "username": "18800002008",
+    "password": "!@#$%",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_special.png"
+  },
+  {
+    "username": "18800002008",
+    "password": "abcdefg",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_alpha.png"
+  },
+  {
+    "username": "17600003000",
+    "password": "Aa123456",
+    "expect": "用户不存在",
+    "img": "login_fail_user2.png"
+  },
+  {
+    "username": "18800002008",
+    "password": "AA123456",
+    "expect": "密码错误",
+    "img": "login_fail_pwd_case.png"
+  }
+]
