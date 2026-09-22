@@ -1,9 +1,0 @@
-INFO     root:base_test.py:38 开始执行API测试: test_api_login[18800002008-Aa123456789-100]
-INFO     root:login_register_api.py:106 登录，手机号: 18800002008
-INFO     root:base_request.py:42 请求方法: POST, 请求地址: http://121.43.169.97:8081/member/public/login
-INFO     root:base_request.py:44 请求参数: {'keywords': '18800002008', 'password': 'Aa123456789'}
-INFO     root:base_request.py:46 请求JSON: None
-INFO     root:base_request.py:50 响应状态码: 200
-INFO     root:base_request.py:54 响应内容: {'status': 100, 'data': {'login_error': 2}, 'description': '密码错误1次,达到3次将锁定账户'}
-INFO     root:test_api_02_login.py:21 登录响应结果: {'status': 100, 'data': {'login_error': 2}, 'description': '密码错误1次,达到3次将锁定账户'}
-INFO     root:base_test.py:42 API测试执行完成，耗时: 0.41秒
