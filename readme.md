@@ -189,6 +189,51 @@ pytest -m security
 
 测试站点地址在 `.env` 中配置（参照 `.env.example`）。
 
+## 测试报告
+
+通过 `scripts/` 脚本运行时，每次执行自动产出三类报告（目录不存在会自动创建）：
+
+| 报告 | 路径 | 用途 |
+| --- | --- | --- |
+| HTML 报告 | `output/reports/report_<套件>_<时间戳>.html` | 单文件自包含（CSS 内嵌），浏览器直接打开，可邮件/IM 发送，含每个用例耗时与失败堆栈 |
+| JUnit XML | `output/reports/junit_<套件>_<时间戳>.xml` | 标准格式，供 GitHub Actions / Jenkins 等 CI 平台解析展示 |
+| Allure 报告 | `output/allure/report/index.html` | 运行结束检测到本机装有 allure CLI 时自动 `allure generate`；未安装则跳过（原始结果始终由 pytest.ini 的 `--alluredir` 写入 `output/allure/results`，装好 CLI 后可随时手动生成） |
+
+另外，引擎为每个工作流留有逐步执行明细：`output/atomic/<时间戳>_<工作流ID>/`
+下的 `result.json` 与 `summary.md`；控制台完整输出同时落盘为
+`output/regression_<套件>_<时间戳>.log`。
+
+直接用 pytest 命令运行时，追加 `--html=output/reports/report.html
+--self-contained-html --junitxml=output/reports/junit.xml` 可获得同样的报告产物。
+
+## 持续集成与定时执行
+
+每天凌晨 **02:00（北京时间）** 双通道自动执行，互为补充：
+
+| 通道 | 范围 | 配置 | 产物 |
+| --- | --- | --- | --- |
+| GitHub Actions（[nightly.yml](.github/workflows/nightly.yml)） | quick 套件：smoke/api/性能/并发/安全，纯 HTTP、分钟级 | `schedule: cron '0 18 * * *'`（UTC 18:00），push 到 main 后生效 | Actions Artifacts 中的 HTML + JUnit + Allure 原始结果，保留 30 天 |
+| 本机 Windows 任务计划 | all 全量 91 条（含 UI） | [install_nightly_task.ps1](scripts/install_nightly_task.ps1) 注册的每日任务 | `output/reports/` + `output/allure/report/` |
+
+说明与常用操作：
+
+```bash
+# GitHub 流水线也支持手动触发（Actions -> nightly-regression -> Run workflow），
+# 可临时选择 all 全量（Linux 无头 Chrome，约 1.5~2.5 小时，首次运行需观察适配）。
+# 凭据默认走代码内教学站配置；可在仓库 Settings -> Secrets 用同名变量覆盖
+# （BASE_URL/BACK_URL/ADMIN_USERNAME/ADMIN_PASSWORD/TEST_USER/TEST_PASSWORD 等）。
+
+# 本机任务计划管理（PowerShell）
+.\scripts\install_nightly_task.ps1                 # 注册：每天 02:00 全量
+.\scripts\install_nightly_task.ps1 -Time 23:30    # 改时间
+.\scripts\install_nightly_task.ps1 -Suite quick    # 改为快速套件
+Start-ScheduledTask -TaskName 'TBlocks Nightly Regression'  # 立即试跑
+.\scripts\install_nightly_task.ps1 -Unregister     # 卸载
+```
+
+注意：GitHub 定时任务以 UTC 计时且整点高峰可能延迟；本机任务计划准点执行，
+但凌晨 02:00 需保持开机、联网与登录状态（错过后开机自动补跑一次）。
+
 ## 目录结构
 
 ```

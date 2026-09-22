@@ -1,0 +1,129 @@
+name: nightly-regression
+
+# 定时全量/快速回归。
+# 定时触发：UTC 18:00（= 北京时间次日 02:00），仅作用于默认分支 main。
+# 手动触发：Actions -> nightly-regression -> Run workflow，可选择 quick / all。
+# GitHub 整点任务高峰可能延迟数分钟至数十分钟，精确到分钟的调度请改用本机
+# Windows 任务计划（见 scripts/install_nightly_task.ps1）。
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "执行范围（quick=冒烟+接口+性能+并发+安全；all=全量 91 条含 UI）"
+        type: choice
+        options:
+          - quick
+          - all
+        default: quick
+
+permissions:
+  contents: read
+
+jobs:
+  static-gate:
+    name: 静态校验（compileall + gate）
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 语法编译检查
+        run: python -m compileall -q lib tblocks
+
+      - name: 工作流静态门禁（validate/gate 全部 JSON）
+        run: |
+          python tblocks/tblocks_debugger.py gate $(find tblocks/workflows -name '*.json' | sort)
+
+  test:
+    name: 定时回归（${{ github.event.inputs.scope || 'quick' }}）
+    needs: static-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event.inputs.scope == 'all' && 300 || 30 }}
+    env:
+      # 优先取仓库 Settings -> Secrets 配置；未配置时回退到代码内默认教学站。
+      # 注意：定时任务跑在真实教学站点上，UI 全量为唯一会写数据的场景。
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BACK_URL: ${{ secrets.BACK_URL }}
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_IMG_CODE: ${{ secrets.ADMIN_IMG_CODE }}
+      TEST_USER: ${{ secrets.TEST_USER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TBLOCKS_HEADLESS: '1'
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 安装 Chrome（仅全量 UI 需要）
+        if: github.event.inputs.scope == 'all'
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: 生成 .env（Secrets 为空则回退默认教学站）
+        run: |
+          cat > .env <<EOF
+          BASE_URL=${BASE_URL:-http://121.43.169.97:8081}
+          BACK_URL=${BACK_URL:-http://121.43.169.97:8082}
+          API_BASE_URL=${API_BASE_URL:-http://121.43.169.97:8081}
+          ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+          ADMIN_PASSWORD=${ADMIN_PASSWORD:-HM_2023_test}
+          ADMIN_IMG_CODE=${ADMIN_IMG_CODE:-8888}
+          TEST_USER=${TEST_USER:-18800006000}
+          TEST_PASSWORD=${TEST_PASSWORD:-Aa123456}
+          EOF
+
+      - name: 创建报告目录
+        run: mkdir -p output/reports
+
+      - name: 快速套件（smoke/api/performance/load/security，纯 HTTP）
+        if: github.event.inputs.scope != 'all'
+        run: |
+          python -m pytest -m "smoke or api or performance or load or security" \
+            --html=output/reports/report_quick.html --self-contained-html \
+            --junitxml=output/reports/junit_quick.xml -q
+
+      - name: 全量套件（含 UI，约 1.5~2.5 小时）
+        if: github.event.inputs.scope == 'all'
+        run: |
+          python -m pytest --tblocks-workflows tblocks/workflows \
+            --html=output/reports/report_all.html --self-contained-html \
+            --junitxml=output/reports/junit_all.xml -q
+
+      - name: 上传测试报告（HTML / JUnit / Allure 原始结果）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tblocks-reports-${{ github.event.inputs.scope || 'quick' }}-${{ github.run_id }}
+          path: |
+            output/reports/
+            output/allure/results/
+          retention-days: 30
