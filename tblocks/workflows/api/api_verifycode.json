@@ -1,0 +1,62 @@
+{
+  "id": "api/verifycode",
+  "name": "API_CODE_001",
+  "display_name": "图形验证码签发接口（注册码/充值码）",
+  "description": "GET /common/public/verifycode1/{r}（注册码）与 GET /common/public/verifycode/{r}（充值码）均应返回 HTTP 200 的非空 JPEG 图片（站点响应不带 Content-Type，以 JPEG 魔数字节量做非空断言）。",
+  "category": "api",
+  "module": "common",
+  "priority": "P1",
+  "expected": "两个端点 HTTP 200，响应字节数均 >=1000",
+  "nodes": [
+    {
+      "id": "get_reg_code",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "注册图形验证码",
+      "params": {"path": "/common/public/verifycode1/0.3321", "site": "front"}
+    },
+    {
+      "id": "check_reg_code_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "注册码 HTTP 200",
+      "params": {"http_status": "${get_reg_code.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_reg_code_size",
+      "type": "check",
+      "check_id": "check_probe_body_length_min",
+      "label": "注册码非空图片",
+      "params": {"body_length": "${get_reg_code.data.body_length}", "min_length": 1000}
+    },
+    {
+      "id": "get_recharge_code",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "充值图形验证码",
+      "params": {"path": "/common/public/verifycode/0.8876", "site": "front"}
+    },
+    {
+      "id": "check_recharge_code_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "充值码 HTTP 200",
+      "params": {"http_status": "${get_recharge_code.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_recharge_code_size",
+      "type": "check",
+      "check_id": "check_probe_body_length_min",
+      "label": "充值码非空图片",
+      "params": {"body_length": "${get_recharge_code.data.body_length}", "min_length": 1000}
+    }
+  ],
+  "edges": [
+    {"source": "get_reg_code", "target": "check_reg_code_status", "condition": "pass"},
+    {"source": "check_reg_code_status", "target": "check_reg_code_size", "condition": "pass"},
+    {"source": "check_reg_code_size", "target": "get_recharge_code", "condition": "pass"},
+    {"source": "get_recharge_code", "target": "check_recharge_code_status", "condition": "pass"},
+    {"source": "check_recharge_code_status", "target": "check_recharge_code_size", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api", "write_side_effect": "none"}
+}

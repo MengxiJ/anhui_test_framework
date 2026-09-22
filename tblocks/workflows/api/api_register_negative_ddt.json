@@ -1,0 +1,110 @@
+{
+  "id": "api/register_negative_ddt",
+  "name": "API_REGISTER_NEG_DDT",
+  "display_name": "会员注册接口负向数据驱动（8 行：错图形码/错短信码/已存在/非法手机号）",
+  "description": "数据驱动模板，每行独立会话：取图形验证码 → sendSms（图形码 ${row.sms_img}）→ 提交注册（短信码 ${row.sms_code}）。所有行均在验证码/号码校验阶段被拦截，不会创建任何账户。期望字段置 null 表示该行该项不适用（N/A 跳过断言）：超长/含字母手机号被 Tomcat 在 HTTP 层以 400 拒绝，无业务响应体。错图形码的行短信不下发，不触发教学环境短信限流；真实 sendSms 成功仅 2 行。",
+  "category": "api",
+  "module": "account",
+  "priority": "P1",
+  "precondition": "图形验证码固定 8888；188000026030 为未注册测试号（注册始终失败，可重复使用）",
+  "expected": "短信下发与注册提交的 HTTP/业务码/消息均符合各行期望，无账户被创建",
+  "data_rows": [
+    {"row_id": "wrong_img_code", "phone": "18800026030", "password": "Aa12345678", "sms_img": "1234", "sms_http": 200, "sms_expect": 100, "sms_msg": "图片验证码错误", "sms_code": "666666", "reg_http": 200, "reg_expect": 100, "reg_msg": "过期或无效"},
+    {"row_id": "wrong_sms_code", "phone": "18800026030", "password": "Aa12345678", "sms_img": "8888", "sms_http": 200, "sms_expect": 200, "sms_msg": "短信发送成功", "sms_code": "000000", "reg_http": 200, "reg_expect": 100, "reg_msg": "验证码错误"},
+    {"row_id": "phone_already_exists", "phone": "18800002008", "password": "Aa12345678", "sms_img": "8888", "sms_http": 200, "sms_expect": 200, "sms_msg": "短信发送成功", "sms_code": "666666", "reg_http": 200, "reg_expect": 100, "reg_msg": "手机已存在"},
+    {"row_id": "empty_phone", "phone": "", "password": "Aa12345678", "sms_img": "1234", "sms_http": 200, "sms_expect": 100, "sms_msg": "", "sms_code": "666666", "reg_http": 200, "reg_expect": 100, "reg_msg": ""},
+    {"row_id": "short_phone", "phone": "12345", "password": "Aa12345678", "sms_img": "1234", "sms_http": 200, "sms_expect": 100, "sms_msg": "图片验证码错误", "sms_code": "666666", "reg_http": 200, "reg_expect": 100, "reg_msg": "手机已存在"},
+    {"row_id": "long_phone_22", "phone": "188000012345678901234", "password": "Aa12345678", "sms_img": "1234", "sms_http": 400, "sms_expect": null, "sms_msg": "", "sms_code": "666666", "reg_http": 400, "reg_expect": null, "reg_msg": ""},
+    {"row_id": "letters_phone", "phone": "abcdefghijk", "password": "Aa12345678", "sms_img": "1234", "sms_http": 400, "sms_expect": null, "sms_msg": "", "sms_code": "666666", "reg_http": 400, "reg_expect": null, "reg_msg": ""},
+    {"row_id": "spaced_phone", "phone": "188 0000 2008", "password": "Aa12345678", "sms_img": "1234", "sms_http": 200, "sms_expect": 100, "sms_msg": "图片验证码错误", "sms_code": "666666", "reg_http": 200, "reg_expect": 100, "reg_msg": "手机已存在"}
+  ],
+  "nodes": [
+    {
+      "id": "get_vc",
+      "type": "step",
+      "step_id": "step_account_get_verifycode",
+      "label": "同会话获取图形验证码"
+    },
+    {
+      "id": "check_vc_http",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "图形验证码 HTTP 200",
+      "params": {"http_status": "${get_vc.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "send_sms",
+      "type": "step",
+      "step_id": "step_account_send_sms",
+      "label": "请求短信下发",
+      "params": {"phone": "${row.phone}", "img_verify_code": "${row.sms_img}", "sms_type": "reg"}
+    },
+    {
+      "id": "check_sms_http",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "短信下发 HTTP 状态",
+      "params": {"http_status": "${send_sms.data.http_status}", "expected": "${row.sms_http}"}
+    },
+    {
+      "id": "check_sms_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "短信下发业务码（null=N/A）",
+      "params": {"code": "${send_sms.data.code}", "expected": "${row.sms_expect}"}
+    },
+    {
+      "id": "check_sms_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "短信下发消息（空片段=N/A）",
+      "params": {"message": "${send_sms.data.message}", "expected": "${row.sms_msg}"}
+    },
+    {
+      "id": "register",
+      "type": "step",
+      "step_id": "step_account_register",
+      "label": "提交注册（预期被拦截）",
+      "params": {
+        "phone": "${row.phone}",
+        "password": "${row.password}",
+        "verifycode": "8888",
+        "phone_code": "${row.sms_code}",
+        "dy_server": "on"
+      }
+    },
+    {
+      "id": "check_reg_http",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "注册 HTTP 状态",
+      "params": {"http_status": "${register.data.http_status}", "expected": "${row.reg_http}"}
+    },
+    {
+      "id": "check_reg_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "注册业务码（null=N/A）",
+      "params": {"code": "${register.data.code}", "expected": "${row.reg_expect}"}
+    },
+    {
+      "id": "check_reg_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "注册消息（空片段=N/A）",
+      "params": {"message": "${register.data.message}", "expected": "${row.reg_msg}"}
+    }
+  ],
+  "edges": [
+    {"source": "get_vc", "target": "check_vc_http", "condition": "pass"},
+    {"source": "check_vc_http", "target": "send_sms", "condition": "pass"},
+    {"source": "send_sms", "target": "check_sms_http", "condition": "pass"},
+    {"source": "check_sms_http", "target": "check_sms_code", "condition": "pass"},
+    {"source": "check_sms_code", "target": "check_sms_msg", "condition": "pass"},
+    {"source": "check_sms_msg", "target": "register", "condition": "pass"},
+    {"source": "register", "target": "check_reg_http", "condition": "pass"},
+    {"source": "check_reg_http", "target": "check_reg_code", "condition": "pass"},
+    {"source": "check_reg_code", "target": "check_reg_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative-ddt", "write_side_effect": "none", "note": "全部行在验证码/号码阶段被拦截，不创建账户；null/空片段表示该行不做该项断言"}
+}

@@ -1,0 +1,62 @@
+{
+  "id": "api/register_validation",
+  "name": "API_REG_VAL_001",
+  "display_name": "会员注册接口参数校验（空表单/错误图形验证码）",
+  "description": "POST /member/public/reg 负向：空表单应提示“验证码不能为空”；图形验证码错误应提示“验证码错误”。两个场景都在图形码校验阶段被拦截，不会触达短信发送、不会创建账号，零数据副作用。",
+  "category": "api",
+  "module": "account",
+  "priority": "P1",
+  "expected": "两个场景业务码均为 100，消息分别包含“验证码不能为空”“验证码错误”",
+  "nodes": [
+    {
+      "id": "reg_empty",
+      "type": "step",
+      "step_id": "step_account_register",
+      "label": "空表单注册",
+      "params": {"phone": "", "password": "", "verifycode": "", "phone_code": ""}
+    },
+    {
+      "id": "check_empty_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "空表单业务码 100",
+      "params": {"code": "${reg_empty.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_empty_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示验证码不能为空",
+      "params": {"message": "${reg_empty.data.message}", "expected": "验证码不能为空"}
+    },
+    {
+      "id": "reg_bad_imgcode",
+      "type": "step",
+      "step_id": "step_account_register",
+      "label": "错误图形验证码注册",
+      "params": {"phone": "18800001111", "password": "Aa123456", "verifycode": "0000", "phone_code": "666666"}
+    },
+    {
+      "id": "check_bad_imgcode_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "图形码错误业务码 100",
+      "params": {"code": "${reg_bad_imgcode.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_bad_imgcode_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示验证码错误",
+      "params": {"message": "${reg_bad_imgcode.data.message}", "expected": "验证码错误"}
+    }
+  ],
+  "edges": [
+    {"source": "reg_empty", "target": "check_empty_code", "condition": "pass"},
+    {"source": "check_empty_code", "target": "check_empty_msg", "condition": "pass"},
+    {"source": "check_empty_msg", "target": "reg_bad_imgcode", "condition": "pass"},
+    {"source": "reg_bad_imgcode", "target": "check_bad_imgcode_code", "condition": "pass"},
+    {"source": "check_bad_imgcode_code", "target": "check_bad_imgcode_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative", "write_side_effect": "none", "note": "图形码阶段拦截，不触达短信、不建账号"}
+}

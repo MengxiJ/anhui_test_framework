@@ -1,0 +1,304 @@
+{
+  "id": "backend/backend_capital_menus_tour",
+  "name": "BACKEND_CAPITAL_001",
+  "display_name": "后台界面测试：资金管理菜单巡检（账户/充值/银行卡/提现/收支/红包/活动结算 9 列表）",
+  "description": "管理员登录后台，切换顶部「资金管理」一级菜单，依次巡检 9 个只读列表：资金账户总览、充值记录、充值审核、银行卡管理、提现记录、提现审核、会员收支记录、红包列表、活动结算。校验 iframe 按 rel 路由加载、核心列表表头渲染正确；常态有数据的列表（账户/充值/充值审核/会员收支）校验行数 ≥1，空队列列表仅校验路由与表头，覆盖资金管理全部核心只读页面。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 教学站资金账户/充值/收支队列常态有数据",
+  "expected": "9 个列表 iframe src 均加载对应 rel；账户表头含「账户总额」、充值列表含「充值金额」、会员收支含「费用类型」、银行卡含「银行卡账号」、红包含「红包」；有数据列表行数 ≥1",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_account_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 资金账户总览",
+      "params": {"top_menu": "资金管理", "group": "资金管理", "item_rel": "finance/account/list"}
+    },
+    {
+      "id": "check_account_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验资金账户路由加载",
+      "params": {"actual": "${step_open_account_list.data.src}", "expected": "finance/account/list"}
+    },
+    {
+      "id": "step_get_account_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取资金账户列表信息"
+    },
+    {
+      "id": "check_account_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验资金账户表头渲染",
+      "params": {"actual": "${step_get_account_info.data.headers_text}", "expected": "账户总额"}
+    },
+    {
+      "id": "check_account_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验资金账户队列有数据",
+      "params": {"actual": "${step_get_account_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_recharge_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 充值记录",
+      "params": {"top_menu": "资金管理", "group": "充值管理", "item_rel": "finance/recharge/list"}
+    },
+    {
+      "id": "check_recharge_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值记录路由加载",
+      "params": {"actual": "${step_open_recharge_list.data.src}", "expected": "finance/recharge/list"}
+    },
+    {
+      "id": "step_get_recharge_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取充值记录列表信息"
+    },
+    {
+      "id": "check_recharge_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值记录表头渲染",
+      "params": {"actual": "${step_get_recharge_info.data.headers_text}", "expected": "充值金额"}
+    },
+    {
+      "id": "check_recharge_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验充值记录队列有数据",
+      "params": {"actual": "${step_get_recharge_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_recharge_verify",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 充值审核",
+      "params": {"top_menu": "资金管理", "group": "充值管理", "item_rel": "finance/recharge/verify"}
+    },
+    {
+      "id": "check_recharge_verify_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值审核路由加载",
+      "params": {"actual": "${step_open_recharge_verify.data.src}", "expected": "finance/recharge/verify"}
+    },
+    {
+      "id": "step_get_recharge_verify_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取充值审核列表信息"
+    },
+    {
+      "id": "check_recharge_verify_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值审核表头渲染",
+      "params": {"actual": "${step_get_recharge_verify_info.data.headers_text}", "expected": "充值金额"}
+    },
+    {
+      "id": "check_recharge_verify_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验充值待审队列有数据",
+      "params": {"actual": "${step_get_recharge_verify_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_bank_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 银行卡管理",
+      "params": {"top_menu": "资金管理", "group": "账号管理", "item_rel": "member/bank/list"}
+    },
+    {
+      "id": "check_bank_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验银行卡管理路由加载",
+      "params": {"actual": "${step_open_bank_list.data.src}", "expected": "member/bank/list"}
+    },
+    {
+      "id": "step_get_bank_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取银行卡列表信息"
+    },
+    {
+      "id": "check_bank_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验银行卡表头渲染",
+      "params": {"actual": "${step_get_bank_info.data.headers_text}", "expected": "银行卡账号"}
+    },
+    {
+      "id": "step_open_withdraw_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 提现记录",
+      "params": {"top_menu": "资金管理", "group": "提现管理", "item_rel": "finance/withdraw/list"}
+    },
+    {
+      "id": "check_withdraw_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验提现记录路由加载",
+      "params": {"actual": "${step_open_withdraw_list.data.src}", "expected": "finance/withdraw/list"}
+    },
+    {
+      "id": "step_open_withdraw_verify",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 提现审核",
+      "params": {"top_menu": "资金管理", "group": "提现管理", "item_rel": "finance/withdraw/verify"}
+    },
+    {
+      "id": "check_withdraw_verify_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验提现审核路由加载",
+      "params": {"actual": "${step_open_withdraw_verify.data.src}", "expected": "finance/withdraw/verify"}
+    },
+    {
+      "id": "step_open_accountlog_member",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 会员收支记录",
+      "params": {"top_menu": "资金管理", "group": "收支记录", "item_rel": "finance/accountlog/member"}
+    },
+    {
+      "id": "check_accountlog_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验会员收支记录路由加载",
+      "params": {"actual": "${step_open_accountlog_member.data.src}", "expected": "finance/accountlog/member"}
+    },
+    {
+      "id": "step_get_accountlog_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取会员收支记录列表信息"
+    },
+    {
+      "id": "check_accountlog_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验会员收支记录表头渲染",
+      "params": {"actual": "${step_get_accountlog_info.data.headers_text}", "expected": "费用类型"}
+    },
+    {
+      "id": "check_accountlog_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验会员收支记录队列有数据",
+      "params": {"actual": "${step_get_accountlog_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_bounty_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 红包列表",
+      "params": {"top_menu": "资金管理", "group": "红包管理", "item_rel": "finance/bounty/list"}
+    },
+    {
+      "id": "check_bounty_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验红包列表路由加载",
+      "params": {"actual": "${step_open_bounty_list.data.src}", "expected": "finance/bounty/list"}
+    },
+    {
+      "id": "step_get_bounty_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取红包列表信息"
+    },
+    {
+      "id": "check_bounty_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验红包表头渲染",
+      "params": {"actual": "${step_get_bounty_info.data.headers_text}", "expected": "红包"}
+    },
+    {
+      "id": "step_open_new_rewards",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 活动结算",
+      "params": {"top_menu": "资金管理", "group": "活动结算", "item_rel": "loan/newRewards/list"}
+    },
+    {
+      "id": "check_new_rewards_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验活动结算路由加载",
+      "params": {"actual": "${step_open_new_rewards.data.src}", "expected": "loan/newRewards/list"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_account_list", "condition": "pass"},
+    {"source": "step_open_account_list", "target": "check_account_src", "condition": "pass"},
+    {"source": "check_account_src", "target": "step_get_account_info", "condition": "pass"},
+    {"source": "step_get_account_info", "target": "check_account_headers", "condition": "pass"},
+    {"source": "check_account_headers", "target": "check_account_rows", "condition": "pass"},
+    {"source": "check_account_rows", "target": "step_open_recharge_list", "condition": "pass"},
+    {"source": "step_open_recharge_list", "target": "check_recharge_src", "condition": "pass"},
+    {"source": "check_recharge_src", "target": "step_get_recharge_info", "condition": "pass"},
+    {"source": "step_get_recharge_info", "target": "check_recharge_headers", "condition": "pass"},
+    {"source": "check_recharge_headers", "target": "check_recharge_rows", "condition": "pass"},
+    {"source": "check_recharge_rows", "target": "step_open_recharge_verify", "condition": "pass"},
+    {"source": "step_open_recharge_verify", "target": "check_recharge_verify_src", "condition": "pass"},
+    {"source": "check_recharge_verify_src", "target": "step_get_recharge_verify_info", "condition": "pass"},
+    {"source": "step_get_recharge_verify_info", "target": "check_recharge_verify_headers", "condition": "pass"},
+    {"source": "check_recharge_verify_headers", "target": "check_recharge_verify_rows", "condition": "pass"},
+    {"source": "check_recharge_verify_rows", "target": "step_open_bank_list", "condition": "pass"},
+    {"source": "step_open_bank_list", "target": "check_bank_src", "condition": "pass"},
+    {"source": "check_bank_src", "target": "step_get_bank_info", "condition": "pass"},
+    {"source": "step_get_bank_info", "target": "check_bank_headers", "condition": "pass"},
+    {"source": "check_bank_headers", "target": "step_open_withdraw_list", "condition": "pass"},
+    {"source": "step_open_withdraw_list", "target": "check_withdraw_src", "condition": "pass"},
+    {"source": "check_withdraw_src", "target": "step_open_withdraw_verify", "condition": "pass"},
+    {"source": "step_open_withdraw_verify", "target": "check_withdraw_verify_src", "condition": "pass"},
+    {"source": "check_withdraw_verify_src", "target": "step_open_accountlog_member", "condition": "pass"},
+    {"source": "step_open_accountlog_member", "target": "check_accountlog_src", "condition": "pass"},
+    {"source": "check_accountlog_src", "target": "step_get_accountlog_info", "condition": "pass"},
+    {"source": "step_get_accountlog_info", "target": "check_accountlog_headers", "condition": "pass"},
+    {"source": "check_accountlog_headers", "target": "check_accountlog_rows", "condition": "pass"},
+    {"source": "check_accountlog_rows", "target": "step_open_bounty_list", "condition": "pass"},
+    {"source": "step_open_bounty_list", "target": "check_bounty_src", "condition": "pass"},
+    {"source": "check_bounty_src", "target": "step_get_bounty_info", "condition": "pass"},
+    {"source": "step_get_bounty_info", "target": "check_bounty_headers", "condition": "pass"},
+    {"source": "check_bounty_headers", "target": "step_open_new_rewards", "condition": "pass"},
+    {"source": "step_open_new_rewards", "target": "check_new_rewards_src", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_capital_menus_tour_teardown"}}
+    ]
+  }
+}

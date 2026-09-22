@@ -1,0 +1,119 @@
+{
+  "id": "invest/invest_pages_tour",
+  "name": "INVEST_TOUR_001",
+  "display_name": "巡检：理财管理五页（列表筛选/我的投资四 tab/收款计划/债权转让/自动投标拦截）",
+  "description": "登录后巡检理财管理全部页面：投资列表按标种筛选并核对，我的投资四个状态 tab 逐一切换核对表列/空态，收款计划表列，债权转让筛选项，自动投标入口拦截重定向（双态）。",
+  "category": "invest",
+  "module": "invest",
+  "priority": "P1",
+  "precondition": "会员 18800002008 可登录；自动投标拦截 check 双态兼容（未开通托管=拦截 / 已开通=直达）",
+  "expected": "列表筛选应用成功；我的投资四 tab 表列齐全（或空态）；收款计划表列齐全；债权转让筛选项存在；自动投标入口拦截或直达（双态）",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_filter_list_credit",
+      "type": "step",
+      "step_id": "step_filter_invest_list",
+      "label": "投资列表筛选标种=信用标",
+      "params": {"tag_text": "信用标"}
+    },
+    {
+      "id": "check_list_filter_credit",
+      "type": "check",
+      "check_id": "check_invest_list_filter_consistent",
+      "label": "核对筛选「信用标」应用成功",
+      "params": {"filter_tag": "信用标"}
+    },
+    {
+      "id": "check_tab_repaying",
+      "type": "check",
+      "check_id": "check_my_tenders_table_loaded",
+      "label": "我的投资[回款中] 表列核对",
+      "params": {"tab": "回款中"}
+    },
+    {
+      "id": "check_tab_tendering",
+      "type": "check",
+      "check_id": "check_my_tenders_table_loaded",
+      "label": "我的投资[投标中] 表列核对",
+      "params": {"tab": "投标中"}
+    },
+    {
+      "id": "check_tab_settled",
+      "type": "check",
+      "check_id": "check_my_tenders_table_loaded",
+      "label": "我的投资[已结清] 表列核对",
+      "params": {"tab": "已结清"}
+    },
+    {
+      "id": "check_tab_failed",
+      "type": "check",
+      "check_id": "check_my_tenders_table_loaded",
+      "label": "我的投资[已流标] 表列核对",
+      "params": {"tab": "已流标"}
+    },
+    {
+      "id": "check_receive_plan",
+      "type": "check",
+      "check_id": "check_receive_plan_loaded",
+      "label": "收款计划表列核对（或空态）"
+    },
+    {
+      "id": "check_debt_transfer",
+      "type": "check",
+      "check_id": "check_debt_transfer_loaded",
+      "label": "债权转让页结构核对（下拉+表格）"
+    },
+    {
+      "id": "check_auto_tender",
+      "type": "check",
+      "check_id": "check_auto_tender_intercepted",
+      "label": "自动投标入口拦截核对（双态）"
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存巡检截图",
+      "params": {"file_name": "invest_pages_tour_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_filter_list_credit", "condition": "pass"},
+    {"source": "step_filter_list_credit", "target": "check_list_filter_credit", "condition": "pass"},
+    {"source": "check_list_filter_credit", "target": "check_tab_repaying", "condition": "pass"},
+    {"source": "check_tab_repaying", "target": "check_tab_tendering", "condition": "pass"},
+    {"source": "check_tab_tendering", "target": "check_tab_settled", "condition": "pass"},
+    {"source": "check_tab_settled", "target": "check_tab_failed", "condition": "pass"},
+    {"source": "check_tab_failed", "target": "check_receive_plan", "condition": "pass"},
+    {"source": "check_receive_plan", "target": "check_debt_transfer", "condition": "pass"},
+    {"source": "check_debt_transfer", "target": "check_auto_tender", "condition": "pass"},
+    {"source": "check_auto_tender", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "invest_pages_tour_teardown"}}
+    ]
+  }
+}

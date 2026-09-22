@@ -1,0 +1,111 @@
+{
+  "id": "member/message_read_flow",
+  "name": "MESSAGE_READ_001",
+  "display_name": "前台业务测试：站内信读信业务链（未读列表 → 点开详情 → 已读状态与未读数联动）",
+  "description": "会员登录后打开站内消息列表，读取顶栏未读数与列表未读条数；点开第一封未读消息，校验页内内联详情展开且包含消息标题与发件时间；校验顶栏未读数减 1；重新打开列表后校验该信转为已读、列表未读条数减 1。读信为零副作用只读业务（仅消息已读状态自然流转），可重复执行直至未读清零。",
+  "category": "member",
+  "module": "member",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 账号存在未读站内信（教学站常态有未读消息）",
+  "expected": "详情区内联展开且含标题与「发件时间」；顶栏未读数减 1；重读列表后未读条数减 1",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_message_list",
+      "type": "step",
+      "step_id": "step_get_message_list_info",
+      "label": "打开站内消息列表并读未读快照"
+    },
+    {
+      "id": "check_has_unread",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验列表存在未读消息",
+      "params": {"actual": "${step_message_list.data.list_unread}", "expected": 0}
+    },
+    {
+      "id": "step_open_unread",
+      "type": "step",
+      "step_id": "step_open_first_unread_message",
+      "label": "点开第一封未读消息"
+    },
+    {
+      "id": "check_detail_has_time",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验详情展开且含发件时间",
+      "params": {"actual": "${step_open_unread.data.detail_text}", "expected": "发件时间"}
+    },
+    {
+      "id": "check_detail_has_title",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验详情内容与所点消息标题一致",
+      "params": {"actual": "${step_open_unread.data.detail_text}", "expected": "${step_open_unread.data.title}"}
+    },
+    {
+      "id": "check_topbar_delta",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验顶栏未读数减 1",
+      "params": {"actual": "${step_open_unread.data.topbar_delta}", "expected": 1}
+    },
+    {
+      "id": "step_relist",
+      "type": "step",
+      "step_id": "step_get_message_relist_info",
+      "label": "重新打开列表核对已读状态"
+    },
+    {
+      "id": "check_list_delta",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验列表未读条数减 1",
+      "params": {"actual": "${step_relist.data.list_unread_delta}", "expected": 1}
+    },
+    {
+      "id": "check_topbar_consistent",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验重读后顶栏未读数与读信后一致",
+      "params": {"actual": "${step_relist.data.topbar_unread}", "expected": "${step_open_unread.data.topbar_after}"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_message_list", "condition": "pass"},
+    {"source": "step_message_list", "target": "check_has_unread", "condition": "pass"},
+    {"source": "check_has_unread", "target": "step_open_unread", "condition": "pass"},
+    {"source": "step_open_unread", "target": "check_detail_has_time", "condition": "pass"},
+    {"source": "check_detail_has_time", "target": "check_detail_has_title", "condition": "pass"},
+    {"source": "check_detail_has_title", "target": "check_topbar_delta", "condition": "pass"},
+    {"source": "check_topbar_delta", "target": "step_relist", "condition": "pass"},
+    {"source": "step_relist", "target": "check_list_delta", "condition": "pass"},
+    {"source": "check_list_delta", "target": "check_topbar_consistent", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "message_read_flow_teardown"}}
+    ]
+  }
+}

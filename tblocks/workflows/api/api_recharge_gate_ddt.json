@@ -1,0 +1,63 @@
+{
+  "id": "api/recharge_gate_ddt",
+  "name": "API_RECHARGE_GATE_DDT",
+  "display_name": "充值接口未取验证码统一拦截数据驱动（6 行：非数/零/负/空/超大/逗号金额）",
+  "description": "数据驱动模板，每行独立会话先正确登录，不获取充值图形验证码直接 POST /trust/trust/recharge，服务端对各种金额（含正常金额）一律先经验证码关卡返回业务码 100「验证码错误」，不产生充值订单。该套件固化『充值强校验会话级图形验证码』这一安全基线，任何金额都无法绕过。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "共享教学账号登录；未获取充值验证码",
+  "expected": "每行业务码 100 且消息为「验证码错误」，无充值生成",
+  "data_rows": [
+    {"row_id": "amount_non_numeric", "amount": "abc"},
+    {"row_id": "amount_zero", "amount": "0"},
+    {"row_id": "amount_negative", "amount": "-1"},
+    {"row_id": "amount_empty", "amount": ""},
+    {"row_id": "amount_oversize", "amount": "999999999"},
+    {"row_id": "amount_thousands_comma", "amount": "1,000"}
+  ],
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "recharge",
+      "type": "step",
+      "step_id": "step_account_recharge",
+      "label": "未取验证码直接充值",
+      "params": {"amount": "${row.amount}", "valicode": "8888", "payment_type": "chinapnrTrust"}
+    },
+    {
+      "id": "check_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "业务码 100",
+      "params": {"code": "${recharge.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "消息为验证码错误",
+      "params": {"message": "${recharge.data.message}", "expected": "验证码错误"}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "recharge", "condition": "pass"},
+    {"source": "recharge", "target": "check_code", "condition": "pass"},
+    {"source": "check_code", "target": "check_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative-ddt", "write_side_effect": "none", "note": "会话级图形验证码关卡先于金额校验，任何金额都被拦截"}
+}

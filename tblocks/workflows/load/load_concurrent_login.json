@@ -1,0 +1,70 @@
+{
+  "id": "load/concurrent_login",
+  "name": "LOAD_LOGIN_001",
+  "display_name": "会员登录接口并发压测（并发5/总量15/正确口令）",
+  "description": "纯 HTTP 并发压测：以正确账号 18800002008/Aa123456 对 /member/public/login 发起并发 5、总量 15 的登录请求，验证并发登录全部 HTTP 成功、业务码 status=200 占比 100%、无 5xx、p95<=2000ms。安全口径：只并发正确口令，绝不并发错误口令（站点连续 3 次错误密码会锁账户）；每线程独立 Session，压测客户端零重试。2026-09-19 实测成功率与业务码 100%、p95 约 259ms、RPS 约 34。",
+  "category": "performance",
+  "module": "site",
+  "priority": "P1",
+  "expected": "15 次并发登录全部完成；HTTP 成功率 100%；业务码 200 占比 100%；5xx=0；p95<=2000ms",
+  "nodes": [
+    {
+      "id": "load_login_c5",
+      "type": "step",
+      "step_id": "step_load_http",
+      "label": "并发5压测会员登录",
+      "params": {
+        "path": "/member/public/login", "method": "POST", "site": "front",
+        "data": {"keywords": "18800002008", "password": "Aa123456"},
+        "concurrency": 5, "total_requests": 15
+      }
+    },
+    {
+      "id": "check_login_completed",
+      "type": "check",
+      "check_id": "check_load_all_completed",
+      "label": "登录15请求全部完成",
+      "params": {"total_requests": "${load_login_c5.data.total_requests}", "completed": "${load_login_c5.data.completed}"}
+    },
+    {
+      "id": "check_login_rate",
+      "type": "check",
+      "check_id": "check_load_success_rate",
+      "label": "登录HTTP成功率100%",
+      "params": {"success_rate": "${load_login_c5.data.success_rate}", "min_rate": 1.0}
+    },
+    {
+      "id": "check_login_5xx",
+      "type": "check",
+      "check_id": "check_load_no_server_error",
+      "label": "登录无5xx",
+      "params": {"server_errors": "${load_login_c5.data.server_errors}", "max_count": 0}
+    },
+    {
+      "id": "check_login_p95",
+      "type": "check",
+      "check_id": "check_load_percentile_ms",
+      "label": "登录p95<=2000ms",
+      "params": {"percentile_ms": "${load_login_c5.data.p95_ms}", "percentile": "p95", "max_ms": 2000}
+    },
+    {
+      "id": "check_login_biz",
+      "type": "check",
+      "check_id": "check_load_business_success_rate",
+      "label": "登录业务码200占比100%",
+      "params": {
+        "business_total": "${load_login_c5.data.business_total}",
+        "business_ok": "${load_login_c5.data.business_ok}",
+        "min_rate": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {"source": "load_login_c5", "target": "check_login_completed", "condition": "pass"},
+    {"source": "check_login_completed", "target": "check_login_rate", "condition": "pass"},
+    {"source": "check_login_rate", "target": "check_login_5xx", "condition": "pass"},
+    {"source": "check_login_5xx", "target": "check_login_p95", "condition": "pass"},
+    {"source": "check_login_p95", "target": "check_login_biz", "condition": "pass"}
+  ],
+  "metadata": {"layer": "load", "mode": "http-only", "read_only": true, "concurrency": 5, "correct_password_only": true}
+}

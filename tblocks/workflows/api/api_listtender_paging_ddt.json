@@ -1,0 +1,55 @@
+{
+  "id": "api/listtender_paging_ddt",
+  "name": "API_LISTTENDER_PAGING_DDT",
+  "display_name": "投资列表分页参数边界数据驱动（10 行：空参/缺参/0/负数/非数/超大页/小数）",
+  "description": "数据驱动模板，免登录公共接口 POST /loan/loan/listtender，用探针原子节点直接提交各组 page/epage，断言 HTTP 状态码白名单与响应内容特征。实测固化：正常/缺参/超大页返回 200+分页 JSON（items）；page=0 与 page=-1 返回 HTTP 200 但业务码 100 且泄露 org.springframework.jdbc.BadSqlGrammarException（已记录为已知后端缺陷，本套件断言其可观测行为用于回归监控）；非数字/小数被 Tomcat 以 400 拒绝。",
+  "category": "api",
+  "module": "portal",
+  "priority": "P1",
+  "precondition": "无（免登录只读公共接口）",
+  "expected": "每行 HTTP 状态码落入白名单且响应体包含期望片段",
+  "data_rows": [
+    {"row_id": "empty_body", "data": {}, "allowed": [200], "contains": "items"},
+    {"row_id": "page_only", "data": {"page": "1"}, "allowed": [200], "contains": "items"},
+    {"row_id": "page_zero_leak", "data": {"page": "0", "epage": "5"}, "allowed": [200], "contains": "BadSqlGrammarException"},
+    {"row_id": "page_negative_leak", "data": {"page": "-1", "epage": "5"}, "allowed": [200], "contains": "BadSqlGrammarException"},
+    {"row_id": "epage_zero", "data": {"page": "1", "epage": "0"}, "allowed": [200], "contains": "items"},
+    {"row_id": "non_numeric_400", "data": {"page": "abc", "epage": "xyz"}, "allowed": [400], "contains": "HTTP Status 400"},
+    {"row_id": "epage_huge", "data": {"page": "1", "epage": "99999"}, "allowed": [200], "contains": "items"},
+    {"row_id": "page_huge", "data": {"page": "99999", "epage": "5"}, "allowed": [200], "contains": "items"},
+    {"row_id": "decimal_400", "data": {"page": "1.5", "epage": "2.5"}, "allowed": [400], "contains": "HTTP Status 400"},
+    {"row_id": "normal_baseline", "data": {"page": "1", "epage": "5"}, "allowed": [200], "contains": "items"}
+  ],
+  "nodes": [
+    {
+      "id": "probe",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "分页边界探测",
+      "params": {"path": "/loan/loan/listtender", "data": "${row.data}", "site": "front"}
+    },
+    {
+      "id": "check_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "HTTP 状态码白名单",
+      "params": {"http_status": "${probe.data.http_status}", "allowed": "${row.allowed}"}
+    },
+    {
+      "id": "check_content",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "响应体包含期望片段",
+      "params": {"body_text": "${probe.data.body_text}", "expected": "${row.contains}"}
+    }
+  ],
+  "edges": [
+    {"source": "probe", "target": "check_status", "condition": "pass"},
+    {"source": "check_status", "target": "check_content", "condition": "pass"}
+  ],
+  "metadata": {
+    "layer": "api-boundary-ddt",
+    "write_side_effect": "none",
+    "known_defect": "page=0/-1 触发后端 BadSqlGrammarException 信息泄露（HTTP 200 + 业务码 100），应改为优雅参数错误响应；本套件断言现状用于回归监控，修复后需同步期望"
+  }
+}

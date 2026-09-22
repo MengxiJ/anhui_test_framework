@@ -1,0 +1,174 @@
+{
+  "id": "functional/portal_data_consistency",
+  "name": "FUNCTIONAL_DATA_CONSISTENCY_001",
+  "display_name": "门户多接口数据一致性校验",
+  "description": "免登录只读功能测试：校验门户多个数据接口的业务数据一致性——listtender 总页数数学一致；listindex 首页理财非空；loantotal 平台统计字段（tenderTotal/web_reg_num）有效；noticelist 公告非空；loansearch 筛选枚举（apr_search/loan_type_search）齐全。",
+  "category": "functional",
+  "module": "portal",
+  "priority": "P1",
+  "suites": "functional,regression",
+  "nodes": [
+    {
+      "id": "query_loan_list",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询投资标的列表",
+      "params": {"page": 1, "epage": 10}
+    },
+    {
+      "id": "check_list_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "列表 HTTP 200",
+      "params": {"http_status": "${query_loan_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_pages_math",
+      "type": "check",
+      "check_id": "check_portal_total_pages_consistent",
+      "label": "总页数与总数数学一致",
+      "params": {
+        "total_items": "${query_loan_list.data.total_items}",
+        "total_pages": "${query_loan_list.data.total_pages}",
+        "page_size": 10
+      }
+    },
+    {
+      "id": "query_home_loan_list",
+      "type": "step",
+      "step_id": "step_query_home_loan_list",
+      "label": "查询首页理财项目"
+    },
+    {
+      "id": "check_home_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "首页理财 HTTP 200",
+      "params": {"http_status": "${query_home_loan_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_home_status",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "首页理财业务 status=200",
+      "params": {"code": "${query_home_loan_list.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_home_not_empty",
+      "type": "check",
+      "check_id": "check_portal_list_not_empty",
+      "label": "首页理财列表非空",
+      "params": {"items": "${query_home_loan_list.data.items}"}
+    },
+    {
+      "id": "query_loan_total_stats",
+      "type": "step",
+      "step_id": "step_query_loan_total_stats",
+      "label": "查询平台数据统计"
+    },
+    {
+      "id": "check_stats_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "统计 HTTP 200",
+      "params": {"http_status": "${query_loan_total_stats.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_stats_status",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "统计业务 status=200",
+      "params": {"code": "${query_loan_total_stats.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_stats_tender_total",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "统计包含 tenderTotal",
+      "params": {"body": "${query_loan_total_stats.data.body.data}", "field": "tenderTotal"}
+    },
+    {
+      "id": "check_stats_reg_num",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "统计包含 web_reg_num",
+      "params": {"body": "${query_loan_total_stats.data.body.data}", "field": "web_reg_num"}
+    },
+    {
+      "id": "query_notice_list",
+      "type": "step",
+      "step_id": "step_query_notice_list",
+      "label": "查询网站公告",
+      "params": {"page": 1}
+    },
+    {
+      "id": "check_notice_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "公告 HTTP 200",
+      "params": {"http_status": "${query_notice_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_notice_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "公告至少 1 条",
+      "params": {"items": "${query_notice_list.data.items}", "min_count": 1}
+    },
+    {
+      "id": "query_search_filters",
+      "type": "step",
+      "step_id": "step_query_loan_search_filters",
+      "label": "查询筛选枚举"
+    },
+    {
+      "id": "check_filters_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "筛选枚举 HTTP 200",
+      "params": {"http_status": "${query_search_filters.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_filters_apr",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "筛选枚举包含 apr_search",
+      "params": {"body": "${query_search_filters.data.body}", "field": "apr_search"}
+    },
+    {
+      "id": "check_filters_loan_type",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "筛选枚举包含 loan_type_search",
+      "params": {"body": "${query_search_filters.data.body}", "field": "loan_type_search"}
+    }
+  ],
+  "edges": [
+    {"source": "query_loan_list", "target": "check_list_http", "condition": "pass"},
+    {"source": "check_list_http", "target": "check_pages_math", "condition": "pass"},
+    {"source": "check_pages_math", "target": "query_home_loan_list", "condition": "pass"},
+    {"source": "query_home_loan_list", "target": "check_home_http", "condition": "pass"},
+    {"source": "check_home_http", "target": "check_home_status", "condition": "pass"},
+    {"source": "check_home_status", "target": "check_home_not_empty", "condition": "pass"},
+    {"source": "check_home_not_empty", "target": "query_loan_total_stats", "condition": "pass"},
+    {"source": "query_loan_total_stats", "target": "check_stats_http", "condition": "pass"},
+    {"source": "check_stats_http", "target": "check_stats_status", "condition": "pass"},
+    {"source": "check_stats_status", "target": "check_stats_tender_total", "condition": "pass"},
+    {"source": "check_stats_tender_total", "target": "check_stats_reg_num", "condition": "pass"},
+    {"source": "check_stats_reg_num", "target": "query_notice_list", "condition": "pass"},
+    {"source": "query_notice_list", "target": "check_notice_http", "condition": "pass"},
+    {"source": "check_notice_http", "target": "check_notice_count", "condition": "pass"},
+    {"source": "check_notice_count", "target": "query_search_filters", "condition": "pass"},
+    {"source": "query_search_filters", "target": "check_filters_http", "condition": "pass"},
+    {"source": "check_filters_http", "target": "check_filters_apr", "condition": "pass"},
+    {"source": "check_filters_apr", "target": "check_filters_loan_type", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: functional data consistency begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: functional data consistency end", "level": "info"}}
+    ]
+  }
+}

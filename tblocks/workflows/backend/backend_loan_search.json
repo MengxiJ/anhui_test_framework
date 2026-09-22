@@ -1,0 +1,137 @@
+{
+  "id": "backend/backend_loan_search",
+  "name": "BACKEND_SEARCH_001",
+  "display_name": "后台功能测试：借款列表搜索（精确匹配 / 空结果 / 条件恢复）",
+  "description": "管理员进入初审标列表，先读取基线行数与首行用户，再以首行用户手机号精确搜索并校验首行用户一致、按不存在手机号搜索校验空结果处理、清空条件后校验列表恢复，覆盖后台列表搜索的命中、未命中与重置三类场景。搜索目标自基线列表动态获取，不依赖固定测试数据。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 初审标队列非空（教学站常态有数据）",
+  "expected": "首行用户手机号精确搜索命中且用户一致；不存在手机号返回 0 行；清空条件后列表恢复有数据",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_verify_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 初审标 列表",
+      "params": {"group": "初审管理", "item_rel": "loan/verify/list"}
+    },
+    {
+      "id": "step_get_baseline_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取基线列表信息"
+    },
+    {
+      "id": "check_baseline_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验基线列表有数据",
+      "params": {"actual": "${step_get_baseline_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_search_hit",
+      "type": "step",
+      "step_id": "step_backend_loan_list_search",
+      "label": "按首行用户手机号搜索",
+      "params": {"phone": "${step_get_baseline_info.data.first_member}"}
+    },
+    {
+      "id": "step_get_hit_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取命中结果"
+    },
+    {
+      "id": "check_hit_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验精确搜索命中",
+      "params": {"actual": "${step_get_hit_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "check_hit_member_match",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验首行用户与搜索条件一致",
+      "params": {"actual": "${step_get_hit_info.data.first_member}", "expected": "${step_get_baseline_info.data.first_member}"}
+    },
+    {
+      "id": "step_search_miss",
+      "type": "step",
+      "step_id": "step_backend_loan_list_search",
+      "label": "按不存在手机号搜索",
+      "params": {"phone": "19999999999"}
+    },
+    {
+      "id": "step_get_miss_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取未命中结果"
+    },
+    {
+      "id": "check_miss_empty",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验空结果处理（0 行）",
+      "params": {"actual": "${step_get_miss_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_clear_search",
+      "type": "step",
+      "step_id": "step_backend_loan_list_clear_search",
+      "label": "清空条件恢复列表"
+    },
+    {
+      "id": "step_get_restored_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取恢复后列表"
+    },
+    {
+      "id": "check_restored_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验清空条件后列表恢复",
+      "params": {"actual": "${step_get_restored_info.data.row_count}", "expected": 0}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_verify_list", "condition": "pass"},
+    {"source": "step_open_verify_list", "target": "step_get_baseline_info", "condition": "pass"},
+    {"source": "step_get_baseline_info", "target": "check_baseline_rows", "condition": "pass"},
+    {"source": "check_baseline_rows", "target": "step_search_hit", "condition": "pass"},
+    {"source": "step_search_hit", "target": "step_get_hit_info", "condition": "pass"},
+    {"source": "step_get_hit_info", "target": "check_hit_rows", "condition": "pass"},
+    {"source": "check_hit_rows", "target": "check_hit_member_match", "condition": "pass"},
+    {"source": "check_hit_member_match", "target": "step_search_miss", "condition": "pass"},
+    {"source": "step_search_miss", "target": "step_get_miss_info", "condition": "pass"},
+    {"source": "step_get_miss_info", "target": "check_miss_empty", "condition": "pass"},
+    {"source": "check_miss_empty", "target": "step_clear_search", "condition": "pass"},
+    {"source": "step_clear_search", "target": "step_get_restored_info", "condition": "pass"},
+    {"source": "step_get_restored_info", "target": "check_restored_rows", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_loan_search_teardown"}}
+    ]
+  }
+}

@@ -1,0 +1,1681 @@
+{
+  "check_account_business_code": {
+    "id": "check_account_business_code",
+    "name": "check_account_business_code",
+    "description": "检查接口业务码（成功 200 / 业务失败 100）",
+    "category": "account",
+    "params": {
+      "code": {
+        "name": "实际业务码",
+        "type": "int",
+        "required": true,
+        "default": "${step_account_login.data.code}",
+        "description": "上游接口返回 code"
+      },
+      "expected": {
+        "name": "期望业务码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "enum": [
+          200,
+          100
+        ],
+        "description": "期望业务码"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_account_http_status": {
+    "id": "check_account_http_status",
+    "name": "check_account_http_status",
+    "description": "检查接口 HTTP 状态码",
+    "category": "account",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态码",
+        "type": "int",
+        "required": true,
+        "default": "${step_account_login.data.http_status}",
+        "description": "上游接口 HTTP 状态"
+      },
+      "expected": {
+        "name": "期望状态码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "description": "期望 HTTP 状态"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_account_message_contains": {
+    "id": "check_account_message_contains",
+    "name": "check_account_message_contains",
+    "description": "检查接口业务消息包含期望片段",
+    "category": "account",
+    "params": {
+      "message": {
+        "name": "业务消息",
+        "type": "str",
+        "required": true,
+        "default": "${step_account_login.data.message}",
+        "description": "上游接口消息"
+      },
+      "expected": {
+        "name": "期望片段",
+        "type": "str",
+        "required": true,
+        "description": "期望文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_auto_tender_intercepted": {
+    "id": "check_auto_tender_intercepted",
+    "name": "check_auto_tender_intercepted",
+    "description": "检查自动投标入口重定向（双态：重定向托管页=严格过；停留自动投标页=降级过；其他重定向=失败）",
+    "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_backend_api_business_code": {
+    "id": "check_backend_api_business_code",
+    "name": "check_backend_api_business_code",
+    "description": "检查后台接口业务码（200 成功 / 100 业务失败）",
+    "category": "backend",
+    "params": {
+      "code": {
+        "name": "实际业务码",
+        "type": "int",
+        "required": true,
+        "default": "${step_backend_api_login.data.code}",
+        "description": "上游后台接口返回 code"
+      },
+      "expected": {
+        "name": "期望业务码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "enum": [
+          200,
+          100
+        ],
+        "description": "期望业务码"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_backend_api_http_status": {
+    "id": "check_backend_api_http_status",
+    "name": "check_backend_api_http_status",
+    "description": "检查后台接口 HTTP 状态码",
+    "category": "backend",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态码",
+        "type": "int",
+        "required": true,
+        "default": "${step_backend_api_login.data.http_status}",
+        "description": "上游后台接口 HTTP 状态"
+      },
+      "expected": {
+        "name": "期望状态码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "description": "期望 HTTP 状态"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_backend_api_message_contains": {
+    "id": "check_backend_api_message_contains",
+    "name": "check_backend_api_message_contains",
+    "description": "检查后台接口业务消息包含期望片段",
+    "category": "backend",
+    "params": {
+      "message": {
+        "name": "业务消息",
+        "type": "str",
+        "required": true,
+        "default": "${step_backend_api_login.data.message}",
+        "description": "上游后台接口消息"
+      },
+      "expected": {
+        "name": "期望片段",
+        "type": "str",
+        "required": true,
+        "description": "期望文本，如 OK、用户名/密码错误"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_backend_api_verifycode_size": {
+    "id": "check_backend_api_verifycode_size",
+    "name": "check_backend_api_verifycode_size",
+    "description": "检查后台图形验证码响应字节数不小于阈值",
+    "category": "backend",
+    "params": {
+      "body_length": {
+        "name": "响应字节数",
+        "type": "int",
+        "required": true,
+        "default": "${step_backend_api_get_verifycode.data.body_length}",
+        "description": "验证码图片字节数"
+      },
+      "min_length": {
+        "name": "最小字节数",
+        "type": "int",
+        "required": false,
+        "default": 1000,
+        "description": "图片最小字节阈值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_backend_login_result_contains": {
+    "id": "check_backend_login_result_contains",
+    "name": "check_backend_login_result_contains",
+    "description": "检查后台登录结果文本包含期望内容（如“欢迎光临”）",
+    "category": "backend",
+    "params": {
+      "expected": {
+        "name": "期望文本",
+        "type": "str",
+        "required": true,
+        "default": "欢迎光临",
+        "description": "登录成功标识"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_credit_apply_result_contains": {
+    "id": "check_credit_apply_result_contains",
+    "name": "check_credit_apply_result_contains",
+    "description": "检查前台额度申请结果文本包含期望内容（如申请金额）",
+    "category": "member",
+    "params": {
+      "expected": {
+        "name": "期望文本",
+        "type": "str",
+        "required": true,
+        "description": "额度申请结果应包含的文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_current_url_contains": {
+    "id": "check_current_url_contains",
+    "name": "check_current_url_contains",
+    "description": "检查当前浏览器 URL 包含期望片段",
+    "category": "browser",
+    "params": {
+      "expected": {
+        "name": "URL 片段",
+        "type": "str",
+        "required": true,
+        "description": "期望出现在 URL 中的文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_current_url_matches": {
+    "id": "check_current_url_matches",
+    "name": "check_current_url_matches",
+    "description": "检查当前 URL 匹配期望值（contains=包含 / prefix=前缀 / equals=全等）",
+    "category": "browser",
+    "params": {
+      "expected": {
+        "name": "期望 URL",
+        "type": "str",
+        "required": true,
+        "description": "期望匹配的 URL"
+      },
+      "mode": {
+        "name": "匹配模式",
+        "type": "str",
+        "required": false,
+        "default": "contains",
+        "enum": [
+          "contains",
+          "prefix",
+          "equals"
+        ],
+        "description": "匹配方式"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_debt_transfer_loaded": {
+    "id": "check_debt_transfer_loaded",
+    "name": "check_debt_transfer_loaded",
+    "description": "检查债权转让页结构（状态下拉存在 + 页面含表格）",
+    "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_element_exists": {
+    "id": "check_element_exists",
+    "name": "check_element_exists",
+    "description": "检查元素在给定时间内出现在页面上",
+    "category": "browser",
+    "params": {
+      "by": {
+        "name": "定位方式",
+        "type": "str",
+        "required": true,
+        "description": "定位方式"
+      },
+      "value": {
+        "name": "定位表达式",
+        "type": "str",
+        "required": true,
+        "description": "定位值"
+      },
+      "timeout": {
+        "name": "等待秒数",
+        "type": "int",
+        "required": false,
+        "default": 5,
+        "description": "出现超时"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_element_text_contains": {
+    "id": "check_element_text_contains",
+    "name": "check_element_text_contains",
+    "description": "检查指定元素文本包含期望子串",
+    "category": "browser",
+    "params": {
+      "by": {
+        "name": "定位方式",
+        "type": "str",
+        "required": true,
+        "description": "定位方式"
+      },
+      "value": {
+        "name": "定位表达式",
+        "type": "str",
+        "required": true,
+        "description": "定位值"
+      },
+      "expected": {
+        "name": "期望子串",
+        "type": "str",
+        "required": true,
+        "description": "期望文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_element_visible": {
+    "id": "check_element_visible",
+    "name": "check_element_visible",
+    "description": "检查元素在给定时间内可见",
+    "category": "browser",
+    "params": {
+      "by": {
+        "name": "定位方式",
+        "type": "str",
+        "required": true,
+        "description": "定位方式"
+      },
+      "value": {
+        "name": "定位表达式",
+        "type": "str",
+        "required": true,
+        "description": "定位值"
+      },
+      "timeout": {
+        "name": "等待秒数",
+        "type": "float",
+        "required": false,
+        "default": 5,
+        "description": "可见超时"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_elements_count_at_least": {
+    "id": "check_elements_count_at_least",
+    "name": "check_elements_count_at_least",
+    "description": "检查匹配元素数量不少于 N",
+    "category": "browser",
+    "params": {
+      "by": {
+        "name": "定位方式",
+        "type": "str",
+        "required": true,
+        "description": "定位方式"
+      },
+      "value": {
+        "name": "定位表达式",
+        "type": "str",
+        "required": true,
+        "description": "定位值"
+      },
+      "min_count": {
+        "name": "最小数量",
+        "type": "int",
+        "required": false,
+        "default": 1,
+        "description": "数量下限"
+      },
+      "timeout": {
+        "name": "等待秒数",
+        "type": "float",
+        "required": false,
+        "default": 10,
+        "description": "等待至少一个元素出现的超时"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_account_log_exists": {
+    "id": "check_finance_account_log_exists",
+    "name": "check_finance_account_log_exists",
+    "description": "检查交易明细中存在「金额相等 + 时间窗口内（+ 类型关键字）」的流水行",
+    "category": "finance",
+    "params": {
+      "amount": {
+        "name": "交易金额",
+        "type": "str",
+        "required": true,
+        "description": "待核对的交易金额（元）"
+      },
+      "type_contains": {
+        "name": "类型关键字",
+        "type": "str",
+        "required": false,
+        "default": "",
+        "description": "类型列应包含的文本（空则不校验类型）"
+      },
+      "time_window": {
+        "name": "时间窗口(秒)",
+        "type": "float",
+        "required": false,
+        "default": 900.0,
+        "description": "记录时间与当前时间的允许偏差"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_account_log_filter_consistent": {
+    "id": "check_finance_account_log_filter_consistent",
+    "name": "check_finance_account_log_filter_consistent",
+    "description": "检查当前（已筛选）交易明细的类型列与筛选条件一致；空结果时校验空态文案",
+    "category": "finance",
+    "params": {
+      "expected_type": {
+        "name": "期望类型",
+        "type": "str",
+        "required": true,
+        "description": "筛选时使用的交易类型文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_balance_increased_at_least": {
+    "id": "check_finance_balance_increased_at_least",
+    "name": "check_finance_balance_increased_at_least",
+    "description": "检查当前余额较前值增加不少于 N（实时打开会员中心读取）",
+    "category": "finance",
+    "params": {
+      "previous_balance": {
+        "name": "前值余额",
+        "type": "float",
+        "required": true,
+        "description": "充值前读取的余额（${step_x.data.balance} 引用）"
+      },
+      "min_increase": {
+        "name": "最小增量",
+        "type": "float",
+        "required": false,
+        "default": 0.0,
+        "description": "余额增量下限（默认 0）"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_bounty_page_loaded": {
+    "id": "check_finance_bounty_page_loaded",
+    "name": "check_finance_bounty_page_loaded",
+    "description": "检查我的红包页可达且含红包相关内容",
+    "category": "finance",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_recharge_record_exists": {
+    "id": "check_finance_recharge_record_exists",
+    "name": "check_finance_recharge_record_exists",
+    "description": "检查充值记录中存在「金额相等 + 时间窗口内 + 状态关键字」的记录行",
+    "category": "finance",
+    "params": {
+      "amount": {
+        "name": "充值金额",
+        "type": "str",
+        "required": true,
+        "description": "待核对的充值金额（元）"
+      },
+      "status_contains": {
+        "name": "状态关键字",
+        "type": "str",
+        "required": false,
+        "default": "充值成功",
+        "description": "状态列应包含的文本"
+      },
+      "time_window": {
+        "name": "时间窗口(秒)",
+        "type": "float",
+        "required": false,
+        "default": 900.0,
+        "description": "记录时间与当前时间的允许偏差"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_trust_page_blocks_visible": {
+    "id": "check_finance_trust_page_blocks_visible",
+    "name": "check_finance_trust_page_blocks_visible",
+    "description": "检查我的支付账户页关键区块可见（默认「账户托管」「授权设置」）",
+    "category": "finance",
+    "params": {
+      "blocks": {
+        "name": "区块文本列表",
+        "type": "list",
+        "required": false,
+        "default": [
+          "账户托管",
+          "授权设置"
+        ],
+        "description": "页面应包含的区块文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_finance_withdraw_intercepted": {
+    "id": "check_finance_withdraw_intercepted",
+    "name": "check_finance_withdraw_intercepted",
+    "description": "检查提现入口前置拦截：未绑卡重定向银行卡页；已绑卡降级为提现页可达（双态兼容）",
+    "category": "finance",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_invest_list_filter_consistent": {
+    "id": "check_invest_list_filter_consistent",
+    "name": "check_invest_list_filter_consistent",
+    "description": "检查投资列表筛选标签应用成功（点击成功 + 筛后列表可解析，允许空结果）",
+    "category": "invest",
+    "params": {
+      "filter_tag": {
+        "name": "筛选标签",
+        "type": "str",
+        "required": true,
+        "description": "筛选时使用的标签文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_invest_list_loaded": {
+    "id": "check_invest_list_loaded",
+    "name": "check_invest_list_loaded",
+    "description": "检查投资列表解析 ≥N 个标的且字段完整（loan_id 数字、可投金额 float）",
+    "category": "invest",
+    "params": {
+      "min_count": {
+        "name": "最少标的数",
+        "type": "int",
+        "required": false,
+        "default": 1,
+        "description": "标的数量下限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_all_completed": {
+    "id": "check_load_all_completed",
+    "name": "check_load_all_completed",
+    "description": "检查全部请求均已完成（completed == total_requests）",
+    "category": "load",
+    "params": {
+      "total_requests": {
+        "name": "总请求数",
+        "type": "int",
+        "required": true,
+        "default": "${step_load_http.data.total_requests}",
+        "description": "上游负载节点 total_requests"
+      },
+      "completed": {
+        "name": "已完成数",
+        "type": "int",
+        "required": true,
+        "default": "${step_load_http.data.completed}",
+        "description": "上游负载节点 completed"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_business_success_rate": {
+    "id": "check_load_business_success_rate",
+    "name": "check_load_business_success_rate",
+    "description": "检查 JSON 业务码 200 占比不低于阈值（无业务码字段的端点自动跳过）",
+    "category": "load",
+    "params": {
+      "business_total": {
+        "name": "业务响应总数",
+        "type": "int",
+        "required": true,
+        "default": "${step_load_http.data.business_total}",
+        "description": "上游负载节点 business_total"
+      },
+      "business_ok": {
+        "name": "业务码200数",
+        "type": "int",
+        "required": true,
+        "default": "${step_load_http.data.business_ok}",
+        "description": "上游负载节点 business_ok"
+      },
+      "min_rate": {
+        "name": "最低成功率",
+        "type": "float",
+        "required": false,
+        "default": 1.0,
+        "description": "业务码成功率下限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_no_server_error": {
+    "id": "check_load_no_server_error",
+    "name": "check_load_no_server_error",
+    "description": "检查 5xx 服务端错误数不超过预算（默认 0）",
+    "category": "load",
+    "params": {
+      "server_errors": {
+        "name": "5xx数量",
+        "type": "int",
+        "required": true,
+        "default": "${step_load_http.data.server_errors}",
+        "description": "上游负载节点 server_errors"
+      },
+      "max_count": {
+        "name": "错误预算",
+        "type": "int",
+        "required": false,
+        "default": 0,
+        "description": "允许的 5xx 上限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_percentile_ms": {
+    "id": "check_load_percentile_ms",
+    "name": "check_load_percentile_ms",
+    "description": "检查指定分位延迟（p50/p90/p95/p99）不超过毫秒阈值",
+    "category": "load",
+    "params": {
+      "percentile_ms": {
+        "name": "分位延迟",
+        "type": "float",
+        "required": true,
+        "default": "${step_load_http.data.p95_ms}",
+        "description": "上游负载节点的 pXX_ms 值"
+      },
+      "percentile": {
+        "name": "分位名称",
+        "type": "str",
+        "required": false,
+        "default": "p95",
+        "enum": [
+          "p50",
+          "p90",
+          "p95",
+          "p99"
+        ],
+        "description": "仅用于报告展示"
+      },
+      "max_ms": {
+        "name": "延迟上限毫秒",
+        "type": "float",
+        "required": false,
+        "default": 2000,
+        "description": "分位延迟上限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_rps": {
+    "id": "check_load_rps",
+    "name": "check_load_rps",
+    "description": "检查实测吞吐量 RPS 不低于阈值",
+    "category": "load",
+    "params": {
+      "rps": {
+        "name": "RPS",
+        "type": "float",
+        "required": true,
+        "default": "${step_load_http.data.rps}",
+        "description": "上游负载节点 rps"
+      },
+      "min_rps": {
+        "name": "最低RPS",
+        "type": "float",
+        "required": false,
+        "default": 2.0,
+        "description": "吞吐量下限（请求/秒）"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_load_success_rate": {
+    "id": "check_load_success_rate",
+    "name": "check_load_success_rate",
+    "description": "检查负载成功率不低于阈值",
+    "category": "load",
+    "params": {
+      "success_rate": {
+        "name": "成功率",
+        "type": "float",
+        "required": true,
+        "default": "${step_load_http.data.success_rate}",
+        "description": "上游负载节点 success_rate（0~1）"
+      },
+      "min_rate": {
+        "name": "最低成功率",
+        "type": "float",
+        "required": false,
+        "default": 0.95,
+        "description": "成功率下限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_loan_detail_reachable": {
+    "id": "check_loan_detail_reachable",
+    "name": "check_loan_detail_reachable",
+    "description": "检查标的详情页可达（双态：窗口期就绪=严格过；站点重定向回列表=降级过并说明）",
+    "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_loan_review_status": {
+    "id": "check_loan_review_status",
+    "name": "check_loan_review_status",
+    "description": "检查额度审核记录状态文本精确等于期望值",
+    "category": "backend",
+    "params": {
+      "expected": {
+        "name": "期望状态",
+        "type": "str",
+        "required": false,
+        "default": "通过",
+        "description": "审核状态"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_loan_review_status_contains": {
+    "id": "check_loan_review_status_contains",
+    "name": "check_loan_review_status_contains",
+    "description": "检查额度审核状态文本包含期望内容",
+    "category": "backend",
+    "params": {
+      "expected": {
+        "name": "期望文本",
+        "type": "str",
+        "required": false,
+        "default": "通过",
+        "description": "审核状态片段"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_member_center_summary_loaded": {
+    "id": "check_member_center_summary_loaded",
+    "name": "check_member_center_summary_loaded",
+    "description": "检查会员中心总览：余额可解析为数值、未读数为非负整数",
+    "category": "member",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_member_login_result_contains": {
+    "id": "check_member_login_result_contains",
+    "name": "check_member_login_result_contains",
+    "description": "检查前台登录后页面文本包含期望内容",
+    "category": "member",
+    "params": {
+      "expected": {
+        "name": "期望文本",
+        "type": "str",
+        "required": true,
+        "description": "登录成功页面应包含的文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_member_page_loaded": {
+    "id": "check_member_page_loaded",
+    "name": "check_member_page_loaded",
+    "description": "检查账户管理页面关键区块标题存在（积分/安全/银行卡/推广）",
+    "category": "member",
+    "params": {
+      "page": {
+        "name": "页面标识",
+        "type": "str",
+        "required": true,
+        "description": "credit/safe/bank/spread 之一"
+      },
+      "expected_head": {
+        "name": "区块标题",
+        "type": "str",
+        "required": false,
+        "default": "",
+        "description": "期望出现的区块标题文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_member_register_result_contains": {
+    "id": "check_member_register_result_contains",
+    "name": "check_member_register_result_contains",
+    "description": "检查注册结果文本包含期望内容（如“注册成功”）",
+    "category": "member",
+    "params": {
+      "expected": {
+        "name": "期望文本",
+        "type": "str",
+        "required": true,
+        "default": "注册成功",
+        "description": "注册成功提示"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_my_tenders_table_loaded": {
+    "id": "check_my_tenders_table_loaded",
+    "name": "check_my_tenders_table_loaded",
+    "description": "检查我的投资表格结构（tab 存在 + 表头含 项目名称/投资金额/状态，空态允许）",
+    "category": "invest",
+    "params": {
+      "tab": {
+        "name": "状态 tab",
+        "type": "str",
+        "required": false,
+        "default": "回款中",
+        "description": "要核对的状态 tab 文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_page_title_equal": {
+    "id": "check_page_title_equal",
+    "name": "check_page_title_equal",
+    "description": "检查页面标题等于期望值",
+    "category": "browser",
+    "params": {
+      "expected": {
+        "name": "期望标题",
+        "type": "str",
+        "required": true,
+        "description": "页面标题"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_body_field_exists": {
+    "id": "check_portal_body_field_exists",
+    "name": "check_portal_body_field_exists",
+    "description": "检查响应体包含指定字段且非空（0 视为有效值）",
+    "category": "portal",
+    "params": {
+      "body": {
+        "name": "响应体",
+        "type": "dict",
+        "required": true,
+        "default": "${step_query_loan_total_stats.data.body}",
+        "description": "上游步骤 data.body"
+      },
+      "field": {
+        "name": "字段名",
+        "type": "str",
+        "required": true,
+        "default": "tenderTotal",
+        "description": "期望存在的字段"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_body_json_valid": {
+    "id": "check_portal_body_json_valid",
+    "name": "check_portal_body_json_valid",
+    "description": "检查响应体为合法 JSON（参数被容忍时应返回结构化 JSON）",
+    "category": "portal",
+    "params": {
+      "is_json": {
+        "name": "是否 JSON",
+        "type": "bool",
+        "required": true,
+        "description": "上游探针 data.is_json"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_business_status_equal": {
+    "id": "check_portal_business_status_equal",
+    "name": "check_portal_business_status_equal",
+    "description": "检查门户接口业务 status（成功 200）",
+    "category": "portal",
+    "params": {
+      "code": {
+        "name": "业务 status",
+        "type": "int",
+        "required": true,
+        "default": "${step_query_loan_total_stats.data.code}",
+        "description": "上游步骤 data.code"
+      },
+      "expected": {
+        "name": "期望业务 status",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "enum": [
+          200,
+          100
+        ],
+        "description": "期望业务码"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_http_status_below": {
+    "id": "check_portal_http_status_below",
+    "name": "check_portal_http_status_below",
+    "description": "检查 HTTP 状态码低于上限（负向参数应 4xx 优雅拒绝而非 5xx）",
+    "category": "portal",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态",
+        "type": "int",
+        "required": true,
+        "description": "上游探针 data.http_status"
+      },
+      "limit": {
+        "name": "状态码上限",
+        "type": "int",
+        "required": false,
+        "default": 500,
+        "min": 100,
+        "max": 599,
+        "description": "默认 500（不允许服务端错误）"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_http_status_equal": {
+    "id": "check_portal_http_status_equal",
+    "name": "check_portal_http_status_equal",
+    "description": "检查门户接口 HTTP 状态码",
+    "category": "portal",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态",
+        "type": "int",
+        "required": true,
+        "default": "${step_query_loan_list.data.http_status}",
+        "description": "上游步骤 data.http_status"
+      },
+      "expected": {
+        "name": "期望状态码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "description": "期望 HTTP 状态"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_items_distinct": {
+    "id": "check_portal_items_distinct",
+    "name": "check_portal_items_distinct",
+    "description": "检查列表内记录的指定字段无重复（同页数据不重复）",
+    "category": "portal",
+    "params": {
+      "items": {
+        "name": "列表",
+        "type": "list",
+        "required": true,
+        "description": "上游步骤 data.items"
+      },
+      "field": {
+        "name": "字段名",
+        "type": "str",
+        "required": false,
+        "default": "id",
+        "description": "用于判重的字段"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_items_fields_complete": {
+    "id": "check_portal_items_fields_complete",
+    "name": "check_portal_items_fields_complete",
+    "description": "检查列表每条记录包含且非空指定字段",
+    "category": "portal",
+    "params": {
+      "items": {
+        "name": "列表",
+        "type": "list",
+        "required": true,
+        "default": "${step_query_loan_list.data.items}",
+        "description": "上游步骤 data.items"
+      },
+      "required_fields": {
+        "name": "必填字段",
+        "type": "list",
+        "required": false,
+        "default": [
+          "id",
+          "name",
+          "apr",
+          "period",
+          "amount"
+        ],
+        "description": "字段名数组"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_list_count_gte": {
+    "id": "check_portal_list_count_gte",
+    "name": "check_portal_list_count_gte",
+    "description": "检查本页列表条数不少于期望值",
+    "category": "portal",
+    "params": {
+      "items": {
+        "name": "列表",
+        "type": "list",
+        "required": true,
+        "default": "${step_query_loan_list.data.items}",
+        "description": "上游步骤 data.items"
+      },
+      "min_count": {
+        "name": "最少条数",
+        "type": "int",
+        "required": false,
+        "default": 1,
+        "min": 0,
+        "description": "最少条数"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_list_count_range": {
+    "id": "check_portal_list_count_range",
+    "name": "check_portal_list_count_range",
+    "description": "检查本页列表条数在 [min_count, max_count] 区间内",
+    "category": "portal",
+    "params": {
+      "items": {
+        "name": "列表",
+        "type": "list",
+        "required": true,
+        "description": "上游步骤 data.items"
+      },
+      "min_count": {
+        "name": "最少条数",
+        "type": "int",
+        "required": false,
+        "default": 1,
+        "min": 0,
+        "description": "区间下限"
+      },
+      "max_count": {
+        "name": "最多条数",
+        "type": "int",
+        "required": false,
+        "default": 10,
+        "min": 1,
+        "description": "区间上限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_list_not_empty": {
+    "id": "check_portal_list_not_empty",
+    "name": "check_portal_list_not_empty",
+    "description": "检查列表非空（引用上游 data.items）",
+    "category": "portal",
+    "params": {
+      "items": {
+        "name": "列表",
+        "type": "list",
+        "required": true,
+        "default": "${step_query_loan_list.data.items}",
+        "description": "上游步骤 data.items"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_pagination_differs": {
+    "id": "check_portal_pagination_differs",
+    "name": "check_portal_pagination_differs",
+    "description": "检查两页列表首条记录不同（翻页生效）",
+    "category": "portal",
+    "params": {
+      "items_page1": {
+        "name": "第 1 页列表",
+        "type": "list",
+        "required": true,
+        "description": "第 1 页步骤 data.items"
+      },
+      "items_page2": {
+        "name": "第 2 页列表",
+        "type": "list",
+        "required": true,
+        "description": "第 2 页步骤 data.items"
+      },
+      "field": {
+        "name": "字段名",
+        "type": "str",
+        "required": false,
+        "default": "id",
+        "description": "用于对比的字段"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_total_items_equal": {
+    "id": "check_portal_total_items_equal",
+    "name": "check_portal_total_items_equal",
+    "description": "检查两次查询的 total_items 一致（翻页不改变总数）",
+    "category": "portal",
+    "params": {
+      "total_1": {
+        "name": "第一次总数",
+        "type": "int",
+        "required": true,
+        "description": "第 1 页步骤 data.total_items"
+      },
+      "total_2": {
+        "name": "第二次总数",
+        "type": "int",
+        "required": true,
+        "description": "第 2 页步骤 data.total_items"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_total_items_gte": {
+    "id": "check_portal_total_items_gte",
+    "name": "check_portal_total_items_gte",
+    "description": "检查列表接口 total_items 不少于期望值",
+    "category": "portal",
+    "params": {
+      "total_items": {
+        "name": "总条数",
+        "type": "int",
+        "required": true,
+        "default": "${step_query_loan_list.data.total_items}",
+        "description": "上游步骤 data.total_items"
+      },
+      "min_count": {
+        "name": "最少总数",
+        "type": "int",
+        "required": false,
+        "default": 1,
+        "min": 0,
+        "description": "最少总条数"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_portal_total_pages_consistent": {
+    "id": "check_portal_total_pages_consistent",
+    "name": "check_portal_total_pages_consistent",
+    "description": "检查 total_pages 与 total_items / page_size 数学一致（向上取整）",
+    "category": "portal",
+    "params": {
+      "total_items": {
+        "name": "总条数",
+        "type": "int",
+        "required": true,
+        "description": "上游步骤 data.total_items"
+      },
+      "total_pages": {
+        "name": "总页数",
+        "type": "int",
+        "required": true,
+        "description": "上游步骤 data.total_pages"
+      },
+      "page_size": {
+        "name": "每页条数",
+        "type": "int",
+        "required": false,
+        "default": 10,
+        "min": 1,
+        "description": "服务端每页条数"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_body_length_min": {
+    "id": "check_probe_body_length_min",
+    "name": "check_probe_body_length_min",
+    "description": "检查探针响应体字节数不小于阈值",
+    "category": "probe",
+    "params": {
+      "body_length": {
+        "name": "响应字节数",
+        "type": "int",
+        "required": true,
+        "default": "${step_probe_http_get.data.body_length}",
+        "description": "上游探针节点的 body_length"
+      },
+      "min_length": {
+        "name": "最小字节数",
+        "type": "int",
+        "required": false,
+        "default": 1000,
+        "description": "响应体最小字节阈值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_content_contains": {
+    "id": "check_probe_content_contains",
+    "name": "check_probe_content_contains",
+    "description": "检查探针响应体包含期望文本（页面/接口特征断言）",
+    "category": "probe",
+    "params": {
+      "body_text": {
+        "name": "响应体文本",
+        "type": "str",
+        "required": true,
+        "default": "${step_probe_http_get.data.body_text}",
+        "description": "上游探针节点的 body_text"
+      },
+      "expected": {
+        "name": "期望片段",
+        "type": "str",
+        "required": true,
+        "description": "期望出现的文本，如 ng-app、common/member/login"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_content_not_contains": {
+    "id": "check_probe_content_not_contains",
+    "name": "check_probe_content_not_contains",
+    "description": "检查响应体不包含禁止片段（载荷不回显/敏感内容不泄露）",
+    "category": "probe",
+    "params": {
+      "body_text": {
+        "name": "响应体文本",
+        "type": "str",
+        "required": true,
+        "default": "${step_probe_http_get.data.body_text}",
+        "description": "上游探针节点的 body_text"
+      },
+      "forbidden": {
+        "name": "禁止片段",
+        "type": "str",
+        "required": true,
+        "description": "响应中不允许出现的文本"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_content_type_contains": {
+    "id": "check_probe_content_type_contains",
+    "name": "check_probe_content_type_contains",
+    "description": "检查探针响应 Content-Type 包含期望片段",
+    "category": "probe",
+    "params": {
+      "content_type": {
+        "name": "Content-Type",
+        "type": "str",
+        "required": true,
+        "default": "${step_probe_http_get.data.content_type}",
+        "description": "上游探针节点的 content_type"
+      },
+      "expected": {
+        "name": "期望片段",
+        "type": "str",
+        "required": false,
+        "default": "text/html",
+        "enum": [
+          "text/html",
+          "application/json",
+          "image",
+          "text/plain"
+        ],
+        "description": "Content-Type 期望片段"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_http_status": {
+    "id": "check_probe_http_status",
+    "name": "check_probe_http_status",
+    "description": "检查探针响应 HTTP 状态码",
+    "category": "probe",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态码",
+        "type": "int",
+        "required": true,
+        "default": "${step_probe_http_get.data.http_status}",
+        "description": "上游探针节点的 http_status"
+      },
+      "expected": {
+        "name": "期望状态码",
+        "type": "int",
+        "required": false,
+        "default": 200,
+        "description": "期望 HTTP 状态"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_http_status_in": {
+    "id": "check_probe_http_status_in",
+    "name": "check_probe_http_status_in",
+    "description": "检查 HTTP 状态码在白名单内（允许 200/302/400/403/404 等，禁止 500）",
+    "category": "probe",
+    "params": {
+      "http_status": {
+        "name": "HTTP 状态码",
+        "type": "int",
+        "required": true,
+        "default": "${step_probe_http_get.data.http_status}",
+        "description": "上游探针节点的 http_status"
+      },
+      "allowed": {
+        "name": "状态码白名单",
+        "type": "list",
+        "required": true,
+        "description": "允许的 HTTP 状态码列表，如 [200, 302, 400, 403, 404]"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_no_db_error": {
+    "id": "check_probe_no_db_error",
+    "name": "check_probe_no_db_error",
+    "description": "检查响应体不包含 SQL/数据库错误指纹（SQL 注入未穿透数据层）",
+    "category": "probe",
+    "params": {
+      "body_text": {
+        "name": "响应体文本",
+        "type": "str",
+        "required": true,
+        "default": "${step_probe_http_get.data.body_text}",
+        "description": "上游探针节点的 body_text"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_probe_no_traversal": {
+    "id": "check_probe_no_traversal",
+    "name": "check_probe_no_traversal",
+    "description": "检查响应体不包含系统文件指纹（路径穿越未读到 /etc/passwd、win.ini）",
+    "category": "probe",
+    "params": {
+      "body_text": {
+        "name": "响应体文本",
+        "type": "str",
+        "required": true,
+        "default": "${step_probe_http_get.data.body_text}",
+        "description": "上游探针节点的 body_text"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_profile_field_updated": {
+    "id": "check_profile_field_updated",
+    "name": "check_profile_field_updated",
+    "description": "重新打开资料页回读字段，核对值等于提交值（忽略空白差异）",
+    "category": "member",
+    "params": {
+      "field": {
+        "name": "字段名",
+        "type": "str",
+        "required": true,
+        "description": "如 marryStatus"
+      },
+      "expected_value": {
+        "name": "期望值",
+        "type": "str",
+        "required": true,
+        "description": "保存后回读应呈现的值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_receive_plan_loaded": {
+    "id": "check_receive_plan_loaded",
+    "name": "check_receive_plan_loaded",
+    "description": "检查我的收款计划结构（表头含 应收/标题 列，空态允许）",
+    "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_recent_transactions_loaded": {
+    "id": "check_recent_transactions_loaded",
+    "name": "check_recent_transactions_loaded",
+    "description": "检查最近交易表格表头含时间/类型/金额等列，或呈现明确空态",
+    "category": "member",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_remind_toggled": {
+    "id": "check_remind_toggled",
+    "name": "check_remind_toggled",
+    "description": "重新打开提醒页回读复选框，核对状态较切换前已翻转",
+    "category": "member",
+    "params": {
+      "checkbox_id": {
+        "name": "复选框标识",
+        "type": "str",
+        "required": true,
+        "description": "如 message_1"
+      },
+      "before": {
+        "name": "切换前状态",
+        "type": "bool",
+        "required": true,
+        "description": "切换前选中状态（引用 step 的 data.before）"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_risk_level_present": {
+    "id": "check_risk_level_present",
+    "name": "check_risk_level_present",
+    "description": "检查风险测评等级非空（含等级关键词；自包含重读会员中心/结果页）",
+    "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_risk_quiz_submitted": {
+    "id": "check_risk_quiz_submitted",
+    "name": "check_risk_quiz_submitted",
+    "description": "检查测评提交成功（跳转 introduce）且等级生效；submitted 缺省时自包含重读等级",
+    "category": "invest",
+    "params": {
+      "submitted": {
+        "name": "提交跳转标志",
+        "type": "bool",
+        "required": false,
+        "default": null,
+        "description": "提交节点返回的 submitted（${node.data.submitted} 引用）；缺省自包含判定"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_tender_submitted": {
+    "id": "check_tender_submitted",
+    "name": "check_tender_submitted",
+    "description": "检查投标生效：我的投资命中「标的名称+金额」记录；站点详情页拦截时降级通过并说明（双态）",
+    "category": "invest",
+    "params": {
+      "loan_name": {
+        "name": "标的名称",
+        "type": "str",
+        "required": false,
+        "default": "",
+        "description": "投标选中标的名称（${node.data.loan_name} 引用）"
+      },
+      "amount": {
+        "name": "投资金额",
+        "type": "float",
+        "required": false,
+        "default": null,
+        "description": "投标金额（${node.data.amount} 引用）"
+      },
+      "amount_input": {
+        "name": "金额输入成功",
+        "type": "bool",
+        "required": false,
+        "default": null,
+        "description": "投标动作金额是否输入成功（${node.data.amount_input} 引用；False=站点拦截降级依据）"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_text_contains": {
+    "id": "check_text_contains",
+    "name": "check_text_contains",
+    "description": "检查实际文本包含期望子串",
+    "category": "core",
+    "params": {
+      "actual": {
+        "name": "实际文本",
+        "type": "str",
+        "required": true,
+        "description": "实际文本"
+      },
+      "expected": {
+        "name": "期望子串",
+        "type": "str",
+        "required": true,
+        "description": "期望包含的子串"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_text_not_contains": {
+    "id": "check_text_not_contains",
+    "name": "check_text_not_contains",
+    "description": "检查实际文本不包含指定子串",
+    "category": "core",
+    "params": {
+      "actual": {
+        "name": "实际文本",
+        "type": "str",
+        "required": true,
+        "description": "实际文本"
+      },
+      "expected": {
+        "name": "排除子串",
+        "type": "str",
+        "required": true,
+        "description": "不应出现的子串"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_text_number_compare": {
+    "id": "check_text_number_compare",
+    "name": "check_text_number_compare",
+    "description": "解析文本第一个数值并与期望值比较（兼容 ￥78,000.00 / +100.00 / 10.00% 格式）",
+    "category": "core",
+    "params": {
+      "text": {
+        "name": "数值文本",
+        "type": "str",
+        "required": true,
+        "description": "含数值的文本，如 78,000.00元账户余额 / ￥1,234.56 / +100.00"
+      },
+      "operator": {
+        "name": "比较运算符",
+        "type": "str",
+        "required": false,
+        "default": ">=",
+        "enum": [
+          ">",
+          ">=",
+          "<",
+          "<=",
+          "==",
+          "!="
+        ],
+        "description": "解析值与期望值的比较方式"
+      },
+      "expected": {
+        "name": "期望数值",
+        "type": "float",
+        "required": true,
+        "description": "比较基准值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_unread_count_consistent": {
+    "id": "check_unread_count_consistent",
+    "name": "check_unread_count_consistent",
+    "description": "检查站内消息未读数一致性（页面计数与顶栏，或中心页与消息页顶栏）",
+    "category": "member",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_value_equal": {
+    "id": "check_value_equal",
+    "name": "check_value_equal",
+    "description": "检查两个值相等（数值按数值比较，其余按字符串比较）",
+    "category": "core",
+    "params": {
+      "actual": {
+        "name": "实际值",
+        "type": "str",
+        "required": true,
+        "default": "${step_add_numbers.data.result}",
+        "description": "实际值"
+      },
+      "expected": {
+        "name": "期望值",
+        "type": "str",
+        "required": true,
+        "description": "期望值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_value_greater_than": {
+    "id": "check_value_greater_than",
+    "name": "check_value_greater_than",
+    "description": "检查实际数值大于期望值",
+    "category": "core",
+    "params": {
+      "actual": {
+        "name": "实际值",
+        "type": "float",
+        "required": true,
+        "description": "实际值"
+      },
+      "expected": {
+        "name": "期望值",
+        "type": "float",
+        "required": true,
+        "description": "期望值"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "check_value_within_range": {
+    "id": "check_value_within_range",
+    "name": "check_value_within_range",
+    "description": "检查实际数值落在 [lower, upper] 闭区间内",
+    "category": "core",
+    "params": {
+      "actual": {
+        "name": "实际值",
+        "type": "float",
+        "required": true,
+        "description": "实际值"
+      },
+      "lower": {
+        "name": "下限",
+        "type": "float",
+        "required": true,
+        "description": "区间下限"
+      },
+      "upper": {
+        "name": "上限",
+        "type": "float",
+        "required": true,
+        "description": "区间上限"
+      }
+    },
+    "pre_conditions": [],
+    "post_conditions": []
+  }
+}

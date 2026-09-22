@@ -1,0 +1,52 @@
+{
+  "id": "member/member_login",
+  "name": "MEMBER_LOGIN_001",
+  "display_name": "前台会员登录成功",
+  "description": "打开前台登录页，使用已注册会员登录，校验登录后页面展示手机号。需 Chrome 与可用测试环境。",
+  "category": "member",
+  "module": "member",
+  "priority": "P0",
+  "precondition": "会员 18800002008 已注册，测试环境图形验证码固定 8888",
+  "expected": "登录成功，页面包含手机号 18800002008",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "提交会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_get_login_text",
+      "type": "step",
+      "step_id": "step_get_member_login_result_text",
+      "label": "读取登录结果文本"
+    },
+    {
+      "id": "check_login_phone",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验页面包含手机号",
+      "params": {
+        "actual": "${step_get_login_text.data.result}",
+        "expected": "18800002008"
+      }
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_get_login_text", "condition": "pass"},
+    {"source": "step_get_login_text", "target": "check_login_phone", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "member_login_teardown"}}
+    ]
+  }
+}

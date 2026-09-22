@@ -1,0 +1,180 @@
+{
+  "id": "backend/backend_menus_tour",
+  "name": "BACKEND_MENUS_001",
+  "display_name": "后台界面测试：借款管理菜单巡检（标的生命周期全状态列表）",
+  "description": "管理员登录后台，依次展开借款管理下 6 个分组菜单（所有借款/初审标/正在借款/满标待审/还款中/额度列表），校验 iframe 按预期路由加载、核心列表表头渲染正确且队列有数据，覆盖标的生命周期全部后台状态页面。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 教学站各借款状态队列常态有数据",
+  "expected": "6 个列表 iframe src 均正确加载对应 rel 路由；初审标/满标待审表头含「借款编号」且行数 ≥1；所有借款行数 ≥1",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_all_loans",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 所有借款",
+      "params": {"group": "所有借款", "item_rel": "loan/loan/list"}
+    },
+    {
+      "id": "check_all_loans_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验所有借款路由加载",
+      "params": {"actual": "${step_open_all_loans.data.src}", "expected": "loan/loan/list"}
+    },
+    {
+      "id": "step_open_verify_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 初审标",
+      "params": {"group": "初审管理", "item_rel": "loan/verify/list"}
+    },
+    {
+      "id": "check_verify_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验初审标路由加载",
+      "params": {"actual": "${step_open_verify_list.data.src}", "expected": "loan/verify/list"}
+    },
+    {
+      "id": "step_get_verify_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取初审标列表信息"
+    },
+    {
+      "id": "check_verify_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验初审标表头渲染",
+      "params": {"actual": "${step_get_verify_info.data.headers_text}", "expected": "借款编号"}
+    },
+    {
+      "id": "check_verify_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验初审标队列有数据",
+      "params": {"actual": "${step_get_verify_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_loaning_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 正在借款",
+      "params": {"group": "借款中管理", "item_rel": "loan/loaning/list"}
+    },
+    {
+      "id": "check_loaning_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验正在借款路由加载",
+      "params": {"actual": "${step_open_loaning_list.data.src}", "expected": "loan/loaning/list"}
+    },
+    {
+      "id": "step_open_full_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 满标待审",
+      "params": {"group": "满标管理", "item_rel": "loan/full/list"}
+    },
+    {
+      "id": "check_full_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验满标待审路由加载",
+      "params": {"actual": "${step_open_full_list.data.src}", "expected": "loan/full/list"}
+    },
+    {
+      "id": "step_get_full_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取满标待审列表信息"
+    },
+    {
+      "id": "check_full_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验满标待审表头渲染",
+      "params": {"actual": "${step_get_full_info.data.headers_text}", "expected": "借款编号"}
+    },
+    {
+      "id": "check_full_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验满标待审队列有数据",
+      "params": {"actual": "${step_get_full_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_repaying_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 还款中",
+      "params": {"group": "满标管理", "item_rel": "loan/fullpass/list"}
+    },
+    {
+      "id": "check_repaying_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验还款中路由加载",
+      "params": {"actual": "${step_open_repaying_list.data.src}", "expected": "loan/fullpass/list"}
+    },
+    {
+      "id": "step_open_amount_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 额度列表",
+      "params": {"group": "额度管理", "item_rel": "loan/amount/list"}
+    },
+    {
+      "id": "check_amount_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验额度列表路由加载",
+      "params": {"actual": "${step_open_amount_list.data.src}", "expected": "loan/amount/list"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_all_loans", "condition": "pass"},
+    {"source": "step_open_all_loans", "target": "check_all_loans_src", "condition": "pass"},
+    {"source": "check_all_loans_src", "target": "step_open_verify_list", "condition": "pass"},
+    {"source": "step_open_verify_list", "target": "check_verify_src", "condition": "pass"},
+    {"source": "check_verify_src", "target": "step_get_verify_info", "condition": "pass"},
+    {"source": "step_get_verify_info", "target": "check_verify_headers", "condition": "pass"},
+    {"source": "check_verify_headers", "target": "check_verify_rows", "condition": "pass"},
+    {"source": "check_verify_rows", "target": "step_open_loaning_list", "condition": "pass"},
+    {"source": "step_open_loaning_list", "target": "check_loaning_src", "condition": "pass"},
+    {"source": "check_loaning_src", "target": "step_open_full_list", "condition": "pass"},
+    {"source": "step_open_full_list", "target": "check_full_src", "condition": "pass"},
+    {"source": "check_full_src", "target": "step_get_full_info", "condition": "pass"},
+    {"source": "step_get_full_info", "target": "check_full_headers", "condition": "pass"},
+    {"source": "check_full_headers", "target": "check_full_rows", "condition": "pass"},
+    {"source": "check_full_rows", "target": "step_open_repaying_list", "condition": "pass"},
+    {"source": "step_open_repaying_list", "target": "check_repaying_src", "condition": "pass"},
+    {"source": "check_repaying_src", "target": "step_open_amount_list", "condition": "pass"},
+    {"source": "step_open_amount_list", "target": "check_amount_src", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_menus_tour_teardown"}}
+    ]
+  }
+}

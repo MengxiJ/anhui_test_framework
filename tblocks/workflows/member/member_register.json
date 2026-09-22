@@ -1,0 +1,57 @@
+{
+  "id": "member/member_register",
+  "name": "MEMBER_REGISTER_001",
+  "display_name": "前台会员注册成功",
+  "description": "打开注册页，使用未注册手机号提交注册，校验“注册成功”提示。手机号需保证未被占用，重复执行请更换手机号。",
+  "category": "member",
+  "module": "member",
+  "priority": "P0",
+  "precondition": "测试环境图形验证码固定 8888、短信验证码固定 666666",
+  "expected": "页面提示“注册成功”",
+  "nodes": [
+    {
+      "id": "step_open_register_page",
+      "type": "step",
+      "step_id": "step_open_member_register_page",
+      "label": "打开前台注册页"
+    },
+    {
+      "id": "step_member_register",
+      "type": "step",
+      "step_id": "step_member_register",
+      "label": "提交注册",
+      "params": {
+        "phone": "18800026025",
+        "password": "Aa12345678",
+        "verifycode": "8888",
+        "phone_code": "666666"
+      }
+    },
+    {
+      "id": "step_get_register_text",
+      "type": "step",
+      "step_id": "step_get_member_register_result_text",
+      "label": "读取注册结果文本"
+    },
+    {
+      "id": "check_register_success",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验注册成功提示",
+      "params": {
+        "actual": "${step_get_register_text.data.result}",
+        "expected": "注册成功"
+      }
+    }
+  ],
+  "edges": [
+    {"source": "step_open_register_page", "target": "step_member_register", "condition": "pass"},
+    {"source": "step_member_register", "target": "step_get_register_text", "condition": "pass"},
+    {"source": "step_get_register_text", "target": "check_register_success", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "member_register_teardown"}}
+    ]
+  }
+}

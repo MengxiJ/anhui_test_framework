@@ -1,0 +1,69 @@
+{
+  "id": "ui/ui_backend_login_page",
+  "name": "UI_BACKEND_LOGIN_PAGE_001",
+  "display_name": "后台管理系统登录页界面校验",
+  "description": "UI 界面测试：打开后台站点（8082）登录页，校验页面标题为 帝友系统后台、登录表单三要素（账号/密码/验证码）齐全，并截图存档。不执行登录（零数据变更）。",
+  "category": "ui",
+  "module": "browser",
+  "priority": "P1",
+  "suites": "ui,regression",
+  "nodes": [
+    {
+      "id": "open_backend_login",
+      "type": "step",
+      "step_id": "step_open_browser_url",
+      "label": "打开后台登录页",
+      "params": {"url": "http://121.43.169.97:8082/"}
+    },
+    {
+      "id": "check_backend_title",
+      "type": "check",
+      "check_id": "check_page_title_equal",
+      "label": "后台标题为 帝友系统后台",
+      "params": {"expected": "帝友系统后台"}
+    },
+    {
+      "id": "check_username_input",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "账号输入框存在",
+      "params": {"by": "id", "value": "username", "timeout": 10}
+    },
+    {
+      "id": "check_password_input",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "密码输入框存在",
+      "params": {"by": "id", "value": "password", "timeout": 10}
+    },
+    {
+      "id": "check_valicode_input",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "验证码输入框存在",
+      "params": {"by": "id", "value": "valicode", "timeout": 10}
+    },
+    {
+      "id": "screenshot_backend",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "后台登录页截图存档",
+      "params": {"file_name": "ui_backend_login_page"}
+    }
+  ],
+  "edges": [
+    {"source": "open_backend_login", "target": "check_backend_title", "condition": "pass"},
+    {"source": "check_backend_title", "target": "check_username_input", "condition": "pass"},
+    {"source": "check_username_input", "target": "check_password_input", "condition": "pass"},
+    {"source": "check_password_input", "target": "check_valicode_input", "condition": "pass"},
+    {"source": "check_valicode_input", "target": "screenshot_backend", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: ui backend login begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: ui backend login end", "level": "info"}}
+    ]
+  }
+}

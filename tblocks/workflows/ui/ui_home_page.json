@@ -1,0 +1,69 @@
+{
+  "id": "ui/ui_home_page",
+  "name": "UI_HOME_PAGE_001",
+  "display_name": "前台首页界面校验",
+  "description": "UI 界面测试：打开前台站点首页，校验页面标题、顶部导航登录/注册入口、客服电话展示，并截图存档到 output/screenshot。",
+  "category": "ui",
+  "module": "browser",
+  "priority": "P1",
+  "suites": "ui,regression",
+  "nodes": [
+    {
+      "id": "open_home",
+      "type": "step",
+      "step_id": "step_open_browser_url",
+      "label": "打开前台首页",
+      "params": {"url": "http://121.43.169.97:8081/"}
+    },
+    {
+      "id": "check_home_title",
+      "type": "check",
+      "check_id": "check_page_title_equal",
+      "label": "首页标题为 传智播客",
+      "params": {"expected": "传智播客"}
+    },
+    {
+      "id": "check_login_link",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "顶部登录入口存在",
+      "params": {"by": "css", "value": "a.login", "timeout": 10}
+    },
+    {
+      "id": "check_reg_link",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "顶部注册入口存在",
+      "params": {"by": "css", "value": "a.reg", "timeout": 10}
+    },
+    {
+      "id": "check_tel_text",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "客服电话展示 400-810-6116",
+      "params": {"by": "css", "value": "span.tel", "expected": "400-810-6116"}
+    },
+    {
+      "id": "screenshot_home",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "首页截图存档",
+      "params": {"file_name": "ui_home_page"}
+    }
+  ],
+  "edges": [
+    {"source": "open_home", "target": "check_home_title", "condition": "pass"},
+    {"source": "check_home_title", "target": "check_login_link", "condition": "pass"},
+    {"source": "check_login_link", "target": "check_reg_link", "condition": "pass"},
+    {"source": "check_reg_link", "target": "check_tel_text", "condition": "pass"},
+    {"source": "check_tel_text", "target": "screenshot_home", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: ui home page begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: ui home page end", "level": "info"}}
+    ]
+  }
+}

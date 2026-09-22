@@ -1,0 +1,54 @@
+{
+  "id": "api/tender_validation",
+  "name": "API_TENDER_VAL_001",
+  "display_name": "投标接口参数校验（登录态 + 非法金额，不产生资金变动）",
+  "description": "先以共享教学账号登录建立会话，再 POST /trust/trust/tender 提交非法金额 amount=abc。服务端在金额格式校验阶段返回业务码 100“不是正确的金额”，不会生成投标订单、不冻结资金，属于安全的登录态参数边界用例。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "expected": "登录业务码 200；非法金额投标业务码 100 且消息包含“金额”",
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "tender_bad_amount",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "非法金额投标",
+      "params": {"amount": "abc", "loan_id": 1, "deposit_certificate": -1}
+    },
+    {
+      "id": "check_tender_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "非法金额业务码 100",
+      "params": {"code": "${tender_bad_amount.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_tender_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示金额不正确",
+      "params": {"message": "${tender_bad_amount.data.message}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login_code", "condition": "pass"},
+    {"source": "check_login_code", "target": "tender_bad_amount", "condition": "pass"},
+    {"source": "tender_bad_amount", "target": "check_tender_code", "condition": "pass"},
+    {"source": "check_tender_code", "target": "check_tender_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative", "write_side_effect": "none", "note": "金额格式校验前置拦截，不生成订单不冻结资金"}
+}

@@ -1,0 +1,132 @@
+{
+  "id": "backend/backend_recharge_audit_dialog",
+  "name": "BACKEND_CAPITAL_003",
+  "display_name": "后台功能测试：充值审核弹窗只读校验（表单完整性 + 零数据变更）",
+  "description": "管理员进入资金管理 → 充值审核待审队列，读取基线行数后选中首条待审充值单打开审核弹窗，只读校验弹窗表单完整（通过/不通过两个审核结论、备注、图形验证码、保存与取消按钮），随后点击「取消」关闭弹窗、绝不提交，最后校验弹窗已关闭且列表行数与基线一致，确认该用例不产生任何审核数据变更。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 充值待审队列非空（教学站常态约 20 单）",
+  "expected": "弹窗含「通过/不通过」结论与「保存/取消」按钮；取消后弹窗关闭；列表行数与基线一致（数据无变化）",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_recharge_verify",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 充值审核 待审队列",
+      "params": {"top_menu": "资金管理", "group": "充值管理", "item_rel": "finance/recharge/verify"}
+    },
+    {
+      "id": "check_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值审核路由加载",
+      "params": {"actual": "${step_open_recharge_verify.data.src}", "expected": "finance/recharge/verify"}
+    },
+    {
+      "id": "step_get_baseline",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取待审队列基线信息"
+    },
+    {
+      "id": "check_baseline_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验待审队列有数据",
+      "params": {"actual": "${step_get_baseline.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "check_baseline_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值审核表头渲染",
+      "params": {"actual": "${step_get_baseline.data.headers_text}", "expected": "充值金额"}
+    },
+    {
+      "id": "step_inspect_dialog",
+      "type": "step",
+      "step_id": "step_backend_audit_dialog_inspect",
+      "label": "打开审核弹窗只读校验并取消"
+    },
+    {
+      "id": "check_radio_pass",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验弹窗含「通过」结论",
+      "params": {"actual": "${step_inspect_dialog.data.radio_texts}", "expected": "通过"}
+    },
+    {
+      "id": "check_radio_reject",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验弹窗含「不通过」结论",
+      "params": {"actual": "${step_inspect_dialog.data.radio_texts}", "expected": "不通过"}
+    },
+    {
+      "id": "check_save_btn",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验弹窗含保存按钮",
+      "params": {"actual": "${step_inspect_dialog.data.save_buttons}", "expected": "保存"}
+    },
+    {
+      "id": "check_cancel_btn",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验弹窗含取消按钮",
+      "params": {"actual": "${step_inspect_dialog.data.cancel_buttons}", "expected": "取消"}
+    },
+    {
+      "id": "check_rows_unchanged_local",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验取消后弹窗内巡检前后行数一致",
+      "params": {"actual": "${step_inspect_dialog.data.after_row_count}", "expected": "${step_inspect_dialog.data.before_row_count}"}
+    },
+    {
+      "id": "check_rows_unchanged_baseline",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验列表行数与基线一致（零数据变更）",
+      "params": {"actual": "${step_inspect_dialog.data.after_row_count}", "expected": "${step_get_baseline.data.row_count}"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_recharge_verify", "condition": "pass"},
+    {"source": "step_open_recharge_verify", "target": "check_src", "condition": "pass"},
+    {"source": "check_src", "target": "step_get_baseline", "condition": "pass"},
+    {"source": "step_get_baseline", "target": "check_baseline_rows", "condition": "pass"},
+    {"source": "check_baseline_rows", "target": "check_baseline_headers", "condition": "pass"},
+    {"source": "check_baseline_headers", "target": "step_inspect_dialog", "condition": "pass"},
+    {"source": "step_inspect_dialog", "target": "check_radio_pass", "condition": "pass"},
+    {"source": "check_radio_pass", "target": "check_radio_reject", "condition": "pass"},
+    {"source": "check_radio_reject", "target": "check_save_btn", "condition": "pass"},
+    {"source": "check_save_btn", "target": "check_cancel_btn", "condition": "pass"},
+    {"source": "check_cancel_btn", "target": "check_rows_unchanged_local", "condition": "pass"},
+    {"source": "check_rows_unchanged_local", "target": "check_rows_unchanged_baseline", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_recharge_audit_dialog_teardown"}}
+    ]
+  }
+}

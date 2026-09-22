@@ -1,0 +1,38 @@
+{
+  "id": "api/api_login",
+  "name": "API_LOGIN_001",
+  "display_name": "会员登录接口业务码校验",
+  "description": "POST /member/public/login：已注册会员登录成功，校验业务码 code=200 且 HTTP 状态码为 200。",
+  "category": "api",
+  "module": "account",
+  "priority": "P0",
+  "expected": "业务码 200，HTTP 200",
+  "nodes": [
+    {
+      "id": "step_account_login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "调用登录接口",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_business_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "校验业务码 200",
+      "params": {"code": "${step_account_login.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_http_status",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "校验 HTTP 状态码 200",
+      "params": {"http_status": "${step_account_login.data.http_status}", "expected": 200}
+    }
+  ],
+  "edges": [
+    {"source": "step_account_login", "target": "check_business_code", "condition": "pass"},
+    {"source": "check_business_code", "target": "check_http_status", "condition": "pass"}
+  ],
+  "metadata": {}
+}

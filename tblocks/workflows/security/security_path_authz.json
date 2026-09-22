@@ -1,0 +1,198 @@
+{
+  "id": "security/path_traversal_authz",
+  "name": "SEC_PATH_001",
+  "display_name": "路径穿越/敏感文件泄露与后台未授权访问基线",
+  "description": "纯 HTTP 黑盒安全基线（只读、无数据副作用）：(1) 敏感文件探测 /.git/config、/.env、/composer.json 必须被重定向到登录（302）而非直接 200 提供内容；(2) /WEB-INF/web.xml 必须 404（容器保护），编码路径穿越 %2e%2e 必须被拒（400/403/404/302）且响应不含 /etc/passwd、win.ini 等系统文件指纹；(3) 未登录 POST 后台 /system/index/index、/system/user/list 必须 302/401/403，不得 200 返回管理内容。所有探测禁止 5xx。2026-09-19 实测：敏感文件 302 到 /common/member/login，WEB-INF 404，穿越 400，后台接口 302 到登录根。",
+  "category": "security",
+  "module": "site",
+  "priority": "P1",
+  "expected": "敏感文件不直接提供（302/404/400）；路径穿越无系统文件指纹；后台受保护接口未登录一律重定向，无管理内容泄露；全程无5xx",
+  "nodes": [
+    {
+      "id": "file_git",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测 .git/config",
+      "params": {"path": "/.git/config", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "file_git_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "git配置不直接提供",
+      "params": {"http_status": "${file_git.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "file_git_content",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "无git配置内容",
+      "params": {"body_text": "${file_git.data.body_text}", "forbidden": "[core]"}
+    },
+    {
+      "id": "file_env",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测 .env",
+      "params": {"path": "/.env", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "file_env_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "env文件不直接提供",
+      "params": {"http_status": "${file_env.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "file_env_content",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "无环境配置内容",
+      "params": {"body_text": "${file_env.data.body_text}", "forbidden": "APP_KEY"}
+    },
+    {
+      "id": "file_composer",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测 composer.json",
+      "params": {"path": "/composer.json", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "file_composer_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "composer.json不直接提供",
+      "params": {"http_status": "${file_composer.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "file_webinf",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测 WEB-INF/web.xml",
+      "params": {"path": "/WEB-INF/web.xml", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "file_webinf_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "web.xml受容器保护",
+      "params": {"http_status": "${file_webinf.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "file_webinf_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "无web.xml内容",
+      "params": {"body_text": "${file_webinf.data.body_text}", "forbidden": "<web-app"}
+    },
+    {
+      "id": "trav_etc",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "编码穿越读etc/passwd",
+      "params": {"path": "/%2e%2e/%2e%2e/etc/passwd", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "trav_etc_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "穿越请求被拒无5xx",
+      "params": {"http_status": "${trav_etc.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "trav_etc_nofile",
+      "type": "check",
+      "check_id": "check_probe_no_traversal",
+      "label": "无系统文件指纹",
+      "params": {"body_text": "${trav_etc.data.body_text}"}
+    },
+    {
+      "id": "trav_static",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "static目录编码穿越",
+      "params": {"path": "/static/..%2f..%2fetc%2fpasswd", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "trav_static_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "穿越请求被拒无5xx",
+      "params": {"http_status": "${trav_static.data.http_status}", "allowed": [302, 400, 403, 404]}
+    },
+    {
+      "id": "trav_static_nofile",
+      "type": "check",
+      "check_id": "check_probe_no_traversal",
+      "label": "无系统文件指纹",
+      "params": {"body_text": "${trav_static.data.body_text}"}
+    },
+    {
+      "id": "back_index",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录访问后台首页接口",
+      "params": {"path": "/system/index/index", "site": "back", "data": {}, "allow_redirects": false}
+    },
+    {
+      "id": "back_index_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "后台首页未登录被302拦截",
+      "params": {"http_status": "${back_index.data.http_status}", "allowed": [302, 401, 403]}
+    },
+    {
+      "id": "back_index_nodata",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "未泄露后台管理内容",
+      "params": {"body_text": "${back_index.data.body_text}", "forbidden": "common/admin"}
+    },
+    {
+      "id": "back_userlist",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录查询后台用户列表",
+      "params": {"path": "/system/user/list", "site": "back", "data": {"page": 1, "rows": 10}, "allow_redirects": false}
+    },
+    {
+      "id": "back_userlist_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "用户列表未登录被拦截",
+      "params": {"http_status": "${back_userlist.data.http_status}", "allowed": [302, 401, 403]}
+    },
+    {
+      "id": "back_userlist_nodata",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "未泄露用户列表JSON",
+      "params": {"body_text": "${back_userlist.data.body_text}", "forbidden": "\"rows\""}
+    }
+  ],
+  "edges": [
+    {"source": "file_git", "target": "file_git_status", "condition": "pass"},
+    {"source": "file_git_status", "target": "file_git_content", "condition": "pass"},
+    {"source": "file_git_content", "target": "file_env", "condition": "pass"},
+    {"source": "file_env", "target": "file_env_status", "condition": "pass"},
+    {"source": "file_env_status", "target": "file_env_content", "condition": "pass"},
+    {"source": "file_env_content", "target": "file_composer", "condition": "pass"},
+    {"source": "file_composer", "target": "file_composer_status", "condition": "pass"},
+    {"source": "file_composer_status", "target": "file_webinf", "condition": "pass"},
+    {"source": "file_webinf", "target": "file_webinf_status", "condition": "pass"},
+    {"source": "file_webinf_status", "target": "file_webinf_noecho", "condition": "pass"},
+    {"source": "file_webinf_noecho", "target": "trav_etc", "condition": "pass"},
+    {"source": "trav_etc", "target": "trav_etc_status", "condition": "pass"},
+    {"source": "trav_etc_status", "target": "trav_etc_nofile", "condition": "pass"},
+    {"source": "trav_etc_nofile", "target": "trav_static", "condition": "pass"},
+    {"source": "trav_static", "target": "trav_static_status", "condition": "pass"},
+    {"source": "trav_static_status", "target": "trav_static_nofile", "condition": "pass"},
+    {"source": "trav_static_nofile", "target": "back_index", "condition": "pass"},
+    {"source": "back_index", "target": "back_index_status", "condition": "pass"},
+    {"source": "back_index_status", "target": "back_index_nodata", "condition": "pass"},
+    {"source": "back_index_nodata", "target": "back_userlist", "condition": "pass"},
+    {"source": "back_userlist", "target": "back_userlist_status", "condition": "pass"},
+    {"source": "back_userlist_status", "target": "back_userlist_nodata", "condition": "pass"}
+  ],
+  "metadata": {"layer": "security", "mode": "http-only", "read_only": true, "owasp": "A01 Broken Access Control / A05 Security Misconfiguration"}
+}

@@ -1,0 +1,99 @@
+{
+  "id": "finance/finance_recharge_flow",
+  "name": "FINANCE_RECHARGE_001",
+  "display_name": "核心链路：充值 100 → 记录/明细/余额三重核对",
+  "description": "登录后读取充值前余额，提交 100 元充值（验证码 8888），随后在充值记录、交易明细、余额增量三处交叉核对，全程截图留证。",
+  "category": "finance",
+  "module": "finance",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 图形验证码固定 8888；3. 充值通道默认托管（chinapnrTrust）",
+  "expected": "充值记录出现金额 100 且状态「充值成功」；交易明细含充值流水；余额增量 ≥ 100",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_balance_before",
+      "type": "step",
+      "step_id": "step_get_finance_balance",
+      "label": "读取充值前余额"
+    },
+    {
+      "id": "step_open_recharge_page",
+      "type": "step",
+      "step_id": "step_open_finance_recharge_page",
+      "label": "打开充值页"
+    },
+    {
+      "id": "step_submit_recharge",
+      "type": "step",
+      "step_id": "step_submit_finance_recharge",
+      "label": "提交 100 元充值",
+      "params": {"amount": "100", "valicode": "8888"}
+    },
+    {
+      "id": "check_recharge_record",
+      "type": "check",
+      "check_id": "check_finance_recharge_record_exists",
+      "label": "核对充值记录（金额+状态）",
+      "params": {"amount": "100", "status_contains": "充值成功"}
+    },
+    {
+      "id": "check_account_log",
+      "type": "check",
+      "check_id": "check_finance_account_log_exists",
+      "label": "核对交易明细含充值流水",
+      "params": {"amount": "100", "type_contains": "充值"}
+    },
+    {
+      "id": "check_balance_increased",
+      "type": "check",
+      "check_id": "check_finance_balance_increased_at_least",
+      "label": "核对余额增量 ≥ 100",
+      "params": {
+        "previous_balance": "${step_balance_before.data.balance}",
+        "min_increase": 100
+      }
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "finance_recharge_flow_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_balance_before", "condition": "pass"},
+    {"source": "step_balance_before", "target": "step_open_recharge_page", "condition": "pass"},
+    {"source": "step_open_recharge_page", "target": "step_submit_recharge", "condition": "pass"},
+    {"source": "step_submit_recharge", "target": "check_recharge_record", "condition": "pass"},
+    {"source": "check_recharge_record", "target": "check_account_log", "condition": "pass"},
+    {"source": "check_account_log", "target": "check_balance_increased", "condition": "pass"},
+    {"source": "check_balance_increased", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "finance_recharge_flow_teardown"}}
+    ]
+  }
+}

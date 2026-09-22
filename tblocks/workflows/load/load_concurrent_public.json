@@ -1,0 +1,129 @@
+{
+  "id": "load/concurrent_public",
+  "name": "LOAD_PUBLIC_001",
+  "display_name": "公共查询接口并发压测（并发10/总量40）",
+  "description": "纯 HTTP 只读并发压测（零数据副作用）：对投资列表 listtender 与平台统计 loantotal 两个公共接口以并发 10、每端点 40 请求瞬时加压，验证并发条件下无请求丢失、无 5xx、成功率>=95%、p95<=2000ms、RPS>=5；loantotal 业务码 200 占比 100%。并发安全口径：每线程独立 requests.Session、连接池 pool_block=True、压测客户端零重试。2026-09-19 实测 p95 170~306ms、RPS 47~59。",
+  "category": "performance",
+  "module": "site",
+  "priority": "P1",
+  "expected": "两个端点各 40 请求全部完成；成功率>=95%；5xx=0；p95<=2000ms；RPS>=5；loantotal 业务码 200 占比 100%",
+  "nodes": [
+    {
+      "id": "load_list_c10",
+      "type": "step",
+      "step_id": "step_load_http",
+      "label": "并发10压测投资列表",
+      "params": {
+        "path": "/loan/loan/listtender", "method": "POST", "site": "front",
+        "data": {"page": 1, "epage": 5},
+        "concurrency": 10, "total_requests": 40
+      }
+    },
+    {
+      "id": "check_list_completed",
+      "type": "check",
+      "check_id": "check_load_all_completed",
+      "label": "投资列表40请求全部完成",
+      "params": {"total_requests": "${load_list_c10.data.total_requests}", "completed": "${load_list_c10.data.completed}"}
+    },
+    {
+      "id": "check_list_rate",
+      "type": "check",
+      "check_id": "check_load_success_rate",
+      "label": "投资列表成功率>=95%",
+      "params": {"success_rate": "${load_list_c10.data.success_rate}", "min_rate": 0.95}
+    },
+    {
+      "id": "check_list_5xx",
+      "type": "check",
+      "check_id": "check_load_no_server_error",
+      "label": "投资列表无5xx",
+      "params": {"server_errors": "${load_list_c10.data.server_errors}", "max_count": 0}
+    },
+    {
+      "id": "check_list_p95",
+      "type": "check",
+      "check_id": "check_load_percentile_ms",
+      "label": "投资列表p95<=2000ms",
+      "params": {"percentile_ms": "${load_list_c10.data.p95_ms}", "percentile": "p95", "max_ms": 2000}
+    },
+    {
+      "id": "check_list_rps",
+      "type": "check",
+      "check_id": "check_load_rps",
+      "label": "投资列表RPS>=5",
+      "params": {"rps": "${load_list_c10.data.rps}", "min_rps": 5}
+    },
+    {
+      "id": "load_total_c10",
+      "type": "step",
+      "step_id": "step_load_http",
+      "label": "并发10压测平台统计",
+      "params": {
+        "path": "/common/loan/loantotal", "method": "POST", "site": "front",
+        "data": {}, "concurrency": 10, "total_requests": 40
+      }
+    },
+    {
+      "id": "check_total_completed",
+      "type": "check",
+      "check_id": "check_load_all_completed",
+      "label": "平台统计40请求全部完成",
+      "params": {"total_requests": "${load_total_c10.data.total_requests}", "completed": "${load_total_c10.data.completed}"}
+    },
+    {
+      "id": "check_total_rate",
+      "type": "check",
+      "check_id": "check_load_success_rate",
+      "label": "平台统计成功率>=95%",
+      "params": {"success_rate": "${load_total_c10.data.success_rate}", "min_rate": 0.95}
+    },
+    {
+      "id": "check_total_5xx",
+      "type": "check",
+      "check_id": "check_load_no_server_error",
+      "label": "平台统计无5xx",
+      "params": {"server_errors": "${load_total_c10.data.server_errors}", "max_count": 0}
+    },
+    {
+      "id": "check_total_p95",
+      "type": "check",
+      "check_id": "check_load_percentile_ms",
+      "label": "平台统计p95<=2000ms",
+      "params": {"percentile_ms": "${load_total_c10.data.p95_ms}", "percentile": "p95", "max_ms": 2000}
+    },
+    {
+      "id": "check_total_rps",
+      "type": "check",
+      "check_id": "check_load_rps",
+      "label": "平台统计RPS>=5",
+      "params": {"rps": "${load_total_c10.data.rps}", "min_rps": 5}
+    },
+    {
+      "id": "check_total_biz",
+      "type": "check",
+      "check_id": "check_load_business_success_rate",
+      "label": "平台统计业务码200占比100%",
+      "params": {
+        "business_total": "${load_total_c10.data.business_total}",
+        "business_ok": "${load_total_c10.data.business_ok}",
+        "min_rate": 1.0
+      }
+    }
+  ],
+  "edges": [
+    {"source": "load_list_c10", "target": "check_list_completed", "condition": "pass"},
+    {"source": "check_list_completed", "target": "check_list_rate", "condition": "pass"},
+    {"source": "check_list_rate", "target": "check_list_5xx", "condition": "pass"},
+    {"source": "check_list_5xx", "target": "check_list_p95", "condition": "pass"},
+    {"source": "check_list_p95", "target": "check_list_rps", "condition": "pass"},
+    {"source": "check_list_rps", "target": "load_total_c10", "condition": "pass"},
+    {"source": "load_total_c10", "target": "check_total_completed", "condition": "pass"},
+    {"source": "check_total_completed", "target": "check_total_rate", "condition": "pass"},
+    {"source": "check_total_rate", "target": "check_total_5xx", "condition": "pass"},
+    {"source": "check_total_5xx", "target": "check_total_p95", "condition": "pass"},
+    {"source": "check_total_p95", "target": "check_total_rps", "condition": "pass"},
+    {"source": "check_total_rps", "target": "check_total_biz", "condition": "pass"}
+  ],
+  "metadata": {"layer": "load", "mode": "http-only", "read_only": true, "concurrency": 10}
+}

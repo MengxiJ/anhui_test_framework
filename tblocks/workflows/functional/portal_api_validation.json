@@ -1,0 +1,165 @@
+{
+  "id": "functional/portal_api_validation",
+  "name": "FUNCTIONAL_API_VALIDATION_001",
+  "display_name": "门户只读接口参数校验（负向 / 边界值）",
+  "description": "免登录只读功能测试：通过白名单探针对 /loan/loan/listtender 发送非法与边界参数，验证服务端参数校验功能——page=0/-1 返回业务码 100 优雅拒绝；page=abc 返回 4xx 而非 5xx；epage 非法值与空表单被容忍并回退默认分页。",
+  "category": "functional",
+  "module": "portal",
+  "priority": "P1",
+  "suites": "functional,regression",
+  "nodes": [
+    {
+      "id": "probe_page_zero",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "探针：page=0",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": 0, "epage": 10}}
+    },
+    {
+      "id": "check_pz_no_5xx",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "page=0 无服务端错误",
+      "params": {"http_status": "${probe_page_zero.data.http_status}", "limit": 500}
+    },
+    {
+      "id": "check_pz_json",
+      "type": "check",
+      "check_id": "check_portal_body_json_valid",
+      "label": "page=0 返回合法 JSON",
+      "params": {"is_json": "${probe_page_zero.data.is_json}"}
+    },
+    {
+      "id": "check_pz_biz_code",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "page=0 业务码 100（优雅拒绝）",
+      "params": {"code": "${probe_page_zero.data.code}", "expected": 100}
+    },
+    {
+      "id": "probe_page_negative",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "探针：page=-1",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": -1, "epage": 10}}
+    },
+    {
+      "id": "check_pn_no_5xx",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "page=-1 无服务端错误",
+      "params": {"http_status": "${probe_page_negative.data.http_status}", "limit": 500}
+    },
+    {
+      "id": "check_pn_json",
+      "type": "check",
+      "check_id": "check_portal_body_json_valid",
+      "label": "page=-1 返回合法 JSON",
+      "params": {"is_json": "${probe_page_negative.data.is_json}"}
+    },
+    {
+      "id": "check_pn_biz_code",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "page=-1 业务码 100（优雅拒绝）",
+      "params": {"code": "${probe_page_negative.data.code}", "expected": 100}
+    },
+    {
+      "id": "probe_page_abc",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "探针：page=abc（非数字）",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": "abc", "epage": 10}}
+    },
+    {
+      "id": "check_pa_no_5xx",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "page=abc 4xx 客户端错误而非 5xx",
+      "params": {"http_status": "${probe_page_abc.data.http_status}", "limit": 500}
+    },
+    {
+      "id": "probe_epage_abc",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "探针：epage=abc（非法页大小）",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": 1, "epage": "abc"}}
+    },
+    {
+      "id": "check_ea_no_5xx",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "epage=abc 无服务端错误",
+      "params": {"http_status": "${probe_epage_abc.data.http_status}", "limit": 500}
+    },
+    {
+      "id": "check_ea_json",
+      "type": "check",
+      "check_id": "check_portal_body_json_valid",
+      "label": "epage=abc 返回合法 JSON",
+      "params": {"is_json": "${probe_epage_abc.data.is_json}"}
+    },
+    {
+      "id": "check_ea_fallback",
+      "type": "check",
+      "check_id": "check_portal_list_count_range",
+      "label": "epage=abc 回退默认分页（1-10 条）",
+      "params": {"items": "${probe_epage_abc.data.items}", "min_count": 1, "max_count": 10}
+    },
+    {
+      "id": "probe_empty_data",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "探针：空表单（缺省参数）",
+      "params": {"path": "/loan/loan/listtender", "data": {}}
+    },
+    {
+      "id": "check_ed_no_5xx",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "空表单无服务端错误",
+      "params": {"http_status": "${probe_empty_data.data.http_status}", "limit": 500}
+    },
+    {
+      "id": "check_ed_json",
+      "type": "check",
+      "check_id": "check_portal_body_json_valid",
+      "label": "空表单返回合法 JSON",
+      "params": {"is_json": "${probe_empty_data.data.is_json}"}
+    },
+    {
+      "id": "check_ed_fallback",
+      "type": "check",
+      "check_id": "check_portal_list_count_range",
+      "label": "空表单回退默认分页（1-10 条）",
+      "params": {"items": "${probe_empty_data.data.items}", "min_count": 1, "max_count": 10}
+    }
+  ],
+  "edges": [
+    {"source": "probe_page_zero", "target": "check_pz_no_5xx", "condition": "pass"},
+    {"source": "check_pz_no_5xx", "target": "check_pz_json", "condition": "pass"},
+    {"source": "check_pz_json", "target": "check_pz_biz_code", "condition": "pass"},
+    {"source": "check_pz_biz_code", "target": "probe_page_negative", "condition": "pass"},
+    {"source": "probe_page_negative", "target": "check_pn_no_5xx", "condition": "pass"},
+    {"source": "check_pn_no_5xx", "target": "check_pn_json", "condition": "pass"},
+    {"source": "check_pn_json", "target": "check_pn_biz_code", "condition": "pass"},
+    {"source": "check_pn_biz_code", "target": "probe_page_abc", "condition": "pass"},
+    {"source": "probe_page_abc", "target": "check_pa_no_5xx", "condition": "pass"},
+    {"source": "check_pa_no_5xx", "target": "probe_epage_abc", "condition": "pass"},
+    {"source": "probe_epage_abc", "target": "check_ea_no_5xx", "condition": "pass"},
+    {"source": "check_ea_no_5xx", "target": "check_ea_json", "condition": "pass"},
+    {"source": "check_ea_json", "target": "check_ea_fallback", "condition": "pass"},
+    {"source": "check_ea_fallback", "target": "probe_empty_data", "condition": "pass"},
+    {"source": "probe_empty_data", "target": "check_ed_no_5xx", "condition": "pass"},
+    {"source": "check_ed_no_5xx", "target": "check_ed_json", "condition": "pass"},
+    {"source": "check_ed_json", "target": "check_ed_fallback", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: functional api validation begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: functional api validation end", "level": "info"}}
+    ]
+  }
+}

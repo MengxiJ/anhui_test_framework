@@ -1,0 +1,56 @@
+{
+  "id": "backend/backend_login",
+  "name": "BACKEND_LOGIN_001",
+  "display_name": "运营后台管理员登录成功",
+  "description": "打开运营后台登录页，管理员登录后校验“欢迎光临”提示。需 Chrome 与可用测试环境。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P0",
+  "precondition": "管理员账号 admin，图形验证码固定 8888",
+  "expected": "后台首页出现“欢迎光临”",
+  "nodes": [
+    {
+      "id": "step_open_backend_page",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "提交管理员登录",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_get_backend_text",
+      "type": "step",
+      "step_id": "step_get_backend_login_result_text",
+      "label": "读取后台登录结果文本"
+    },
+    {
+      "id": "check_welcome",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验欢迎光临提示",
+      "params": {
+        "actual": "${step_get_backend_text.data.result}",
+        "expected": "欢迎光临"
+      }
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_page", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_get_backend_text", "condition": "pass"},
+    {"source": "step_get_backend_text", "target": "check_welcome", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_login_teardown"}}
+    ]
+  }
+}

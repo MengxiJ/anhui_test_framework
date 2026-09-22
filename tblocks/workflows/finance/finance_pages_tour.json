@@ -1,0 +1,103 @@
+{
+  "id": "finance/finance_pages_tour",
+  "name": "FINANCE_TOUR_001",
+  "display_name": "巡检：资金管理五页（明细筛选/充值记录/红包/托管/提现拦截）",
+  "description": "登录后巡检资金管理全部页面：交易明细按类型筛选并核对类型一致性，充值记录表结构，我的红包页，我的支付账户托管区块，提现入口前置拦截（双态）。",
+  "category": "finance",
+  "module": "finance",
+  "priority": "P1",
+  "precondition": "会员 18800002008 可登录；提现拦截 check 双态兼容（未绑卡=拦截 / 已绑卡=直达）",
+  "expected": "明细筛选类型一致；充值记录表结构存在；红包页可达含内容；托管区块「账户托管/授权设置」可见；提现入口拦截或直达（双态）",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_filter_logs_recharge",
+      "type": "step",
+      "step_id": "step_filter_finance_account_logs",
+      "label": "交易明细筛选类型=充值",
+      "params": {"log_type": "充值"}
+    },
+    {
+      "id": "check_logs_filter_recharge",
+      "type": "check",
+      "check_id": "check_finance_account_log_filter_consistent",
+      "label": "核对筛后明细类型一致（或空态）",
+      "params": {"expected_type": "充值"}
+    },
+    {
+      "id": "step_get_recharge_records",
+      "type": "step",
+      "step_id": "step_get_finance_recharge_records",
+      "label": "读取充值记录表格"
+    },
+    {
+      "id": "check_recharge_table",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "核对充值记录页存在数据表",
+      "params": {"by": "css", "value": "table", "timeout": 10}
+    },
+    {
+      "id": "check_bounty_page",
+      "type": "check",
+      "check_id": "check_finance_bounty_page_loaded",
+      "label": "巡检我的红包页（可达+内容）"
+    },
+    {
+      "id": "check_trust_blocks",
+      "type": "check",
+      "check_id": "check_finance_trust_page_blocks_visible",
+      "label": "巡检我的支付账户托管区块",
+      "params": {"blocks": ["账户托管", "授权设置"]}
+    },
+    {
+      "id": "check_withdraw_intercepted",
+      "type": "check",
+      "check_id": "check_finance_withdraw_intercepted",
+      "label": "巡检提现入口拦截（双态）"
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存巡检截图",
+      "params": {"file_name": "finance_pages_tour_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_filter_logs_recharge", "condition": "pass"},
+    {"source": "step_filter_logs_recharge", "target": "check_logs_filter_recharge", "condition": "pass"},
+    {"source": "check_logs_filter_recharge", "target": "step_get_recharge_records", "condition": "pass"},
+    {"source": "step_get_recharge_records", "target": "check_recharge_table", "condition": "pass"},
+    {"source": "check_recharge_table", "target": "check_bounty_page", "condition": "pass"},
+    {"source": "check_bounty_page", "target": "check_trust_blocks", "condition": "pass"},
+    {"source": "check_trust_blocks", "target": "check_withdraw_intercepted", "condition": "pass"},
+    {"source": "check_withdraw_intercepted", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "finance_pages_tour_teardown"}}
+    ]
+  }
+}

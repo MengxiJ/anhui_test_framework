@@ -1,0 +1,156 @@
+{
+  "id": "member/member_center_overview",
+  "name": "MEMBER_OVERVIEW_001",
+  "display_name": "巡检：会员中心总览 + 账户管理全页巡检",
+  "description": "登录后核对会员中心总览（余额解析/未读数/最近交易表列），站内消息页与顶栏未读数一致性，随后巡检积分记录、安全设置、银行卡信息、我的推广四个账户管理页面的关键区块。",
+  "category": "member",
+  "module": "member",
+  "priority": "P1",
+  "precondition": "会员 18800002008 可登录",
+  "expected": "总览结构核对通过；未读数两处一致；积分/安全/银行卡/推广页关键区块均存在",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_center_summary",
+      "type": "step",
+      "step_id": "step_get_member_center_summary",
+      "label": "读取会员中心总览"
+    },
+    {
+      "id": "check_center_summary",
+      "type": "check",
+      "check_id": "check_member_center_summary_loaded",
+      "label": "核对总览结构（余额/未读数）"
+    },
+    {
+      "id": "step_recent_transactions",
+      "type": "step",
+      "step_id": "step_get_recent_transactions",
+      "label": "读取最近交易表格"
+    },
+    {
+      "id": "check_recent_transactions",
+      "type": "check",
+      "check_id": "check_recent_transactions_loaded",
+      "label": "核对最近交易表列（或空态）"
+    },
+    {
+      "id": "step_message_page",
+      "type": "step",
+      "step_id": "step_get_message_page_info",
+      "label": "打开站内消息页并读顶栏未读数"
+    },
+    {
+      "id": "check_unread_consistent",
+      "type": "check",
+      "check_id": "check_unread_count_consistent",
+      "label": "核对顶栏与消息页未读数一致"
+    },
+    {
+      "id": "step_open_credit",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "巡检积分记录页",
+      "params": {"page": "credit"}
+    },
+    {
+      "id": "check_credit_page",
+      "type": "check",
+      "check_id": "check_member_page_loaded",
+      "label": "核对积分页区块「我的积分记录」",
+      "params": {"page": "credit", "expected_head": "我的积分记录"}
+    },
+    {
+      "id": "step_open_safe",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "巡检安全设置页",
+      "params": {"page": "safe"}
+    },
+    {
+      "id": "check_safe_page",
+      "type": "check",
+      "check_id": "check_member_page_loaded",
+      "label": "核对安全设置页区块「安全设置」",
+      "params": {"page": "safe", "expected_head": "安全设置"}
+    },
+    {
+      "id": "step_open_bank",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "巡检银行卡信息页",
+      "params": {"page": "bank"}
+    },
+    {
+      "id": "check_bank_page",
+      "type": "check",
+      "check_id": "check_member_page_loaded",
+      "label": "核对银行卡页区块「银行卡信息」（未绑卡含温馨提示）",
+      "params": {"page": "bank", "expected_head": "银行卡信息"}
+    },
+    {
+      "id": "step_open_spread",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "巡检我的推广页",
+      "params": {"page": "spread"}
+    },
+    {
+      "id": "check_spread_page",
+      "type": "check",
+      "check_id": "check_member_page_loaded",
+      "label": "核对推广页区块「推广管理」",
+      "params": {"page": "spread", "expected_head": "推广管理"}
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存巡检截图",
+      "params": {"file_name": "member_center_overview_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_center_summary", "condition": "pass"},
+    {"source": "step_center_summary", "target": "check_center_summary", "condition": "pass"},
+    {"source": "check_center_summary", "target": "step_recent_transactions", "condition": "pass"},
+    {"source": "step_recent_transactions", "target": "check_recent_transactions", "condition": "pass"},
+    {"source": "check_recent_transactions", "target": "step_message_page", "condition": "pass"},
+    {"source": "step_message_page", "target": "check_unread_consistent", "condition": "pass"},
+    {"source": "check_unread_consistent", "target": "step_open_credit", "condition": "pass"},
+    {"source": "step_open_credit", "target": "check_credit_page", "condition": "pass"},
+    {"source": "check_credit_page", "target": "step_open_safe", "condition": "pass"},
+    {"source": "step_open_safe", "target": "check_safe_page", "condition": "pass"},
+    {"source": "check_safe_page", "target": "step_open_bank", "condition": "pass"},
+    {"source": "step_open_bank", "target": "check_bank_page", "condition": "pass"},
+    {"source": "check_bank_page", "target": "step_open_spread", "condition": "pass"},
+    {"source": "step_open_spread", "target": "check_spread_page", "condition": "pass"},
+    {"source": "check_spread_page", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "member_center_overview_teardown"}}
+    ]
+  }
+}

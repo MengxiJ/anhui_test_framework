@@ -1,0 +1,125 @@
+{
+  "id": "invest/invest_full_flow",
+  "name": "INVEST_FULL_001",
+  "display_name": "核心链路：余额校验 → 测评 → 动态选标投标 → 我的投资核对",
+  "description": "登录后校验余额（不足 1000 时先充值 1000），再按测评状态条件分支（未测评先完成答题），随后从投资列表按可投金额动态选标、窗口期提交 1000 元投标，最终在我的投资核对标的与金额，全程截图留证。",
+  "category": "invest",
+  "module": "invest",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 图形验证码固定 8888；3. 投资列表存在可投金额 ≥ 1000 的标的",
+  "expected": "投标提交后我的投资（投标中/回款中）命中标的名称与金额 1000 的记录；若被站点详情页拦截则降级通过并说明",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_balance_first",
+      "type": "step",
+      "step_id": "step_get_finance_balance",
+      "label": "读取当前余额"
+    },
+    {
+      "id": "condition_balance_enough",
+      "type": "condition",
+      "check_id": "check_value_greater_than",
+      "label": "条件：余额 ≥ 1000",
+      "params": {"actual": "${step_balance_first.data.balance}", "expected": 999}
+    },
+    {
+      "id": "step_recharge_for_tender",
+      "type": "step",
+      "step_id": "step_submit_finance_recharge",
+      "label": "余额不足分支：充值 1000",
+      "params": {"amount": "1000", "valicode": "8888"}
+    },
+    {
+      "id": "step_get_risk_level",
+      "type": "step",
+      "step_id": "step_get_risk_level",
+      "label": "读取风险测评状态"
+    },
+    {
+      "id": "condition_assessed",
+      "type": "condition",
+      "check_id": "check_value_equal",
+      "label": "条件：是否已完成测评",
+      "params": {"actual": "${step_get_risk_level.data.assessed}", "expected": true}
+    },
+    {
+      "id": "step_submit_quiz",
+      "type": "step",
+      "step_id": "step_submit_risk_quiz",
+      "label": "未测评分支：完成答题提交"
+    },
+    {
+      "id": "check_quiz_submitted",
+      "type": "check",
+      "check_id": "check_risk_quiz_submitted",
+      "label": "校验答题提交生效",
+      "params": {"submitted": "${step_submit_quiz.data.submitted}"}
+    },
+    {
+      "id": "step_submit_tender",
+      "type": "step",
+      "step_id": "step_submit_tender",
+      "label": "动态选标并提交 1000 元投标",
+      "params": {"amount": "1000", "min_available": "1000"}
+    },
+    {
+      "id": "check_tender_submitted",
+      "type": "check",
+      "check_id": "check_tender_submitted",
+      "label": "我的投资核对标的+金额（双态）",
+      "params": {
+        "loan_name": "${step_submit_tender.data.loan_name}",
+        "amount": 1000,
+        "amount_input": "${step_submit_tender.data.amount_input}"
+      }
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "invest_full_flow_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_balance_first", "condition": "pass"},
+    {"source": "step_balance_first", "target": "condition_balance_enough", "condition": "pass"},
+    {"source": "condition_balance_enough", "target": "step_get_risk_level", "condition": "pass"},
+    {"source": "condition_balance_enough", "target": "step_recharge_for_tender", "condition": "fail"},
+    {"source": "step_recharge_for_tender", "target": "step_get_risk_level", "condition": "pass"},
+    {"source": "step_get_risk_level", "target": "condition_assessed", "condition": "pass"},
+    {"source": "condition_assessed", "target": "step_submit_tender", "condition": "pass"},
+    {"source": "condition_assessed", "target": "step_submit_quiz", "condition": "fail"},
+    {"source": "step_submit_quiz", "target": "check_quiz_submitted", "condition": "pass"},
+    {"source": "check_quiz_submitted", "target": "step_submit_tender", "condition": "pass"},
+    {"source": "step_submit_tender", "target": "check_tender_submitted", "condition": "pass"},
+    {"source": "check_tender_submitted", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "invest_full_flow_teardown"}}
+    ]
+  }
+}

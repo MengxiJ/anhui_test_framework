@@ -1,0 +1,136 @@
+{
+  "id": "functional/portal_pagination",
+  "name": "FUNCTIONAL_PAGINATION_001",
+  "display_name": "投资标的分页功能校验",
+  "description": "免登录只读功能测试：验证 /loan/loan/listtender 分页功能——每页条数区间、页内记录唯一、翻页数据不同、翻页前后总数一致、总页数数学一致、越界页优雅返回空列表。",
+  "category": "functional",
+  "module": "portal",
+  "priority": "P1",
+  "suites": "functional,regression",
+  "nodes": [
+    {
+      "id": "query_page1",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询第 1 页",
+      "params": {"page": 1, "epage": 10}
+    },
+    {
+      "id": "check_page1_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "第 1 页 HTTP 200",
+      "params": {"http_status": "${query_page1.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_page1_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_range",
+      "label": "第 1 页条数在 [1,10]",
+      "params": {"items": "${query_page1.data.items}", "min_count": 1, "max_count": 10}
+    },
+    {
+      "id": "check_page1_distinct",
+      "type": "check",
+      "check_id": "check_portal_items_distinct",
+      "label": "第 1 页记录 id 无重复",
+      "params": {"items": "${query_page1.data.items}", "field": "id"}
+    },
+    {
+      "id": "query_page2",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询第 2 页",
+      "params": {"page": 2, "epage": 10}
+    },
+    {
+      "id": "check_page2_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "第 2 页 HTTP 200",
+      "params": {"http_status": "${query_page2.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_page2_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_range",
+      "label": "第 2 页条数在 [1,10]",
+      "params": {"items": "${query_page2.data.items}", "min_count": 1, "max_count": 10}
+    },
+    {
+      "id": "check_pagination_differs",
+      "type": "check",
+      "check_id": "check_portal_pagination_differs",
+      "label": "两页首条记录不同（翻页生效）",
+      "params": {
+        "items_page1": "${query_page1.data.items}",
+        "items_page2": "${query_page2.data.items}",
+        "field": "id"
+      }
+    },
+    {
+      "id": "check_total_equal",
+      "type": "check",
+      "check_id": "check_portal_total_items_equal",
+      "label": "两页 total_items 一致",
+      "params": {
+        "total_1": "${query_page1.data.total_items}",
+        "total_2": "${query_page2.data.total_items}"
+      }
+    },
+    {
+      "id": "check_total_pages_math",
+      "type": "check",
+      "check_id": "check_portal_total_pages_consistent",
+      "label": "总页数与总数数学一致",
+      "params": {
+        "total_items": "${query_page1.data.total_items}",
+        "total_pages": "${query_page1.data.total_pages}",
+        "page_size": 10
+      }
+    },
+    {
+      "id": "query_page_out_of_range",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询越界页（第 999 页）",
+      "params": {"page": 999, "epage": 10}
+    },
+    {
+      "id": "check_oor_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "越界页 HTTP 200",
+      "params": {"http_status": "${query_page_out_of_range.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_oor_empty",
+      "type": "check",
+      "check_id": "check_portal_list_count_range",
+      "label": "越界页返回空列表（0 条）",
+      "params": {"items": "${query_page_out_of_range.data.items}", "min_count": 0, "max_count": 0}
+    }
+  ],
+  "edges": [
+    {"source": "query_page1", "target": "check_page1_http", "condition": "pass"},
+    {"source": "check_page1_http", "target": "check_page1_count", "condition": "pass"},
+    {"source": "check_page1_count", "target": "check_page1_distinct", "condition": "pass"},
+    {"source": "check_page1_distinct", "target": "query_page2", "condition": "pass"},
+    {"source": "query_page2", "target": "check_page2_http", "condition": "pass"},
+    {"source": "check_page2_http", "target": "check_page2_count", "condition": "pass"},
+    {"source": "check_page2_count", "target": "check_pagination_differs", "condition": "pass"},
+    {"source": "check_pagination_differs", "target": "check_total_equal", "condition": "pass"},
+    {"source": "check_total_equal", "target": "check_total_pages_math", "condition": "pass"},
+    {"source": "check_total_pages_math", "target": "query_page_out_of_range", "condition": "pass"},
+    {"source": "query_page_out_of_range", "target": "check_oor_http", "condition": "pass"},
+    {"source": "check_oor_http", "target": "check_oor_empty", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: functional pagination begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: functional pagination end", "level": "info"}}
+    ]
+  }
+}

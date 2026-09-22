@@ -1,0 +1,224 @@
+{
+  "id": "backend/backend_records_tour",
+  "name": "BACKEND_RECORDS_001",
+  "display_name": "后台界面测试：借贷记录与债权转让管理巡检（投标/还款计划/收款/转让 4 状态）",
+  "description": "管理员登录后台，在借款管理一级菜单下依次巡检 6 个只读列表：借贷记录分组的投标记录、还款计划、收款列表，债权转让分组的全部转让、转让中、已成功转让。校验 iframe 按 rel 路由加载且 dygrid 表头框架正常渲染（首列 ID），覆盖投资后与债权转让两条后台业务线的全部核心页面。只读巡检，不产生任何数据变更。",
+  "category": "backend",
+  "module": "backend",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 各列表允许空队列（仅校验路由与表头框架）",
+  "expected": "6 个列表 iframe src 均加载对应 rel 路由，dygrid 表头正常渲染（投标/还款计划含 ID，收款含借款编号，债权转让含转让价格）",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_tender_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 投标记录",
+      "params": {"group": "借贷记录", "item_rel": "loan/tender/list"}
+    },
+    {
+      "id": "check_tender_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验投标记录路由加载",
+      "params": {"actual": "${step_open_tender_list.data.src}", "expected": "loan/tender/list"}
+    },
+    {
+      "id": "step_get_tender_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取投标记录列表信息"
+    },
+    {
+      "id": "check_tender_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验投标记录表头框架",
+      "params": {"actual": "${step_get_tender_info.data.headers_text}", "expected": "ID"}
+    },
+    {
+      "id": "step_open_repayperiod_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 还款计划",
+      "params": {"group": "借贷记录", "item_rel": "loan/repayperiod/list"}
+    },
+    {
+      "id": "check_repayperiod_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验还款计划路由加载",
+      "params": {"actual": "${step_open_repayperiod_list.data.src}", "expected": "loan/repayperiod/list"}
+    },
+    {
+      "id": "step_get_repayperiod_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取还款计划列表信息"
+    },
+    {
+      "id": "check_repayperiod_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验还款计划表头框架",
+      "params": {"actual": "${step_get_repayperiod_info.data.headers_text}", "expected": "ID"}
+    },
+    {
+      "id": "step_open_recover_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 收款列表",
+      "params": {"group": "借贷记录", "item_rel": "loan/recover/list"}
+    },
+    {
+      "id": "check_recover_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验收款列表路由加载",
+      "params": {"actual": "${step_open_recover_list.data.src}", "expected": "loan/recover/list"}
+    },
+    {
+      "id": "step_get_recover_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取收款列表信息"
+    },
+    {
+      "id": "check_recover_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验收款表头渲染",
+      "params": {"actual": "${step_get_recover_info.data.headers_text}", "expected": "借款编号"}
+    },
+    {
+      "id": "step_open_change_all",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 全部债权转让",
+      "params": {"group": "债权转让", "item_rel": "finance/change/all"}
+    },
+    {
+      "id": "check_change_all_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验全部转让路由加载",
+      "params": {"actual": "${step_open_change_all.data.src}", "expected": "finance/change/all"}
+    },
+    {
+      "id": "step_get_change_all_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取全部转让列表信息"
+    },
+    {
+      "id": "check_change_all_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验全部转让表头渲染",
+      "params": {"actual": "${step_get_change_all_info.data.headers_text}", "expected": "转让价格"}
+    },
+    {
+      "id": "step_open_change_now",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 转让中",
+      "params": {"group": "债权转让", "item_rel": "finance/change/now"}
+    },
+    {
+      "id": "check_change_now_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验转让中路由加载",
+      "params": {"actual": "${step_open_change_now.data.src}", "expected": "finance/change/now"}
+    },
+    {
+      "id": "step_get_change_now_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取转让中列表信息"
+    },
+    {
+      "id": "check_change_now_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验转让中表头渲染",
+      "params": {"actual": "${step_get_change_now_info.data.headers_text}", "expected": "转让价格"}
+    },
+    {
+      "id": "step_open_change_success",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 已成功转让",
+      "params": {"group": "债权转让", "item_rel": "finance/change/success"}
+    },
+    {
+      "id": "check_change_success_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验已成功转让路由加载",
+      "params": {"actual": "${step_open_change_success.data.src}", "expected": "finance/change/success"}
+    },
+    {
+      "id": "step_get_change_success_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取已成功转让列表信息"
+    },
+    {
+      "id": "check_change_success_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验已成功转让表头渲染",
+      "params": {"actual": "${step_get_change_success_info.data.headers_text}", "expected": "转让价格"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_tender_list", "condition": "pass"},
+    {"source": "step_open_tender_list", "target": "check_tender_src", "condition": "pass"},
+    {"source": "check_tender_src", "target": "step_get_tender_info", "condition": "pass"},
+    {"source": "step_get_tender_info", "target": "check_tender_headers", "condition": "pass"},
+    {"source": "check_tender_headers", "target": "step_open_repayperiod_list", "condition": "pass"},
+    {"source": "step_open_repayperiod_list", "target": "check_repayperiod_src", "condition": "pass"},
+    {"source": "check_repayperiod_src", "target": "step_get_repayperiod_info", "condition": "pass"},
+    {"source": "step_get_repayperiod_info", "target": "check_repayperiod_headers", "condition": "pass"},
+    {"source": "check_repayperiod_headers", "target": "step_open_recover_list", "condition": "pass"},
+    {"source": "step_open_recover_list", "target": "check_recover_src", "condition": "pass"},
+    {"source": "check_recover_src", "target": "step_get_recover_info", "condition": "pass"},
+    {"source": "step_get_recover_info", "target": "check_recover_headers", "condition": "pass"},
+    {"source": "check_recover_headers", "target": "step_open_change_all", "condition": "pass"},
+    {"source": "step_open_change_all", "target": "check_change_all_src", "condition": "pass"},
+    {"source": "check_change_all_src", "target": "step_get_change_all_info", "condition": "pass"},
+    {"source": "step_get_change_all_info", "target": "check_change_all_headers", "condition": "pass"},
+    {"source": "check_change_all_headers", "target": "step_open_change_now", "condition": "pass"},
+    {"source": "step_open_change_now", "target": "check_change_now_src", "condition": "pass"},
+    {"source": "check_change_now_src", "target": "step_get_change_now_info", "condition": "pass"},
+    {"source": "step_get_change_now_info", "target": "check_change_now_headers", "condition": "pass"},
+    {"source": "check_change_now_headers", "target": "step_open_change_success", "condition": "pass"},
+    {"source": "step_open_change_success", "target": "check_change_success_src", "condition": "pass"},
+    {"source": "check_change_success_src", "target": "step_get_change_success_info", "condition": "pass"},
+    {"source": "step_get_change_success_info", "target": "check_change_success_headers", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_records_tour_teardown"}}
+    ]
+  }
+}

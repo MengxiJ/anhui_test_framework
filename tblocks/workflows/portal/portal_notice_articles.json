@@ -1,0 +1,111 @@
+{
+  "id": "portal/portal_notice_articles",
+  "name": "PORTAL_NOTICE_001",
+  "display_name": "公告、智客动态与文章详情只读校验",
+  "description": "免登录只读：POST /content/notice/noticelist 公告列表、POST /content/articles/mydtarticles 智客动态文章、GET /content/articles/getDetail?id=1 文章详情页。",
+  "category": "portal",
+  "module": "portal",
+  "priority": "P1",
+  "suites": "smoke",
+  "nodes": [
+    {
+      "id": "step_query_notice_list",
+      "type": "step",
+      "step_id": "step_query_notice_list",
+      "label": "查询公告列表",
+      "params": {"page": 1}
+    },
+    {
+      "id": "check_notice_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "公告 HTTP 200",
+      "params": {"http_status": "${step_query_notice_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_notice_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "公告至少 1 条",
+      "params": {"items": "${step_query_notice_list.data.items}", "min_count": 1}
+    },
+    {
+      "id": "check_notice_fields",
+      "type": "check",
+      "check_id": "check_portal_items_fields_complete",
+      "label": "公告字段完整",
+      "params": {
+        "items": "${step_query_notice_list.data.items}",
+        "required_fields": ["id", "title", "add_time"]
+      }
+    },
+    {
+      "id": "step_query_article_columns",
+      "type": "step",
+      "step_id": "step_query_article_columns",
+      "label": "查询智客动态文章"
+    },
+    {
+      "id": "check_article_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "文章 HTTP 200",
+      "params": {"http_status": "${step_query_article_columns.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_article_status",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "文章业务 status=200",
+      "params": {"code": "${step_query_article_columns.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_article_not_empty",
+      "type": "check",
+      "check_id": "check_portal_list_not_empty",
+      "label": "文章列表非空",
+      "params": {"items": "${step_query_article_columns.data.items}"}
+    },
+    {
+      "id": "step_get_article_detail",
+      "type": "step",
+      "step_id": "step_get_article_detail",
+      "label": "获取文章详情页",
+      "params": {"article_id": 1}
+    },
+    {
+      "id": "check_detail_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "详情页 HTTP 200",
+      "params": {"http_status": "${step_get_article_detail.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_detail_length",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "详情页内容长度大于 1000",
+      "params": {"actual": "${step_get_article_detail.data.content_length}", "expected": 1000}
+    }
+  ],
+  "edges": [
+    {"source": "step_query_notice_list", "target": "check_notice_http", "condition": "pass"},
+    {"source": "check_notice_http", "target": "check_notice_count", "condition": "pass"},
+    {"source": "check_notice_count", "target": "check_notice_fields", "condition": "pass"},
+    {"source": "check_notice_fields", "target": "step_query_article_columns", "condition": "pass"},
+    {"source": "step_query_article_columns", "target": "check_article_http", "condition": "pass"},
+    {"source": "check_article_http", "target": "check_article_status", "condition": "pass"},
+    {"source": "check_article_status", "target": "check_article_not_empty", "condition": "pass"},
+    {"source": "check_article_not_empty", "target": "step_get_article_detail", "condition": "pass"},
+    {"source": "step_get_article_detail", "target": "check_detail_http", "condition": "pass"},
+    {"source": "check_detail_http", "target": "check_detail_length", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: portal notice begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: portal notice end", "level": "info"}}
+    ]
+  }
+}

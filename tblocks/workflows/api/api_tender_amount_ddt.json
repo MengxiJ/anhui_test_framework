@@ -1,0 +1,65 @@
+{
+  "id": "api/tender_amount_ddt",
+  "name": "API_TENDER_AMOUNT_DDT",
+  "display_name": "投标接口非法金额数据驱动（8 行：空/非数/负数/逗号/科学计数/空格/中文/正号）",
+  "description": "数据驱动模板，每行独立会话先正确登录建立会话，再 POST /trust/trust/tender（loan_id=0）提交各种非法金额，全部在金额格式/非空校验阶段返回业务码 100，不生成订单、不冻结资金。空字符串经框架 str 类型转换为 None，对应服务端『投资金额不能为空』；其余统一『不是正确的金额』。消息均含『金额』，可统一断言。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "共享教学账号 18800002008 可登录；loan_id=0 不存在",
+  "expected": "每行业务码 100 且消息包含「金额」，无资金变动",
+  "data_rows": [
+    {"row_id": "amount_empty", "amount": ""},
+    {"row_id": "amount_non_numeric", "amount": "abc"},
+    {"row_id": "amount_negative", "amount": "-100"},
+    {"row_id": "amount_thousands_comma", "amount": "1,000"},
+    {"row_id": "amount_scientific", "amount": "1e9"},
+    {"row_id": "amount_spaces", "amount": "   "},
+    {"row_id": "amount_chinese_yuan", "amount": "0元"},
+    {"row_id": "amount_leading_plus", "amount": "+100"}
+  ],
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "tender",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "非法金额投标",
+      "params": {"amount": "${row.amount}", "loan_id": 0, "deposit_certificate": -1}
+    },
+    {
+      "id": "check_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "业务码 100",
+      "params": {"code": "${tender.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "消息包含「金额」",
+      "params": {"message": "${tender.data.message}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "tender", "condition": "pass"},
+    {"source": "tender", "target": "check_code", "condition": "pass"},
+    {"source": "check_code", "target": "check_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative-ddt", "write_side_effect": "none", "note": "金额格式/非空前置拦截，不生成订单不冻结资金"}
+}

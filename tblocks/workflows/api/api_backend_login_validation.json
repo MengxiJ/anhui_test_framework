@@ -1,0 +1,62 @@
+{
+  "id": "api/backend_login_validation",
+  "name": "API_BACK_LOGIN_VAL_001",
+  "display_name": "后台管理员登录接口参数校验（错误密码/空账号）",
+  "description": "POST /system/public/verifyLogin（8082）：错误密码返回业务码 100“用户名/密码错误”；空账号返回业务码 100“用户名不能为空”。每次提交前自动在同会话拉取图形验证码，模拟真实前端序列。",
+  "category": "api",
+  "module": "admin",
+  "priority": "P1",
+  "expected": "错误密码与空账号业务码均为 100，消息分别匹配",
+  "nodes": [
+    {
+      "id": "login_bad_pwd",
+      "type": "step",
+      "step_id": "step_backend_api_login",
+      "label": "错误密码登录后台",
+      "params": {"username": "admin", "password": "bad_pwd_x", "valicode": "8888", "fetch_code": true}
+    },
+    {
+      "id": "check_bad_pwd_code",
+      "type": "check",
+      "check_id": "check_backend_api_business_code",
+      "label": "错误密码业务码 100",
+      "params": {"code": "${login_bad_pwd.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_bad_pwd_msg",
+      "type": "check",
+      "check_id": "check_backend_api_message_contains",
+      "label": "提示用户名/密码错误",
+      "params": {"message": "${login_bad_pwd.data.message}", "expected": "用户名/密码错误"}
+    },
+    {
+      "id": "login_empty",
+      "type": "step",
+      "step_id": "step_backend_api_login",
+      "label": "空账号登录后台",
+      "params": {"username": "", "password": "", "valicode": "8888", "fetch_code": true}
+    },
+    {
+      "id": "check_empty_code",
+      "type": "check",
+      "check_id": "check_backend_api_business_code",
+      "label": "空账号业务码 100",
+      "params": {"code": "${login_empty.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_empty_msg",
+      "type": "check",
+      "check_id": "check_backend_api_message_contains",
+      "label": "提示用户名不能为空",
+      "params": {"message": "${login_empty.data.message}", "expected": "用户名不能为空"}
+    }
+  ],
+  "edges": [
+    {"source": "login_bad_pwd", "target": "check_bad_pwd_code", "condition": "pass"},
+    {"source": "check_bad_pwd_code", "target": "check_bad_pwd_msg", "condition": "pass"},
+    {"source": "check_bad_pwd_msg", "target": "login_empty", "condition": "pass"},
+    {"source": "login_empty", "target": "check_empty_code", "condition": "pass"},
+    {"source": "check_empty_code", "target": "check_empty_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative", "write_side_effect": "none", "site": "http://121.43.169.97:8082"}
+}

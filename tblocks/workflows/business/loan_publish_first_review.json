@@ -1,0 +1,163 @@
+{
+  "id": "business/loan_publish_first_review",
+  "name": "BUSINESS_LOAN_001",
+  "display_name": "核心业务：前台发标 → 后台初审通过 → 状态流转核验",
+  "description": "借款人前台发标 200 元信用标，管理员进入初审标列表按标题搜索选中该标并初审通过，随后核验该标移出初审队列、进入正在借款（投标中）状态，完成发标-初审业务闭环。",
+  "category": "business",
+  "module": "business",
+  "priority": "P0",
+  "precondition": "1. 借款人 18800002008 可用信用额度充足（≥200 元）；2. 管理员 admin 可登录后台；3. 图形验证码固定 8888",
+  "expected": "发标成功进入初审队列；初审通过后该借款编号在初审标列表清零、在正在借款列表出现",
+  "nodes": [
+    {
+      "id": "step_open_member_login",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "借款人登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_open_loan_index",
+      "type": "step",
+      "step_id": "step_open_loan_index",
+      "label": "打开个人借款页"
+    },
+    {
+      "id": "step_publish_borrow",
+      "type": "step",
+      "step_id": "step_publish_borrow",
+      "label": "发标 200 元信用标",
+      "params": {
+        "title": "自动化发标流转",
+        "use": "周转",
+        "amount": "200",
+        "apr": "5",
+        "repay_type": "到期还本还息",
+        "period": "1个月",
+        "validate": "3天",
+        "tender_min": "50元",
+        "tender_max": "不限",
+        "contents": "自动化测试借款标，用于发标-初审-投标-复审全链路验证。",
+        "valicode": "8888"
+      }
+    },
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_first_review",
+      "type": "step",
+      "step_id": "step_backend_loan_list_review",
+      "label": "初审列表搜索该标并审核通过",
+      "params": {
+        "group": "初审管理",
+        "item_rel": "loan/verify/list",
+        "title": "自动化发标流转",
+        "note": "初审通过-自动化",
+        "img_code": "8888",
+        "marker": "自动化测试"
+      }
+    },
+    {
+      "id": "check_review_target_found",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验该标已进入初审队列",
+      "params": {
+        "actual": "${step_first_review.data.row_count}",
+        "expected": 0
+      }
+    },
+    {
+      "id": "step_requery_verify_empty",
+      "type": "step",
+      "step_id": "step_backend_loan_list_requery",
+      "label": "复查初审标队列（按借款编号）",
+      "params": {
+        "group": "初审管理",
+        "item_rel": "loan/verify/list",
+        "serial_no": "${step_first_review.data.serialno}"
+      }
+    },
+    {
+      "id": "check_verify_queue_cleared",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验该标已移出初审队列",
+      "params": {
+        "actual": "${step_requery_verify_empty.data.row_count}",
+        "expected": 0
+      }
+    },
+    {
+      "id": "step_requery_loaning",
+      "type": "step",
+      "step_id": "step_backend_loan_list_requery",
+      "label": "复查正在借款列表（按借款编号）",
+      "params": {
+        "group": "借款中管理",
+        "item_rel": "loan/loaning/list",
+        "serial_no": "${step_first_review.data.serialno}"
+      }
+    },
+    {
+      "id": "check_loaning_appeared",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验该标已进入正在借款（投标中）",
+      "params": {
+        "actual": "${step_requery_loaning.data.row_count}",
+        "expected": 1
+      }
+    },
+    {
+      "id": "check_loaning_serialno_match",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验正在借款首行编号与审核标一致",
+      "params": {
+        "actual": "${step_requery_loaning.data.first_serialno}",
+        "expected": "${step_first_review.data.serialno}"
+      }
+    }
+  ],
+  "edges": [
+    {"source": "step_open_member_login", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_open_loan_index", "condition": "pass"},
+    {"source": "step_open_loan_index", "target": "step_publish_borrow", "condition": "pass"},
+    {"source": "step_publish_borrow", "target": "step_open_backend_login", "condition": "pass"},
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_first_review", "condition": "pass"},
+    {"source": "step_first_review", "target": "check_review_target_found", "condition": "pass"},
+    {"source": "check_review_target_found", "target": "step_requery_verify_empty", "condition": "pass"},
+    {"source": "step_requery_verify_empty", "target": "check_verify_queue_cleared", "condition": "pass"},
+    {"source": "check_verify_queue_cleared", "target": "step_requery_loaning", "condition": "pass"},
+    {"source": "step_requery_loaning", "target": "check_loaning_appeared", "condition": "pass"},
+    {"source": "check_loaning_appeared", "target": "check_loaning_serialno_match", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "business_loan_first_review_teardown"}}
+    ]
+  }
+}

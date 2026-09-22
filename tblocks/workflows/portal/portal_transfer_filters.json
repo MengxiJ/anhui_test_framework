@@ -1,0 +1,131 @@
+{
+  "id": "portal/portal_transfer_filters",
+  "name": "PORTAL_TRANSFER_001",
+  "display_name": "债权转让、体验标与筛选枚举只读校验",
+  "description": "免登录只读：债权转让筛选枚举与可购买列表（允许 0 条）、体验标列表（允许 0 条）、投资列表筛选枚举。仅校验 HTTP 与响应字段存在。",
+  "category": "portal",
+  "module": "portal",
+  "priority": "P1",
+  "suites": "smoke",
+  "nodes": [
+    {
+      "id": "step_query_transfer_types",
+      "type": "step",
+      "step_id": "step_query_transfer_types",
+      "label": "查询债权转让筛选枚举"
+    },
+    {
+      "id": "check_types_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "枚举 HTTP 200",
+      "params": {"http_status": "${step_query_transfer_types.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_types_apr",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 apr 枚举",
+      "params": {"body": "${step_query_transfer_types.data.body}", "field": "apr"}
+    },
+    {
+      "id": "check_types_account",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 account 枚举",
+      "params": {"body": "${step_query_transfer_types.data.body}", "field": "account"}
+    },
+    {
+      "id": "step_query_transfer_list",
+      "type": "step",
+      "step_id": "step_query_transfer_list",
+      "label": "查询债权转让可购买列表",
+      "params": {"page": 1}
+    },
+    {
+      "id": "check_transfer_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "转让列表 HTTP 200",
+      "params": {"http_status": "${step_query_transfer_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_transfer_total_field",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 total_items 字段（可为 0）",
+      "params": {"body": "${step_query_transfer_list.data.body}", "field": "total_items"}
+    },
+    {
+      "id": "step_query_experience_loan_list",
+      "type": "step",
+      "step_id": "step_query_experience_loan_list",
+      "label": "查询体验标列表",
+      "params": {"page": 1}
+    },
+    {
+      "id": "check_experience_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "体验标 HTTP 200",
+      "params": {"http_status": "${step_query_experience_loan_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_experience_total_field",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 total_items 字段（可为 0）",
+      "params": {"body": "${step_query_experience_loan_list.data.body}", "field": "total_items"}
+    },
+    {
+      "id": "step_query_loan_search_filters",
+      "type": "step",
+      "step_id": "step_query_loan_search_filters",
+      "label": "查询投资筛选枚举"
+    },
+    {
+      "id": "check_filters_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "筛选枚举 HTTP 200",
+      "params": {"http_status": "${step_query_loan_search_filters.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_filters_loan_type",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 loan_type_search",
+      "params": {"body": "${step_query_loan_search_filters.data.body}", "field": "loan_type_search"}
+    },
+    {
+      "id": "check_filters_period",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "含 period_search",
+      "params": {"body": "${step_query_loan_search_filters.data.body}", "field": "period_search"}
+    }
+  ],
+  "edges": [
+    {"source": "step_query_transfer_types", "target": "check_types_http", "condition": "pass"},
+    {"source": "check_types_http", "target": "check_types_apr", "condition": "pass"},
+    {"source": "check_types_apr", "target": "check_types_account", "condition": "pass"},
+    {"source": "check_types_account", "target": "step_query_transfer_list", "condition": "pass"},
+    {"source": "step_query_transfer_list", "target": "check_transfer_http", "condition": "pass"},
+    {"source": "check_transfer_http", "target": "check_transfer_total_field", "condition": "pass"},
+    {"source": "check_transfer_total_field", "target": "step_query_experience_loan_list", "condition": "pass"},
+    {"source": "step_query_experience_loan_list", "target": "check_experience_http", "condition": "pass"},
+    {"source": "check_experience_http", "target": "check_experience_total_field", "condition": "pass"},
+    {"source": "check_experience_total_field", "target": "step_query_loan_search_filters", "condition": "pass"},
+    {"source": "step_query_loan_search_filters", "target": "check_filters_http", "condition": "pass"},
+    {"source": "check_filters_http", "target": "check_filters_loan_type", "condition": "pass"},
+    {"source": "check_filters_loan_type", "target": "check_filters_period", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: portal transfer begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: portal transfer end", "level": "info"}}
+    ]
+  }
+}

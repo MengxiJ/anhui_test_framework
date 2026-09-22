@@ -1,0 +1,88 @@
+{
+  "id": "invest/risk_assessment_flow",
+  "name": "INVEST_RISK_001",
+  "display_name": "核心链路：风险测评（未测评答题 / 已测评直验）",
+  "description": "登录后读取测评状态：未测评则完成一次答题提交（默认每题第一项），已测评则跳过答题；最终均校验测评等级非空且含等级关键词。",
+  "category": "invest",
+  "module": "invest",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 测评答题页「风险提示」模态框可关闭",
+  "expected": "测评等级文本含等级关键词（保守/稳健/平衡/成长/进取/激进）",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_risk_level",
+      "type": "step",
+      "step_id": "step_get_risk_level",
+      "label": "读取风险测评状态"
+    },
+    {
+      "id": "condition_assessed",
+      "type": "condition",
+      "check_id": "check_value_equal",
+      "label": "条件：是否已完成测评",
+      "params": {"actual": "${step_get_risk_level.data.assessed}", "expected": true}
+    },
+    {
+      "id": "step_submit_quiz",
+      "type": "step",
+      "step_id": "step_submit_risk_quiz",
+      "label": "未测评分支：完成答题提交"
+    },
+    {
+      "id": "check_quiz_submitted",
+      "type": "check",
+      "check_id": "check_risk_quiz_submitted",
+      "label": "校验答题提交生效",
+      "params": {"submitted": "${step_submit_quiz.data.submitted}"}
+    },
+    {
+      "id": "check_level_present",
+      "type": "check",
+      "check_id": "check_risk_level_present",
+      "label": "校验测评等级非空（自包含重读）"
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "risk_assessment_flow_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_risk_level", "condition": "pass"},
+    {"source": "step_get_risk_level", "target": "condition_assessed", "condition": "pass"},
+    {"source": "condition_assessed", "target": "check_level_present", "condition": "pass"},
+    {"source": "condition_assessed", "target": "step_submit_quiz", "condition": "fail"},
+    {"source": "step_submit_quiz", "target": "check_quiz_submitted", "condition": "pass"},
+    {"source": "check_quiz_submitted", "target": "check_level_present", "condition": "pass"},
+    {"source": "check_level_present", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "risk_assessment_flow_teardown"}}
+    ]
+  }
+}

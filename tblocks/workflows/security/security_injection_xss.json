@@ -1,0 +1,190 @@
+{
+  "id": "security/injection_xss",
+  "name": "SEC_INJECT_001",
+  "display_name": "注入与XSS防御基线（SQLi/反射型XSS/后台登录注入）",
+  "description": "纯 HTTP 黑盒安全基线（只读、无数据副作用）：向前台公共查询、会员登录、平台统计及后台登录提交 SQL 注入与 XSS 载荷，断言：(1) 响应状态码仅落在 200/302/400/403/404，绝不 5xx（输入未打穿应用）；(2) 响应体不含任何数据库/ORM 错误指纹（参数化/异常兜底生效）；(3) 载荷字符串不被原样回显（无反射型 XSS、无注入回显）；(4) 后台注入登录不得返回 status:200。2026-09-19 实测：Tomcat 对特殊字符表单直接 400、登录接口返回业务码 100（用户不存在/验证码错误），均无错误指纹与回显。",
+  "category": "security",
+  "module": "site",
+  "priority": "P1",
+  "expected": "全部注入/XSS 探测无 5xx、无数据库错误指纹、无载荷回显；后台注入登录认证失败",
+  "nodes": [
+    {
+      "id": "sqli_listtender",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "投资列表提交SQLi载荷",
+      "params": {"path": "/loan/loan/listtender", "site": "front", "data": {"page": "1' OR '1'='1", "epage": "5"}}
+    },
+    {
+      "id": "sqli_listtender_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${sqli_listtender.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "sqli_listtender_nodb",
+      "type": "check",
+      "check_id": "check_probe_no_db_error",
+      "label": "无数据库错误指纹",
+      "params": {"body_text": "${sqli_listtender.data.body_text}"}
+    },
+    {
+      "id": "sqli_listtender_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "载荷不回显",
+      "params": {"body_text": "${sqli_listtender.data.body_text}", "forbidden": "OR '1'='1"}
+    },
+    {
+      "id": "sqli_login",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "会员登录提交SQLi用户名",
+      "params": {"path": "/member/public/login", "site": "front", "data": {"keywords": "' OR '1'='1' -- ", "password": "x"}}
+    },
+    {
+      "id": "sqli_login_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${sqli_login.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "sqli_login_nodb",
+      "type": "check",
+      "check_id": "check_probe_no_db_error",
+      "label": "无数据库错误指纹",
+      "params": {"body_text": "${sqli_login.data.body_text}"}
+    },
+    {
+      "id": "sqli_login_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "载荷不回显",
+      "params": {"body_text": "${sqli_login.data.body_text}", "forbidden": "OR '1'='1"}
+    },
+    {
+      "id": "sqli_loantotal",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "平台统计提交SQLi参数",
+      "params": {"path": "/common/loan/loantotal", "site": "front", "data": {"id": "1' AND '1'='1"}}
+    },
+    {
+      "id": "sqli_loantotal_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${sqli_loantotal.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "sqli_loantotal_nodb",
+      "type": "check",
+      "check_id": "check_probe_no_db_error",
+      "label": "无数据库错误指纹",
+      "params": {"body_text": "${sqli_loantotal.data.body_text}"}
+    },
+    {
+      "id": "sqli_loantotal_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "载荷不回显",
+      "params": {"body_text": "${sqli_loantotal.data.body_text}", "forbidden": "AND '1'='1"}
+    },
+    {
+      "id": "xss_get",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "首页URL提交XSS脚本",
+      "params": {"path": "/?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E", "site": "front", "allow_redirects": false}
+    },
+    {
+      "id": "xss_get_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${xss_get.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "xss_get_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "脚本标签不回显",
+      "params": {"body_text": "${xss_get.data.body_text}", "forbidden": "<script>alert(1)</script>"}
+    },
+    {
+      "id": "xss_post",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "投资列表提交XSS分页参数",
+      "params": {"path": "/loan/loan/listtender", "site": "front", "data": {"page": "<script>alert(1)</script>", "epage": "5"}}
+    },
+    {
+      "id": "xss_post_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${xss_post.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "xss_post_noecho",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "脚本标签不回显",
+      "params": {"body_text": "${xss_post.data.body_text}", "forbidden": "<script>alert(1)</script>"}
+    },
+    {
+      "id": "sqli_back_login",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "后台登录提交SQLi用户名",
+      "params": {"path": "/system/public/verifyLogin", "site": "back", "data": {"username": "admin' OR '1'='1' -- ", "password": "x", "valicode": "8888"}}
+    },
+    {
+      "id": "sqli_back_status",
+      "type": "check",
+      "check_id": "check_probe_http_status_in",
+      "label": "无5xx",
+      "params": {"http_status": "${sqli_back_login.data.http_status}", "allowed": [200, 302, 400, 403, 404]}
+    },
+    {
+      "id": "sqli_back_nodb",
+      "type": "check",
+      "check_id": "check_probe_no_db_error",
+      "label": "无数据库错误指纹",
+      "params": {"body_text": "${sqli_back_login.data.body_text}"}
+    },
+    {
+      "id": "sqli_back_noauth",
+      "type": "check",
+      "check_id": "check_probe_content_not_contains",
+      "label": "注入登录不得认证成功",
+      "params": {"body_text": "${sqli_back_login.data.body_text}", "forbidden": "\"status\":200"}
+    }
+  ],
+  "edges": [
+    {"source": "sqli_listtender", "target": "sqli_listtender_status", "condition": "pass"},
+    {"source": "sqli_listtender_status", "target": "sqli_listtender_nodb", "condition": "pass"},
+    {"source": "sqli_listtender_nodb", "target": "sqli_listtender_noecho", "condition": "pass"},
+    {"source": "sqli_listtender_noecho", "target": "sqli_login", "condition": "pass"},
+    {"source": "sqli_login", "target": "sqli_login_status", "condition": "pass"},
+    {"source": "sqli_login_status", "target": "sqli_login_nodb", "condition": "pass"},
+    {"source": "sqli_login_nodb", "target": "sqli_login_noecho", "condition": "pass"},
+    {"source": "sqli_login_noecho", "target": "sqli_loantotal", "condition": "pass"},
+    {"source": "sqli_loantotal", "target": "sqli_loantotal_status", "condition": "pass"},
+    {"source": "sqli_loantotal_status", "target": "sqli_loantotal_nodb", "condition": "pass"},
+    {"source": "sqli_loantotal_nodb", "target": "sqli_loantotal_noecho", "condition": "pass"},
+    {"source": "sqli_loantotal_noecho", "target": "xss_get", "condition": "pass"},
+    {"source": "xss_get", "target": "xss_get_status", "condition": "pass"},
+    {"source": "xss_get_status", "target": "xss_get_noecho", "condition": "pass"},
+    {"source": "xss_get_noecho", "target": "xss_post", "condition": "pass"},
+    {"source": "xss_post", "target": "xss_post_status", "condition": "pass"},
+    {"source": "xss_post_status", "target": "xss_post_noecho", "condition": "pass"},
+    {"source": "xss_post_noecho", "target": "sqli_back_login", "condition": "pass"},
+    {"source": "sqli_back_login", "target": "sqli_back_status", "condition": "pass"},
+    {"source": "sqli_back_status", "target": "sqli_back_nodb", "condition": "pass"},
+    {"source": "sqli_back_nodb", "target": "sqli_back_noauth", "condition": "pass"}
+  ],
+  "metadata": {"layer": "security", "mode": "http-only", "read_only": true, "owasp": "A03 Injection / A07 XSS"}
+}

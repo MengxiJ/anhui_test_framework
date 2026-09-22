@@ -1,0 +1,134 @@
+{
+  "id": "member/member_profile_flow",
+  "name": "MEMBER_PROFILE_001",
+  "display_name": "核心链路：资料编辑（可逆翻转）+ 提醒开关（往返核对）",
+  "description": "登录后读取基础信息快照，将婚姻状况改为「已婚」并回读核对，再改回「未婚」并回读核对（终态确定、可重复执行）；随后读取提醒设置状态，切换 message_1 站内消息通知并核对翻转生效，再切回原状态核对，全程截图留证。",
+  "category": "member",
+  "module": "member",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 基础信息页 marryStatus 下拉含「已婚/未婚」选项；3. 提醒设置页存在 message_1 复选框",
+  "expected": "资料字段两次回读均等于提交值；提醒开关两次翻转均生效（读值 != before）",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_read_profile",
+      "type": "step",
+      "step_id": "step_read_member_profile",
+      "label": "读取基础信息快照"
+    },
+    {
+      "id": "step_edit_marry_first",
+      "type": "step",
+      "step_id": "step_edit_member_profile_field",
+      "label": "婚姻状况改为「已婚」",
+      "params": {"field": "marryStatus", "value": "已婚"}
+    },
+    {
+      "id": "check_marry_first",
+      "type": "check",
+      "check_id": "check_profile_field_updated",
+      "label": "回读婚姻状况=已婚",
+      "params": {"field": "marryStatus", "expected_value": "已婚"}
+    },
+    {
+      "id": "step_edit_marry_back",
+      "type": "step",
+      "step_id": "step_edit_member_profile_field",
+      "label": "婚姻状况改回「未婚」（可逆）",
+      "params": {"field": "marryStatus", "value": "未婚"}
+    },
+    {
+      "id": "check_marry_back",
+      "type": "check",
+      "check_id": "check_profile_field_updated",
+      "label": "回读婚姻状况=未婚",
+      "params": {"field": "marryStatus", "expected_value": "未婚"}
+    },
+    {
+      "id": "step_read_remind",
+      "type": "step",
+      "step_id": "step_read_remind_states",
+      "label": "读取提醒设置快照"
+    },
+    {
+      "id": "step_toggle_msg_first",
+      "type": "step",
+      "step_id": "step_toggle_remind",
+      "label": "切换 message_1 站内消息通知",
+      "params": {"checkbox_id": "message_1"}
+    },
+    {
+      "id": "check_toggle_first",
+      "type": "check",
+      "check_id": "check_remind_toggled",
+      "label": "核对 message_1 翻转生效",
+      "params": {
+        "checkbox_id": "message_1",
+        "before": "${step_toggle_msg_first.data.before}"
+      }
+    },
+    {
+      "id": "step_toggle_msg_back",
+      "type": "step",
+      "step_id": "step_toggle_remind",
+      "label": "切回 message_1 原状态（可逆）",
+      "params": {"checkbox_id": "message_1"}
+    },
+    {
+      "id": "check_toggle_back",
+      "type": "check",
+      "check_id": "check_remind_toggled",
+      "label": "核对 message_1 再次翻转生效",
+      "params": {
+        "checkbox_id": "message_1",
+        "before": "${step_toggle_msg_back.data.before}"
+      }
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "member_profile_flow_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_read_profile", "condition": "pass"},
+    {"source": "step_read_profile", "target": "step_edit_marry_first", "condition": "pass"},
+    {"source": "step_edit_marry_first", "target": "check_marry_first", "condition": "pass"},
+    {"source": "check_marry_first", "target": "step_edit_marry_back", "condition": "pass"},
+    {"source": "step_edit_marry_back", "target": "check_marry_back", "condition": "pass"},
+    {"source": "check_marry_back", "target": "step_read_remind", "condition": "pass"},
+    {"source": "step_read_remind", "target": "step_toggle_msg_first", "condition": "pass"},
+    {"source": "step_toggle_msg_first", "target": "check_toggle_first", "condition": "pass"},
+    {"source": "check_toggle_first", "target": "step_toggle_msg_back", "condition": "pass"},
+    {"source": "step_toggle_msg_back", "target": "check_toggle_back", "condition": "pass"},
+    {"source": "check_toggle_back", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "member_profile_flow_teardown"}}
+    ]
+  }
+}

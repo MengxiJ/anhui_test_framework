@@ -1,0 +1,50 @@
+{
+  "id": "api/login_boundary_ddt",
+  "name": "API_LOGIN_BOUND_DDT",
+  "display_name": "会员登录接口边界值数据驱动（9 行：空参/不存在用户/非法手机号）",
+  "description": "数据驱动模板，data_rows 每行展开为一个独立 pytest 项。POST /member/public/login 边界与负向：空用户名/空密码、不存在的用户、10 位/19 位/50 位手机号、纯字母、含空格手机号，统一期望业务码 100 且消息匹配。全部输入不针对任何已存在账户的错误口令，不触发账户锁定。",
+  "category": "api",
+  "module": "account",
+  "priority": "P1",
+  "precondition": "无（纯接口负向，不产生数据）",
+  "expected": "每行业务码 100 且业务消息匹配期望片段",
+  "data_rows": [
+    {"row_id": "empty_both", "phone": "", "password": "", "expect_msg": ""},
+    {"row_id": "empty_phone", "phone": "", "password": "Aa123456", "expect_msg": ""},
+    {"row_id": "empty_password", "phone": "18800002008", "password": "", "expect_msg": "密码不能为空"},
+    {"row_id": "user_not_exist_199", "phone": "19900000000", "password": "Aa123456", "expect_msg": "用户不存在"},
+    {"row_id": "phone_10_digits", "phone": "1380013800", "password": "Aa123456", "expect_msg": "用户不存在"},
+    {"row_id": "phone_19_digits", "phone": "18800001234567890", "password": "Aa123456", "expect_msg": "用户不存在"},
+    {"row_id": "phone_letters", "phone": "abcdefghijk", "password": "Aa123456", "expect_msg": "用户不存在"},
+    {"row_id": "phone_with_space", "phone": "1880000 2008", "password": "Aa123456", "expect_msg": "用户不存在"},
+    {"row_id": "phone_50_digits", "phone": "11111111111111111111111111111111111111111111111111", "password": "Aa123456", "expect_msg": "用户不存在"}
+  ],
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "边界输入登录",
+      "params": {"keywords": "${row.phone}", "password": "${row.password}"}
+    },
+    {
+      "id": "check_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "业务码 100",
+      "params": {"code": "${login.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "业务消息匹配",
+      "params": {"message": "${login.data.message}", "expected": "${row.expect_msg}"}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_code", "condition": "pass"},
+    {"source": "check_code", "target": "check_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative-ddt", "write_side_effect": "none", "lockout_note": "不使用已存在账户的错误口令，避免触发连续 3 次锁账户"}
+}

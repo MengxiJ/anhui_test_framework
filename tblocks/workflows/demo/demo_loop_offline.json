@@ -1,0 +1,38 @@
+{
+  "id": "demo/demo_loop_offline",
+  "name": "DEMO_LOOP_001",
+  "display_name": "离线 range 循环演示",
+  "description": "演示 loop 节点（range 循环 3 次）+ 循环变量 ${loop_index.data.result} 引用，完全离线可运行。",
+  "category": "demo",
+  "module": "core",
+  "priority": "P1",
+  "suites": "smoke",
+  "nodes": [
+    {
+      "id": "step_loop_body_log",
+      "type": "step",
+      "step_id": "step_log_message",
+      "label": "循环体日志",
+      "params": {"message": "loop iteration ${loop_index.data.result}", "level": "info"}
+    },
+    {
+      "id": "loop_three_times",
+      "type": "loop",
+      "label": "循环 3 次",
+      "loop_type": "range",
+      "loop_params": {"start": 0, "stop": 3, "step": 1},
+      "target_nodes": ["step_loop_body_log"]
+    },
+    {
+      "id": "check_loop_finished",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验循环结束值为 3",
+      "params": {"actual": "${loop_three_times.data.result}", "expected": 3}
+    }
+  ],
+  "edges": [
+    {"source": "loop_three_times", "target": "check_loop_finished", "condition": null}
+  ],
+  "metadata": {}
+}

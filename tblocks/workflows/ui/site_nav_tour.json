@@ -1,0 +1,122 @@
+{
+  "id": "ui/site_nav_tour",
+  "name": "UI_NAV_TOUR_001",
+  "display_name": "巡检：顶部导航三页（品质理财/财富计划/帮助中心）",
+  "description": "登录后逐页巡检顶部导航：品质理财页含借款标介绍区块与三类标种，财富计划页含标题与安全保障入口，帮助中心页含帮助文章列表与贷款者/投资者帮助入口。",
+  "category": "ui",
+  "module": "browser",
+  "priority": "P1",
+  "precondition": "前台站点可访问（无需登录亦可巡检，本流程带登录态）",
+  "expected": "三个导航页均可达且关键区块文本存在",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_quality",
+      "type": "step",
+      "step_id": "step_open_url_settled",
+      "label": "导航：品质理财页",
+      "params": {"url": "http://121.43.169.97:8081/loan/loan/index"}
+    },
+    {
+      "id": "check_quality_intro",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "核对品质理财「借款标介绍」区块",
+      "params": {"by": "tag_name", "value": "h2", "expected": "借款标介绍"}
+    },
+    {
+      "id": "check_quality_types",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "核对三类标种（信用标/天标/担保标）",
+      "params": {"by": "tag_name", "value": "h3", "expected": "信用标"}
+    },
+    {
+      "id": "step_open_wealth",
+      "type": "step",
+      "step_id": "step_open_url_settled",
+      "label": "导航：财富计划页",
+      "params": {"url": "http://121.43.169.97:8081/yemian"}
+    },
+    {
+      "id": "check_wealth_title",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "核对财富计划标题",
+      "params": {"by": "tag_name", "value": "h2", "expected": "财富计划"}
+    },
+    {
+      "id": "check_wealth_safety",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "核对「安全保障」区块",
+      "params": {"by": "tag_name", "value": "h3", "expected": "安全保障"}
+    },
+    {
+      "id": "step_open_help",
+      "type": "step",
+      "step_id": "step_open_url_settled",
+      "label": "导航：帮助中心页",
+      "params": {"url": "http://121.43.169.97:8081/bangzhu"}
+    },
+    {
+      "id": "check_help_articles",
+      "type": "check",
+      "check_id": "check_element_text_contains",
+      "label": "核对帮助文章列表（贷款者帮助）",
+      "params": {"by": "tag_name", "value": "h2", "expected": "贷款者帮助"}
+    },
+    {
+      "id": "check_help_investor",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "核对投资者帮助入口",
+      "params": {"by": "xpath", "value": "//a[contains(text(), '投资者帮助')]"}
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存巡检截图",
+      "params": {"file_name": "site_nav_tour_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_quality", "condition": "pass"},
+    {"source": "step_open_quality", "target": "check_quality_intro", "condition": "pass"},
+    {"source": "check_quality_intro", "target": "check_quality_types", "condition": "pass"},
+    {"source": "check_quality_types", "target": "step_open_wealth", "condition": "pass"},
+    {"source": "step_open_wealth", "target": "check_wealth_title", "condition": "pass"},
+    {"source": "check_wealth_title", "target": "check_wealth_safety", "condition": "pass"},
+    {"source": "check_wealth_safety", "target": "step_open_help", "condition": "pass"},
+    {"source": "step_open_help", "target": "check_help_articles", "condition": "pass"},
+    {"source": "check_help_articles", "target": "check_help_investor", "condition": "pass"},
+    {"source": "check_help_investor", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "site_nav_tour_teardown"}}
+    ]
+  }
+}

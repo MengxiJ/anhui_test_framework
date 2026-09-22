@@ -1,0 +1,106 @@
+{
+  "id": "portal/portal_loan_list",
+  "name": "PORTAL_LOAN_LIST_001",
+  "display_name": "投资标的列表与平台统计只读校验",
+  "description": "免登录只读：POST /loan/loan/listtender 拉取投资标的首页，校验 HTTP、total_items、本页条数与标的字段完整性；再校验 POST /common/loan/loantotal 平台统计。",
+  "category": "portal",
+  "module": "portal",
+  "priority": "P0",
+  "suites": "smoke",
+  "nodes": [
+    {
+      "id": "step_query_loan_list",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询投资标的列表第1页",
+      "params": {"page": 1, "epage": 5}
+    },
+    {
+      "id": "check_loan_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "HTTP 200",
+      "params": {"http_status": "${step_query_loan_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_loan_total",
+      "type": "check",
+      "check_id": "check_portal_total_items_gte",
+      "label": "标的总数至少 1 条",
+      "params": {"total_items": "${step_query_loan_list.data.total_items}", "min_count": 1}
+    },
+    {
+      "id": "check_loan_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "本页返回至少 1 条",
+      "params": {"items": "${step_query_loan_list.data.items}", "min_count": 1}
+    },
+    {
+      "id": "check_loan_fields",
+      "type": "check",
+      "check_id": "check_portal_items_fields_complete",
+      "label": "标的关键字段完整",
+      "params": {
+        "items": "${step_query_loan_list.data.items}",
+        "required_fields": ["id", "name", "apr", "period", "amount", "status_name"]
+      }
+    },
+    {
+      "id": "step_log_loan_error",
+      "type": "step",
+      "step_id": "step_log_message",
+      "label": "标的列表校验失败分支",
+      "params": {"message": "portal loan list checks failed", "level": "error"}
+    },
+    {
+      "id": "step_query_loan_total_stats",
+      "type": "step",
+      "step_id": "step_query_loan_total_stats",
+      "label": "查询平台数据统计"
+    },
+    {
+      "id": "check_stats_http",
+      "type": "check",
+      "check_id": "check_portal_http_status_equal",
+      "label": "统计接口 HTTP 200",
+      "params": {"http_status": "${step_query_loan_total_stats.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_stats_status",
+      "type": "check",
+      "check_id": "check_portal_business_status_equal",
+      "label": "统计业务 status=200",
+      "params": {"code": "${step_query_loan_total_stats.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_stats_field",
+      "type": "check",
+      "check_id": "check_portal_body_field_exists",
+      "label": "统计包含 tenderTotal 字段",
+      "params": {"body": "${step_query_loan_total_stats.data.body.data}", "field": "tenderTotal"}
+    }
+  ],
+  "edges": [
+    {"source": "step_query_loan_list", "target": "check_loan_http", "condition": "pass"},
+    {"source": "check_loan_http", "target": "check_loan_total", "condition": "pass"},
+    {"source": "check_loan_total", "target": "check_loan_count", "condition": "pass"},
+    {"source": "check_loan_count", "target": "check_loan_fields", "condition": "pass"},
+    {"source": "check_loan_fields", "target": "step_query_loan_total_stats", "condition": "pass"},
+    {"source": "check_loan_http", "target": "step_log_loan_error", "condition": "fail"},
+    {"source": "check_loan_total", "target": "step_log_loan_error", "condition": "fail"},
+    {"source": "check_loan_count", "target": "step_log_loan_error", "condition": "fail"},
+    {"source": "check_loan_fields", "target": "step_log_loan_error", "condition": "fail"},
+    {"source": "step_query_loan_total_stats", "target": "check_stats_http", "condition": "pass"},
+    {"source": "check_stats_http", "target": "check_stats_status", "condition": "pass"},
+    {"source": "check_stats_status", "target": "check_stats_field", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: portal loan list begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: portal loan list end", "level": "info"}}
+    ]
+  }
+}

@@ -1,0 +1,782 @@
+{
+  "steps": {
+    "step_accept_alert": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_accept_alert"
+    },
+    "step_account_approve_realname": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_approve_realname"
+    },
+    "step_account_get_approve": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_get_approve"
+    },
+    "step_account_get_verifycode": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_get_verifycode"
+    },
+    "step_account_is_login": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_is_login"
+    },
+    "step_account_login": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_login"
+    },
+    "step_account_recharge": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_recharge"
+    },
+    "step_account_register": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_register"
+    },
+    "step_account_send_sms": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_send_sms"
+    },
+    "step_account_tender": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_tender"
+    },
+    "step_account_trust_register": {
+      "tblocks_impl": "tblocks/step_impl/account",
+      "lib_entry": "lib.common.account.*_step.step_account_trust_register"
+    },
+    "step_add_numbers": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_add_numbers"
+    },
+    "step_apply_credit_limit": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_apply_credit_limit"
+    },
+    "step_backend_api_get_verifycode": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_api_get_verifycode"
+    },
+    "step_backend_api_login": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_api_login"
+    },
+    "step_backend_audit_dialog_inspect": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_audit_dialog_inspect"
+    },
+    "step_backend_loan_list_clear_search": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_loan_list_clear_search"
+    },
+    "step_backend_loan_list_requery": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_loan_list_requery"
+    },
+    "step_backend_loan_list_review": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_loan_list_review"
+    },
+    "step_backend_loan_list_search": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_loan_list_search"
+    },
+    "step_backend_login": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_backend_login"
+    },
+    "step_capture_screenshot": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_capture_screenshot"
+    },
+    "step_click_element": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_click_element"
+    },
+    "step_click_present_element": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_click_present_element"
+    },
+    "step_click_text_in_container": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_click_text_in_container"
+    },
+    "step_concatenate_text": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_concatenate_text"
+    },
+    "step_edit_member_profile_field": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_edit_member_profile_field"
+    },
+    "step_execute_js": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_execute_js"
+    },
+    "step_filter_finance_account_logs": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_filter_finance_account_logs"
+    },
+    "step_filter_invest_list": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_filter_invest_list"
+    },
+    "step_get_article_detail": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_get_article_detail"
+    },
+    "step_get_backend_loan_list_info": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_get_backend_loan_list_info"
+    },
+    "step_get_backend_login_result_text": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_get_backend_login_result_text"
+    },
+    "step_get_borrow_result_text": {
+      "tblocks_impl": "tblocks/step_impl/borrow",
+      "lib_entry": "lib.common.borrow.*_step.step_get_borrow_result_text"
+    },
+    "step_get_credit_apply_result_text": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_credit_apply_result_text"
+    },
+    "step_get_debt_transfer_list": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_debt_transfer_list"
+    },
+    "step_get_element_attribute": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_get_element_attribute"
+    },
+    "step_get_element_text": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_get_element_text"
+    },
+    "step_get_elements_attribute": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_get_elements_attribute"
+    },
+    "step_get_elements_text": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_get_elements_text"
+    },
+    "step_get_finance_account_logs": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_get_finance_account_logs"
+    },
+    "step_get_finance_balance": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_get_finance_balance"
+    },
+    "step_get_finance_recharge_records": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_get_finance_recharge_records"
+    },
+    "step_get_invest_list": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_invest_list"
+    },
+    "step_get_loan_review_result_text": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_get_loan_review_result_text"
+    },
+    "step_get_member_center_summary": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_member_center_summary"
+    },
+    "step_get_member_login_result_text": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_member_login_result_text"
+    },
+    "step_get_member_register_result_text": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_member_register_result_text"
+    },
+    "step_get_message_list_info": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_message_list_info"
+    },
+    "step_get_message_page_info": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_message_page_info"
+    },
+    "step_get_message_relist_info": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_message_relist_info"
+    },
+    "step_get_my_tender_all_tabs": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_my_tender_all_tabs"
+    },
+    "step_get_my_tenders": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_my_tenders"
+    },
+    "step_get_receive_plan": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_receive_plan"
+    },
+    "step_get_recent_transactions": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_recent_transactions"
+    },
+    "step_get_risk_level": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_get_risk_level"
+    },
+    "step_get_table_data": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_get_table_data"
+    },
+    "step_get_trust_account_result_text": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_trust_account_result_text"
+    },
+    "step_input_element_text": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_input_element_text"
+    },
+    "step_load_http": {
+      "tblocks_impl": "tblocks/step_impl/load",
+      "lib_entry": "lib.common.load.*_step.step_load_http"
+    },
+    "step_log_message": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_log_message"
+    },
+    "step_member_login": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_member_login"
+    },
+    "step_member_register": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_member_register"
+    },
+    "step_multiply_numbers": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_multiply_numbers"
+    },
+    "step_navigate_browser_url": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_navigate_browser_url"
+    },
+    "step_open_auto_tender_entry": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_open_auto_tender_entry"
+    },
+    "step_open_backend_loan_menu": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_open_backend_loan_menu"
+    },
+    "step_open_backend_login_page": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_open_backend_login_page"
+    },
+    "step_open_browser_url": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_open_browser_url"
+    },
+    "step_open_finance_bounty_page": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_open_finance_bounty_page"
+    },
+    "step_open_finance_recharge_page": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_open_finance_recharge_page"
+    },
+    "step_open_finance_trust_page": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_open_finance_trust_page"
+    },
+    "step_open_finance_withdraw_entry": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_open_finance_withdraw_entry"
+    },
+    "step_open_first_unread_message": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_open_first_unread_message"
+    },
+    "step_open_loan_audit_dialog": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_open_loan_audit_dialog"
+    },
+    "step_open_loan_detail": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_open_loan_detail"
+    },
+    "step_open_loan_index": {
+      "tblocks_impl": "tblocks/step_impl/borrow",
+      "lib_entry": "lib.common.borrow.*_step.step_open_loan_index"
+    },
+    "step_open_loan_review_menu": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_open_loan_review_menu"
+    },
+    "step_open_member_login_page": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_open_member_login_page"
+    },
+    "step_open_member_page": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_open_member_page"
+    },
+    "step_open_member_register_page": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_open_member_register_page"
+    },
+    "step_open_trust_account": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_open_trust_account"
+    },
+    "step_open_url_settled": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_open_url_settled"
+    },
+    "step_parse_number_text": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_parse_number_text"
+    },
+    "step_probe_http_get": {
+      "tblocks_impl": "tblocks/step_impl/probe",
+      "lib_entry": "lib.common.probe.*_step.step_probe_http_get"
+    },
+    "step_probe_http_post": {
+      "tblocks_impl": "tblocks/step_impl/probe",
+      "lib_entry": "lib.common.probe.*_step.step_probe_http_post"
+    },
+    "step_probe_portal_endpoint": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_probe_portal_endpoint"
+    },
+    "step_publish_borrow": {
+      "tblocks_impl": "tblocks/step_impl/borrow",
+      "lib_entry": "lib.common.borrow.*_step.step_publish_borrow"
+    },
+    "step_query_article_columns": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_article_columns"
+    },
+    "step_query_experience_loan_list": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_experience_loan_list"
+    },
+    "step_query_home_loan_list": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_home_loan_list"
+    },
+    "step_query_loan_application_record": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_query_loan_application_record"
+    },
+    "step_query_loan_list": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_loan_list"
+    },
+    "step_query_loan_plans": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_loan_plans"
+    },
+    "step_query_loan_search_filters": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_loan_search_filters"
+    },
+    "step_query_loan_total_stats": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_loan_total_stats"
+    },
+    "step_query_new_tender_preview": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_new_tender_preview"
+    },
+    "step_query_notice_list": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_notice_list"
+    },
+    "step_query_transfer_list": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_transfer_list"
+    },
+    "step_query_transfer_types": {
+      "tblocks_impl": "tblocks/step_impl/portal",
+      "lib_entry": "lib.common.portal.*_step.step_query_transfer_types"
+    },
+    "step_read_member_profile": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_read_member_profile"
+    },
+    "step_read_remind_states": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_read_remind_states"
+    },
+    "step_review_credit_application": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_review_credit_application"
+    },
+    "step_search_loan_record": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_search_loan_record"
+    },
+    "step_select_dropdown_option": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_select_dropdown_option"
+    },
+    "step_submit_finance_recharge": {
+      "tblocks_impl": "tblocks/step_impl/finance",
+      "lib_entry": "lib.common.finance.*_step.step_submit_finance_recharge"
+    },
+    "step_submit_loan_audit": {
+      "tblocks_impl": "tblocks/step_impl/backend",
+      "lib_entry": "lib.common.backend.*_step.step_submit_loan_audit"
+    },
+    "step_submit_risk_quiz": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_submit_risk_quiz"
+    },
+    "step_submit_tender": {
+      "tblocks_impl": "tblocks/step_impl/invest",
+      "lib_entry": "lib.common.invest.*_step.step_submit_tender"
+    },
+    "step_subtract_numbers": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_subtract_numbers"
+    },
+    "step_switch_default_frame": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_switch_default_frame"
+    },
+    "step_switch_frame": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_switch_frame"
+    },
+    "step_switch_new_window": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_switch_new_window"
+    },
+    "step_toggle_remind": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_toggle_remind"
+    },
+    "step_wait_for_text": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_wait_for_text"
+    },
+    "step_wait_for_url": {
+      "tblocks_impl": "tblocks/step_impl/browser",
+      "lib_entry": "lib.common.browser.*_step.step_wait_for_url"
+    },
+    "step_wait_seconds": {
+      "tblocks_impl": "tblocks/step_impl/core",
+      "lib_entry": "lib.common.core.*_step.step_wait_seconds"
+    }
+  },
+  "checks": {
+    "check_account_business_code": {
+      "tblocks_impl": "tblocks/check_impl/account",
+      "lib_entry": "lib.common.account.*_check.check_account_business_code"
+    },
+    "check_account_http_status": {
+      "tblocks_impl": "tblocks/check_impl/account",
+      "lib_entry": "lib.common.account.*_check.check_account_http_status"
+    },
+    "check_account_message_contains": {
+      "tblocks_impl": "tblocks/check_impl/account",
+      "lib_entry": "lib.common.account.*_check.check_account_message_contains"
+    },
+    "check_auto_tender_intercepted": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_auto_tender_intercepted"
+    },
+    "check_backend_api_business_code": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_backend_api_business_code"
+    },
+    "check_backend_api_http_status": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_backend_api_http_status"
+    },
+    "check_backend_api_message_contains": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_backend_api_message_contains"
+    },
+    "check_backend_api_verifycode_size": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_backend_api_verifycode_size"
+    },
+    "check_backend_login_result_contains": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_backend_login_result_contains"
+    },
+    "check_credit_apply_result_contains": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_credit_apply_result_contains"
+    },
+    "check_current_url_contains": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_current_url_contains"
+    },
+    "check_current_url_matches": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_current_url_matches"
+    },
+    "check_debt_transfer_loaded": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_debt_transfer_loaded"
+    },
+    "check_element_exists": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_element_exists"
+    },
+    "check_element_text_contains": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_element_text_contains"
+    },
+    "check_element_visible": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_element_visible"
+    },
+    "check_elements_count_at_least": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_elements_count_at_least"
+    },
+    "check_finance_account_log_exists": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_account_log_exists"
+    },
+    "check_finance_account_log_filter_consistent": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_account_log_filter_consistent"
+    },
+    "check_finance_balance_increased_at_least": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_balance_increased_at_least"
+    },
+    "check_finance_bounty_page_loaded": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_bounty_page_loaded"
+    },
+    "check_finance_recharge_record_exists": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_recharge_record_exists"
+    },
+    "check_finance_trust_page_blocks_visible": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_trust_page_blocks_visible"
+    },
+    "check_finance_withdraw_intercepted": {
+      "tblocks_impl": "tblocks/check_impl/finance",
+      "lib_entry": "lib.common.finance.*_check.check_finance_withdraw_intercepted"
+    },
+    "check_invest_list_filter_consistent": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_invest_list_filter_consistent"
+    },
+    "check_invest_list_loaded": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_invest_list_loaded"
+    },
+    "check_load_all_completed": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_all_completed"
+    },
+    "check_load_business_success_rate": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_business_success_rate"
+    },
+    "check_load_no_server_error": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_no_server_error"
+    },
+    "check_load_percentile_ms": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_percentile_ms"
+    },
+    "check_load_rps": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_rps"
+    },
+    "check_load_success_rate": {
+      "tblocks_impl": "tblocks/check_impl/load",
+      "lib_entry": "lib.common.load.*_check.check_load_success_rate"
+    },
+    "check_loan_detail_reachable": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_loan_detail_reachable"
+    },
+    "check_loan_review_status": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_loan_review_status"
+    },
+    "check_loan_review_status_contains": {
+      "tblocks_impl": "tblocks/check_impl/backend",
+      "lib_entry": "lib.common.backend.*_check.check_loan_review_status_contains"
+    },
+    "check_member_center_summary_loaded": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_member_center_summary_loaded"
+    },
+    "check_member_login_result_contains": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_member_login_result_contains"
+    },
+    "check_member_page_loaded": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_member_page_loaded"
+    },
+    "check_member_register_result_contains": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_member_register_result_contains"
+    },
+    "check_my_tenders_table_loaded": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_my_tenders_table_loaded"
+    },
+    "check_page_title_equal": {
+      "tblocks_impl": "tblocks/check_impl/browser",
+      "lib_entry": "lib.common.browser.*_check.check_page_title_equal"
+    },
+    "check_portal_body_field_exists": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_body_field_exists"
+    },
+    "check_portal_body_json_valid": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_body_json_valid"
+    },
+    "check_portal_business_status_equal": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_business_status_equal"
+    },
+    "check_portal_http_status_below": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_http_status_below"
+    },
+    "check_portal_http_status_equal": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_http_status_equal"
+    },
+    "check_portal_items_distinct": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_items_distinct"
+    },
+    "check_portal_items_fields_complete": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_items_fields_complete"
+    },
+    "check_portal_list_count_gte": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_list_count_gte"
+    },
+    "check_portal_list_count_range": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_list_count_range"
+    },
+    "check_portal_list_not_empty": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_list_not_empty"
+    },
+    "check_portal_pagination_differs": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_pagination_differs"
+    },
+    "check_portal_total_items_equal": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_total_items_equal"
+    },
+    "check_portal_total_items_gte": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_total_items_gte"
+    },
+    "check_portal_total_pages_consistent": {
+      "tblocks_impl": "tblocks/check_impl/portal",
+      "lib_entry": "lib.common.portal.*_check.check_portal_total_pages_consistent"
+    },
+    "check_probe_body_length_min": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_body_length_min"
+    },
+    "check_probe_content_contains": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_content_contains"
+    },
+    "check_probe_content_not_contains": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_content_not_contains"
+    },
+    "check_probe_content_type_contains": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_content_type_contains"
+    },
+    "check_probe_http_status": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_http_status"
+    },
+    "check_probe_http_status_in": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_http_status_in"
+    },
+    "check_probe_no_db_error": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_no_db_error"
+    },
+    "check_probe_no_traversal": {
+      "tblocks_impl": "tblocks/check_impl/probe",
+      "lib_entry": "lib.common.probe.*_check.check_probe_no_traversal"
+    },
+    "check_profile_field_updated": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_profile_field_updated"
+    },
+    "check_receive_plan_loaded": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_receive_plan_loaded"
+    },
+    "check_recent_transactions_loaded": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_recent_transactions_loaded"
+    },
+    "check_remind_toggled": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_remind_toggled"
+    },
+    "check_risk_level_present": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_risk_level_present"
+    },
+    "check_risk_quiz_submitted": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_risk_quiz_submitted"
+    },
+    "check_tender_submitted": {
+      "tblocks_impl": "tblocks/check_impl/invest",
+      "lib_entry": "lib.common.invest.*_check.check_tender_submitted"
+    },
+    "check_text_contains": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_text_contains"
+    },
+    "check_text_not_contains": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_text_not_contains"
+    },
+    "check_text_number_compare": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_text_number_compare"
+    },
+    "check_unread_count_consistent": {
+      "tblocks_impl": "tblocks/check_impl/member",
+      "lib_entry": "lib.common.member.*_check.check_unread_count_consistent"
+    },
+    "check_value_equal": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_value_equal"
+    },
+    "check_value_greater_than": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_value_greater_than"
+    },
+    "check_value_within_range": {
+      "tblocks_impl": "tblocks/check_impl/core",
+      "lib_entry": "lib.common.core.*_check.check_value_within_range"
+    }
+  }
+}

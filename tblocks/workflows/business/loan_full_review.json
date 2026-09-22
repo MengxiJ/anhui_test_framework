@@ -1,0 +1,108 @@
+{
+  "id": "business/loan_full_review",
+  "name": "BUSINESS_LOAN_002",
+  "display_name": "核心业务：后台满标复审提交 → 缺陷基线核验（还款中流转受阻监控）",
+  "description": "管理员进入满标待审列表，选中首条满标标并完整填写复审通过表单（通过/备注/验证码）提交。实测教学站复审接口 loan/loan/reVerifySubmit 对合法请求固定返回 status:100，标的无法流转（满标待审队列长期积压 400+ 条佐证），因此本用例断言提交后该标仍在满标待审队列、未进入还款中，作为真实缺陷的行为基线监控；若站点修复该接口，本用例两处流转断言将失败，需同步更新为「移出满标待审、进入还款中」。与 invest_full_flow 投标链路、BUSINESS_LOAN_001 发标初审链路共同覆盖标的完整生命周期。",
+  "category": "business",
+  "module": "business",
+  "priority": "P0",
+  "precondition": "1. 管理员 admin 可登录后台；2. 满标待审队列存在待复审标的（教学站常态 >400 条）；3. 图形验证码固定 8888",
+  "expected": "复审提交后该借款编号仍在满标待审队列且未进入还款中（reVerifySubmit 接口缺陷基线）",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_full_review",
+      "type": "step",
+      "step_id": "step_backend_loan_list_review",
+      "label": "满标待审列表选中首条并复审通过",
+      "params": {
+        "group": "满标管理",
+        "item_rel": "loan/full/list",
+        "note": "复审通过-自动化",
+        "img_code": "8888"
+      }
+    },
+    {
+      "id": "check_full_review_target_found",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验满标待审队列非空",
+      "params": {
+        "actual": "${step_full_review.data.row_count}",
+        "expected": 0
+      }
+    },
+    {
+      "id": "step_requery_full_queue",
+      "type": "step",
+      "step_id": "step_backend_loan_list_requery",
+      "label": "复查满标待审队列（按借款编号）",
+      "params": {
+        "group": "满标管理",
+        "item_rel": "loan/full/list",
+        "serial_no": "${step_full_review.data.serialno}"
+      }
+    },
+    {
+      "id": "check_still_in_full_queue",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验该标仍在满标待审队列（复审接口缺陷基线）",
+      "params": {
+        "actual": "${step_requery_full_queue.data.row_count}",
+        "expected": 1
+      }
+    },
+    {
+      "id": "step_requery_repaying",
+      "type": "step",
+      "step_id": "step_backend_loan_list_requery",
+      "label": "复查还款中列表（按借款编号）",
+      "params": {
+        "group": "满标管理",
+        "item_rel": "loan/fullpass/list",
+        "serial_no": "${step_full_review.data.serialno}"
+      }
+    },
+    {
+      "id": "check_repaying_not_appeared",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验该标未进入还款中（复审接口缺陷基线）",
+      "params": {
+        "actual": "${step_requery_repaying.data.row_count}",
+        "expected": 0
+      }
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_full_review", "condition": "pass"},
+    {"source": "step_full_review", "target": "check_full_review_target_found", "condition": "pass"},
+    {"source": "check_full_review_target_found", "target": "step_requery_full_queue", "condition": "pass"},
+    {"source": "step_requery_full_queue", "target": "check_still_in_full_queue", "condition": "pass"},
+    {"source": "check_still_in_full_queue", "target": "step_requery_repaying", "condition": "pass"},
+    {"source": "step_requery_repaying", "target": "check_repaying_not_appeared", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "business_loan_full_review_teardown"}}
+    ]
+  }
+}

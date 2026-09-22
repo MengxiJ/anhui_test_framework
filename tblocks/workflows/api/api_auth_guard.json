@@ -1,0 +1,86 @@
+{
+  "id": "api/auth_guard",
+  "name": "API_AUTH_GUARD_001",
+  "display_name": "会员鉴权拦截（未登录访问认证信息/投标/充值）",
+  "description": "使用无登录态会话 POST 受保护接口：/member/member/getapprove、/trust/trust/tender、/trust/trust/recharge。站点统一拦截并返回前台 AngularJS 登录壳页（HTTP 200 + text/html，页内含 common/member/login 入口），不得返回任何业务 JSON 数据。",
+  "category": "api",
+  "module": "security",
+  "priority": "P1",
+  "expected": "三个接口均 HTTP 200 + Content-Type 含 text/html + 响应体含 member/login，业务零泄露",
+  "nodes": [
+    {
+      "id": "guard_getapprove",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录查认证信息",
+      "params": {"path": "/member/member/getapprove", "data": {}, "site": "front"}
+    },
+    {
+      "id": "check_getapprove_html",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "getapprove 返回 HTML",
+      "params": {"content_type": "${guard_getapprove.data.content_type}", "expected": "text/html"}
+    },
+    {
+      "id": "check_getapprove_login",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "getapprove 被导向登录",
+      "params": {"body_text": "${guard_getapprove.data.body_text}", "expected": "member/login"}
+    },
+    {
+      "id": "guard_tender",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录投标",
+      "params": {"path": "/trust/trust/tender", "data": {"id": 1, "depositCertificate": -1, "amount": 100}, "site": "front"}
+    },
+    {
+      "id": "check_tender_html",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "tender 返回 HTML",
+      "params": {"content_type": "${guard_tender.data.content_type}", "expected": "text/html"}
+    },
+    {
+      "id": "check_tender_login",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "tender 被导向登录",
+      "params": {"body_text": "${guard_tender.data.body_text}", "expected": "member/login"}
+    },
+    {
+      "id": "guard_recharge",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录充值",
+      "params": {"path": "/trust/trust/recharge", "data": {"paymentType": "chinapnrTrust", "amount": 100, "formStr": "reForm", "valicode": "8888"}, "site": "front"}
+    },
+    {
+      "id": "check_recharge_html",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "recharge 返回 HTML",
+      "params": {"content_type": "${guard_recharge.data.content_type}", "expected": "text/html"}
+    },
+    {
+      "id": "check_recharge_login",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "recharge 被导向登录",
+      "params": {"body_text": "${guard_recharge.data.body_text}", "expected": "member/login"}
+    }
+  ],
+  "edges": [
+    {"source": "guard_getapprove", "target": "check_getapprove_html", "condition": "pass"},
+    {"source": "check_getapprove_html", "target": "check_getapprove_login", "condition": "pass"},
+    {"source": "check_getapprove_login", "target": "guard_tender", "condition": "pass"},
+    {"source": "guard_tender", "target": "check_tender_html", "condition": "pass"},
+    {"source": "check_tender_html", "target": "check_tender_login", "condition": "pass"},
+    {"source": "check_tender_login", "target": "guard_recharge", "condition": "pass"},
+    {"source": "guard_recharge", "target": "check_recharge_html", "condition": "pass"},
+    {"source": "check_recharge_html", "target": "check_recharge_login", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-security", "write_side_effect": "none", "note": "探针独立无登录态会话；站点拦截方式为返回登录壳页"}
+}

@@ -1,0 +1,69 @@
+{
+  "id": "ui/ui_home_navigation",
+  "name": "UI_HOME_NAVIGATION_001",
+  "display_name": "首页导航至登录页功能校验",
+  "description": "UI 界面功能测试：打开前台首页后点击顶部登录入口，校验浏览器成功跳转到登录页（URL 与表单要素），验证页面间导航功能，并截图存档。",
+  "category": "ui",
+  "module": "browser",
+  "priority": "P1",
+  "suites": "ui,regression",
+  "nodes": [
+    {
+      "id": "open_home",
+      "type": "step",
+      "step_id": "step_open_browser_url",
+      "label": "打开前台首页",
+      "params": {"url": "http://121.43.169.97:8081/"}
+    },
+    {
+      "id": "check_home_ready",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "首页登录入口就绪",
+      "params": {"by": "css", "value": "a.login", "timeout": 10}
+    },
+    {
+      "id": "click_login_link",
+      "type": "step",
+      "step_id": "step_click_element",
+      "label": "点击顶部登录入口",
+      "params": {"by": "css", "value": "a.login"}
+    },
+    {
+      "id": "check_url_navigated",
+      "type": "check",
+      "check_id": "check_current_url_contains",
+      "label": "URL 跳转到登录页",
+      "params": {"expected": "common/member/login"}
+    },
+    {
+      "id": "check_login_form_ready",
+      "type": "check",
+      "check_id": "check_element_exists",
+      "label": "登录表单渲染完成",
+      "params": {"by": "id", "value": "login-btn", "timeout": 10}
+    },
+    {
+      "id": "screenshot_navigated",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "跳转后页面截图存档",
+      "params": {"file_name": "ui_home_navigation"}
+    }
+  ],
+  "edges": [
+    {"source": "open_home", "target": "check_home_ready", "condition": "pass"},
+    {"source": "check_home_ready", "target": "click_login_link", "condition": "pass"},
+    {"source": "click_login_link", "target": "check_url_navigated", "condition": "pass"},
+    {"source": "check_url_navigated", "target": "check_login_form_ready", "condition": "pass"},
+    {"source": "check_login_form_ready", "target": "screenshot_navigated", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: ui home navigation begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: ui home navigation end", "level": "info"}}
+    ]
+  }
+}

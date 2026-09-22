@@ -1,0 +1,142 @@
+{
+  "id": "smoke/front_site",
+  "name": "SMOKE_FRONT_001",
+  "display_name": "前台站点冒烟（8081：首页/验证码/公共接口/会员登录）",
+  "description": "纯 HTTP 冒烟：验证前台首页可达、注册图形验证码可签发、投资列表与平台统计公共接口可用、会员登录接口成功。全程不启动浏览器，秒级完成，用于版本准入快速判断。",
+  "category": "smoke",
+  "module": "site",
+  "priority": "P0",
+  "expected": "首页 HTTP 200 且为 AngularJS 壳页；两张验证码 200 且字节>=1000；两个公共接口 200 且返回 JSON；登录业务码 200",
+  "nodes": [
+    {
+      "id": "get_home",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测前台首页",
+      "params": {"path": "/", "site": "front"}
+    },
+    {
+      "id": "check_home_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "首页 200",
+      "params": {"http_status": "${get_home.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_home_marker",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "首页为 AngularJS 壳页",
+      "params": {"body_text": "${get_home.data.body_text}", "expected": "ng-app"}
+    },
+    {
+      "id": "get_reg_code",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "探测注册图形验证码",
+      "params": {"path": "/common/public/verifycode1/0.7788", "site": "front"}
+    },
+    {
+      "id": "check_reg_code_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "注册验证码 200",
+      "params": {"http_status": "${get_reg_code.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_reg_code_size",
+      "type": "check",
+      "check_id": "check_probe_body_length_min",
+      "label": "注册验证码非空图片",
+      "params": {"body_length": "${get_reg_code.data.body_length}", "min_length": 1000}
+    },
+    {
+      "id": "post_loan_list",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "探测投资列表公共接口",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": 1, "epage": 5}, "site": "front"}
+    },
+    {
+      "id": "check_loan_list_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "投资列表 200",
+      "params": {"http_status": "${post_loan_list.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_loan_list_json",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "投资列表返回 JSON",
+      "params": {"content_type": "${post_loan_list.data.content_type}", "expected": "application/json"}
+    },
+    {
+      "id": "check_loan_list_items",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "投资列表含 items 数据包",
+      "params": {"body_text": "${post_loan_list.data.body_text}", "expected": "items"}
+    },
+    {
+      "id": "post_loan_total",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "探测平台数据统计公共接口",
+      "params": {"path": "/common/loan/loantotal", "data": {}, "site": "front"}
+    },
+    {
+      "id": "check_loan_total_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "平台统计 200",
+      "params": {"http_status": "${post_loan_total.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_loan_total_json",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "平台统计返回 JSON",
+      "params": {"content_type": "${post_loan_total.data.content_type}", "expected": "application/json"}
+    },
+    {
+      "id": "step_login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录接口",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${step_login.data.code}", "expected": 200}
+    },
+    {
+      "id": "check_login_status",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "登录 HTTP 200",
+      "params": {"http_status": "${step_login.data.http_status}", "expected": 200}
+    }
+  ],
+  "edges": [
+    {"source": "get_home", "target": "check_home_status", "condition": "pass"},
+    {"source": "check_home_status", "target": "check_home_marker", "condition": "pass"},
+    {"source": "check_home_marker", "target": "get_reg_code", "condition": "pass"},
+    {"source": "get_reg_code", "target": "check_reg_code_status", "condition": "pass"},
+    {"source": "check_reg_code_status", "target": "check_reg_code_size", "condition": "pass"},
+    {"source": "check_reg_code_size", "target": "post_loan_list", "condition": "pass"},
+    {"source": "post_loan_list", "target": "check_loan_list_status", "condition": "pass"},
+    {"source": "check_loan_list_status", "target": "check_loan_list_json", "condition": "pass"},
+    {"source": "check_loan_list_json", "target": "check_loan_list_items", "condition": "pass"},
+    {"source": "check_loan_list_items", "target": "post_loan_total", "condition": "pass"},
+    {"source": "post_loan_total", "target": "check_loan_total_status", "condition": "pass"},
+    {"source": "check_loan_total_status", "target": "check_loan_total_json", "condition": "pass"},
+    {"source": "check_loan_total_json", "target": "step_login", "condition": "pass"},
+    {"source": "step_login", "target": "check_login_code", "condition": "pass"},
+    {"source": "check_login_code", "target": "check_login_status", "condition": "pass"}
+  ],
+  "metadata": {"layer": "smoke", "mode": "http-only", "site": "http://121.43.169.97:8081"}
+}

@@ -1,0 +1,110 @@
+{
+  "id": "business/credit_application_review",
+  "name": "BUSINESS_CREDIT_001",
+  "display_name": "核心业务：前台额度申请 → 后台审核通过",
+  "description": "对应原 scripts/test_00_business.py：借款人前台登录并提交 100000 元额度申请，管理员后台审核通过，最后在申请记录中校验状态为“通过”。",
+  "category": "business",
+  "module": "business",
+  "priority": "P0",
+  "precondition": "1. 借款人 18800006000 已注册并登录可用；2. 管理员 admin 可登录后台；3. 图形验证码固定 8888",
+  "expected": "前台额度申请成功展示 100,000.00；后台审核状态为“通过”",
+  "nodes": [
+    {
+      "id": "step_open_member_login",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "借款人登录",
+      "params": {"phone": "18800006000", "password": "Aa123456"}
+    },
+    {
+      "id": "step_apply_credit",
+      "type": "step",
+      "step_id": "step_apply_credit_limit",
+      "label": "提交 100000 元额度申请",
+      "params": {"amount": "100000", "detail_msg": "额度申请详情信息", "img_code": "8888"}
+    },
+    {
+      "id": "step_get_credit_text",
+      "type": "step",
+      "step_id": "step_get_credit_apply_result_text",
+      "label": "读取额度申请结果文本"
+    },
+    {
+      "id": "check_credit_amount",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验申请金额展示",
+      "params": {
+        "actual": "${step_get_credit_text.data.result}",
+        "expected": "100,000.00"
+      }
+    },
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_review_credit",
+      "type": "step",
+      "step_id": "step_review_credit_application",
+      "label": "额度申请审核通过",
+      "params": {"phone": "18800006000", "note": "审核OK", "img_code": "8888"}
+    },
+    {
+      "id": "step_query_record",
+      "type": "step",
+      "step_id": "step_query_loan_application_record",
+      "label": "查询审核记录",
+      "params": {"phone": "18800006000", "status": "通过"}
+    },
+    {
+      "id": "step_get_review_text",
+      "type": "step",
+      "step_id": "step_get_loan_review_result_text",
+      "label": "读取审核状态文本"
+    },
+    {
+      "id": "check_review_passed",
+      "type": "check",
+      "check_id": "check_loan_review_status",
+      "label": "校验审核状态为通过",
+      "params": {"expected": "通过"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_member_login", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_apply_credit", "condition": "pass"},
+    {"source": "step_apply_credit", "target": "step_get_credit_text", "condition": "pass"},
+    {"source": "step_get_credit_text", "target": "check_credit_amount", "condition": "pass"},
+    {"source": "check_credit_amount", "target": "step_open_backend_login", "condition": "pass"},
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_review_credit", "condition": "pass"},
+    {"source": "step_review_credit", "target": "step_query_record", "condition": "pass"},
+    {"source": "step_query_record", "target": "step_get_review_text", "condition": "pass"},
+    {"source": "step_get_review_text", "target": "check_review_passed", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "business_credit_teardown"}}
+    ]
+  }
+}

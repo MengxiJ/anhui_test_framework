@@ -1,0 +1,101 @@
+{
+  "id": "demo/demo_math_offline",
+  "name": "DEMO_MATH_001",
+  "display_name": "离线数值运算与断言演示",
+  "description": "不依赖浏览器、网络与被测站点的演示工作流：数值运算 + 文本拼接 + condition 分支 + setup/teardown hooks，用于验证引擎端到端可用性。",
+  "category": "demo",
+  "module": "core",
+  "priority": "P0",
+  "suites": "smoke",
+  "nodes": [
+    {
+      "id": "step_setup_log",
+      "type": "step",
+      "step_id": "step_log_message",
+      "label": "记录开始日志",
+      "params": {"message": "demo workflow main graph started", "level": "info"}
+    },
+    {
+      "id": "step_add_numbers",
+      "type": "step",
+      "step_id": "step_add_numbers",
+      "label": "计算 2 + 3",
+      "params": {"left": 2, "right": 3}
+    },
+    {
+      "id": "check_sum_equal",
+      "type": "check",
+      "check_id": "check_value_equal",
+      "label": "校验和为 5",
+      "params": {"actual": "${step_add_numbers.data.result}", "expected": 5}
+    },
+    {
+      "id": "step_check_failed_log",
+      "type": "step",
+      "step_id": "step_log_message",
+      "label": "失败分支日志",
+      "params": {"message": "check_sum_equal failed", "level": "error"}
+    },
+    {
+      "id": "step_multiply_numbers",
+      "type": "step",
+      "step_id": "step_multiply_numbers",
+      "label": "计算 4 * 5",
+      "params": {"left": 4, "right": 5}
+    },
+    {
+      "id": "check_product_greater",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验乘积大于 15",
+      "params": {"actual": "${step_multiply_numbers.data.result}", "expected": 15}
+    },
+    {
+      "id": "step_concatenate_text",
+      "type": "step",
+      "step_id": "step_concatenate_text",
+      "label": "拼接文本",
+      "params": {"left": "Hello", "right": "World", "separator": ", "}
+    },
+    {
+      "id": "check_text_contains_hello",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验文本包含 Hello",
+      "params": {"actual": "${step_concatenate_text.data.result}", "expected": "Hello"}
+    },
+    {
+      "id": "condition_sum_correct",
+      "type": "condition",
+      "check_id": "check_value_equal",
+      "label": "条件分支：再次确认和为 5",
+      "params": {"actual": "${step_add_numbers.data.result}", "expected": 5}
+    },
+    {
+      "id": "step_finish_log",
+      "type": "step",
+      "step_id": "step_log_message",
+      "label": "记录完成日志",
+      "params": {"message": "demo workflow finished", "level": "info"}
+    }
+  ],
+  "edges": [
+    {"source": "step_setup_log", "target": "step_add_numbers", "condition": "pass"},
+    {"source": "step_add_numbers", "target": "check_sum_equal", "condition": "pass"},
+    {"source": "check_sum_equal", "target": "step_check_failed_log", "condition": "fail"},
+    {"source": "check_sum_equal", "target": "step_multiply_numbers", "condition": "pass"},
+    {"source": "step_multiply_numbers", "target": "check_product_greater", "condition": "pass"},
+    {"source": "check_product_greater", "target": "step_concatenate_text", "condition": "pass"},
+    {"source": "step_concatenate_text", "target": "check_text_contains_hello", "condition": "pass"},
+    {"source": "check_text_contains_hello", "target": "condition_sum_correct", "condition": "pass"},
+    {"source": "condition_sum_correct", "target": "step_finish_log", "condition": "pass"}
+  ],
+  "metadata": {
+    "setup_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "setup hook: demo begin", "level": "info"}}
+    ],
+    "teardown_hooks": [
+      {"step_id": "step_log_message", "params": {"message": "teardown hook: demo end", "level": "info"}}
+    ]
+  }
+}

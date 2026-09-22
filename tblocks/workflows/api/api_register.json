@@ -1,0 +1,72 @@
+{
+  "id": "api/api_register",
+  "name": "API_REGISTER_001",
+  "display_name": "会员注册接口业务码校验",
+  "description": "完整注册链路：同会话先取图形验证码（会话级强制），再请求短信下发（成功后测试环境短信码固定 666666），最后 POST /member/public/reg 注册，校验业务码 code=200。图形验证码固定 8888。重复执行同一手机号会得到 100（号码已注册），此时请更换手机号。",
+  "category": "api",
+  "module": "account",
+  "priority": "P0",
+  "precondition": "手机号 18800026026 未被注册；测试环境图形验证码固定 8888、短信验证码固定 666666",
+  "expected": "注册业务码 200",
+  "nodes": [
+    {
+      "id": "step_get_verifycode",
+      "type": "step",
+      "step_id": "step_account_get_verifycode",
+      "label": "同会话获取注册图形验证码"
+    },
+    {
+      "id": "check_verifycode_status",
+      "type": "check",
+      "check_id": "check_account_http_status",
+      "label": "图形验证码 HTTP 200",
+      "params": {"http_status": "${step_get_verifycode.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "step_send_sms",
+      "type": "step",
+      "step_id": "step_account_send_sms",
+      "label": "请求下发短信验证码",
+      "params": {
+        "phone": "18800026026",
+        "img_verify_code": "8888",
+        "sms_type": "reg"
+      }
+    },
+    {
+      "id": "check_send_sms_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "短信下发业务码 200",
+      "params": {"code": "${step_send_sms.data.code}", "expected": 200}
+    },
+    {
+      "id": "step_account_register",
+      "type": "step",
+      "step_id": "step_account_register",
+      "label": "调用注册接口",
+      "params": {
+        "phone": "18800026026",
+        "password": "Aa12345678",
+        "verifycode": "8888",
+        "phone_code": "666666",
+        "dy_server": "on"
+      }
+    },
+    {
+      "id": "check_business_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "校验业务码 200",
+      "params": {"code": "${step_account_register.data.code}", "expected": 200}
+    }
+  ],
+  "edges": [
+    {"source": "step_get_verifycode", "target": "check_verifycode_status", "condition": "pass"},
+    {"source": "check_verifycode_status", "target": "step_send_sms", "condition": "pass"},
+    {"source": "step_send_sms", "target": "check_send_sms_code", "condition": "pass"},
+    {"source": "check_send_sms_code", "target": "step_account_register", "condition": "pass"},
+    {"source": "step_account_register", "target": "check_business_code", "condition": "pass"}
+  ],
+  "metadata": {}
+}
