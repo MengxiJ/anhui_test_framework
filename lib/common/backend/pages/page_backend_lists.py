@@ -13,6 +13,7 @@
 import time
 from typing import Any, Dict
 
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from lib.core.page_base import BasePage
@@ -60,18 +61,23 @@ class BackendListsPage(BasePage):
         if top_menu == self._active_top:
             return
         self.base_default_frame()
-        nav = None
+        # 导航在渲染期间会整体重绘，已定位的 <a> 可能在下一帧失效；
+        # 每轮都重新查找，JS 点击遇 stale 直接进入下一轮。
+        clicked = False
         for _ in range(20):
-            for candidate in self.driver.find_elements(*self.__top_navs):
-                if (candidate.text or "").strip() == top_menu:
-                    nav = candidate
-                    break
-            if nav is not None:
+            try:
+                for candidate in self.driver.find_elements(*self.__top_navs):
+                    if (candidate.text or "").strip() == top_menu:
+                        self.driver.execute_script("arguments[0].click();", candidate)
+                        clicked = True
+                        break
+            except StaleElementReferenceException:
+                pass
+            if clicked:
                 break
             time.sleep(0.5)
-        if nav is None:
+        if not clicked:
             raise RuntimeError(f"后台顶部一级菜单未找到: {top_menu}")
-        self.driver.execute_script("arguments[0].click();", nav)
         time.sleep(self.__wait_load)
         self._active_top = top_menu
 
@@ -90,17 +96,23 @@ class BackendListsPage(BasePage):
         last_src = ""
         for attempt in range(3):
             self.base_default_frame()
-            item_loc = (By.XPATH, f'//a[@rel="{item_rel}"]')
-            items = self.driver.find_elements(*item_loc)
-            if items and items[0].is_displayed():
-                self._js_click(item_loc)
-            else:
-                group_els = self.driver.find_elements(
-                    By.XPATH, f'//span[text()="{group_text}"]')
-                if group_els:
-                    self.driver.execute_script("arguments[0].click();", group_els[0])
-                time.sleep(self.__wait_short)
-                self._js_click(item_loc)
+            # 一级菜单切换后左侧手风琴整体重渲染，期间定位到的元素会失效，
+            # 捕获 stale 后等待重绘完成进入下一轮重试。
+            try:
+                item_loc = (By.XPATH, f'//a[@rel="{item_rel}"]')
+                items = self.driver.find_elements(*item_loc)
+                if items and items[0].is_displayed():
+                    self._js_click(item_loc)
+                else:
+                    group_els = self.driver.find_elements(
+                        By.XPATH, f'//span[text()="{group_text}"]')
+                    if group_els:
+                        self.driver.execute_script("arguments[0].click();", group_els[0])
+                    time.sleep(self.__wait_short)
+                    self._js_click(item_loc)
+            except StaleElementReferenceException:
+                time.sleep(self.__wait_load)
+                continue
             last_src = self._wait_iframe_src_contains(item_rel)
             if last_src:
                 self.enter_list_frame()
@@ -141,10 +153,17 @@ class BackendListsPage(BasePage):
             pass
 
     def _js_click(self, loc):
-        elements = self.driver.find_elements(*loc)
-        if not elements:
-            raise RuntimeError(f"后台菜单元素未找到: {loc}")
-        self.driver.execute_script("arguments[0].click();", elements[0])
+        # 元素可能在手风琴重渲染瞬间失效，重新定位后重试。
+        for _ in range(3):
+            elements = self.driver.find_elements(*loc)
+            if not elements:
+                raise RuntimeError(f"后台菜单元素未找到: {loc}")
+            try:
+                self.driver.execute_script("arguments[0].click();", elements[0])
+                return
+            except StaleElementReferenceException:
+                time.sleep(self.__wait_short)
+        raise RuntimeError(f"后台菜单元素重渲染后仍不可点击: {loc}")
 
     # ---- 列表读取（需已在 iframe_box 内） ----
     def enter_list_frame(self):

@@ -8,6 +8,11 @@
 [![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=flat\&logo=selenium\&logoColor=white)](https://www.selenium.dev/)
 [![自研框架](https://img.shields.io/badge/自研框架-Step_Check_Workflow-8A2BE2?style=flat)]()
 
+> 📄 **最新全量回归测试报告（2026-09-24，91 条：89 通过 / 2 失败，通过率 97.8%）：**
+> [标准版 PDF](测试报告/T-Blocks全量回归测试报告20260924.pdf) ｜
+> [Allure 风格 PDF](测试报告/T-Blocks_Allure回归报告20260924.pdf)
+> （GitHub 页面点击即可在线预览；2 个失败项均为被测教学站环境波动，详见报告内归因说明）
+
 ## 项目背景
 
 测试对象为**安汇智投平台**——一个在线 P2P 借贷网站，包含前台（注册、登录、开户、充值、投标、发标）
@@ -205,6 +210,18 @@ pytest -m security
 
 直接用 pytest 命令运行时，追加 `--html=output/reports/report.html
 --self-contained-html --junitxml=output/reports/junit.xml` 可获得同样的报告产物。
+
+可投递/留底的 PDF 报告（由 reportlab 生成，微软雅黑内嵌）：
+
+```bash
+# 标准版（JUnit XML -> PDF，含业务域通过率统计表）
+python scripts/generate_pdf_report.py output/reports/junit_<套件>_<时间戳>.xml output/reports/report.pdf
+# Allure 风格版（需先 allure generate，按 Allure 配色列出全部用例）
+python scripts/generate_allure_pdf.py output/allure/report output/reports/allure_report.pdf
+```
+
+最新一期全量回归 PDF 归档于仓库根目录 [测试报告/](测试报告/)（不随 `output/` 被 gitignore，
+便于直接在 GitHub 在线查看）。
 
 ## 持续集成与定时执行
 

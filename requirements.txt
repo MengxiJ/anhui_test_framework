@@ -10,3 +10,4 @@ python-dotenv>=1.0.0  # 环境变量管理
 # 可选依赖
 pytest-html>=4.0.0    # HTML测试报告
 pytest-xdist>=3.0.0   # 并行测试
+reportlab>=4.0.0      # PDF测试报告（scripts/generate_*_pdf.py）
