@@ -8,9 +8,9 @@
 [![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=flat\&logo=selenium\&logoColor=white)](https://www.selenium.dev/)
 [![自研框架](https://img.shields.io/badge/自研框架-Step_Check_Workflow-8A2BE2?style=flat)]()
 
-> 📄 **最新全量回归测试报告（2026-09-24，91 条：89 通过 / 2 失败，通过率 97.8%）：**
+> 📄 **最新全量回归测试报告（2026-09-24，91条 ：89 通过 / 2 失败，通过率 97.8%）：**
 > [标准版 PDF](测试报告/T-Blocks全量回归测试报告20260924.pdf) ｜
-> [Allure 风格 PDF](测试报告/T-Blocks_Allure回归报告20260924.pdf)
+> [Allure PDF](测试报告/T-Blocks_Allure回归报告20260924.pdf)
 
 ## 项目背景
 
