@@ -1,0 +1,65 @@
+{
+  "id": "invest/receive_plan",
+  "name": "INVEST_RECEIVE_PLAN_001",
+  "display_name": "理财管理：我的收款计划表格校验",
+  "description": "登录后进入「理财管理 → 我的收款计划」，读取收款明细表，校验表头含标题/应收日期/应收总额等核心列，表格结构完整可渲染。",
+  "category": "invest",
+  "module": "recover",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "收款计划页正常加载，表格表头含应收日期/应收总额等核心列",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_receive_plan",
+      "type": "step",
+      "step_id": "step_get_receive_plan",
+      "label": "读取我的收款计划表格"
+    },
+    {
+      "id": "check_plan_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含应收日期",
+      "params": {"actual": "${step_get_receive_plan.data.headers_text}", "expected": "应收日期"}
+    },
+    {
+      "id": "check_plan_has_amount",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含应收总额",
+      "params": {"actual": "${step_get_receive_plan.data.headers_text}", "expected": "总额"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_receive_plan", "condition": "pass"},
+    {"source": "step_get_receive_plan", "target": "check_plan_headers", "condition": "pass"},
+    {"source": "check_plan_headers", "target": "check_plan_has_amount", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "invest_receive_plan_teardown"}}
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "finance/withdraw_entry",
+  "name": "FINANCE_WITHDRAW_001",
+  "display_name": "资金管理：提现入口可达性与未绑卡拦截校验",
+  "description": "登录后点击「资金管理 → 提现」，校验入口可达。未绑定银行卡时应重定向至银行卡信息页并提示添加银行卡，不允许直接进入提现表单。",
+  "category": "finance",
+  "module": "withdraw",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 该账号未绑定提现银行卡",
+  "expected": "提现入口重定向至银行卡页，页面提示「添加银行卡」",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_withdraw",
+      "type": "step",
+      "step_id": "step_open_finance_withdraw_entry",
+      "label": "打开提现入口"
+    },
+    {
+      "id": "step_read_withdraw_page",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取提现跳转后页面文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_redirect_to_bank",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验重定向至银行卡页（含银行卡）",
+      "params": {"actual": "${step_read_withdraw_page.data.text}", "expected": "银行卡"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_withdraw", "condition": "pass"},
+    {"source": "step_open_withdraw", "target": "step_read_withdraw_page", "condition": "pass"},
+    {"source": "step_read_withdraw_page", "target": "check_redirect_to_bank", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-business", "write_side_effect": "none", "note": "未绑卡用户提现应被拦截到银行卡页"}
+}

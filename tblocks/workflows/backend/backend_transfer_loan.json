@@ -1,0 +1,89 @@
+{
+  "id": "backend/transfer_loan",
+  "name": "BACKEND_TRANSFER_LOAN_001",
+  "display_name": "后端：流转标管理 - 流转记录/流转中/回购中列表校验",
+  "description": "管理员登录后台，依次进入「借款管理 → 流转标管理」的流转记录、流转中、回购中三个子页面，校验各列表 iframe 加载正确、表头渲染完整。",
+  "category": "backend",
+  "module": "transfer",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "流转标三个子列表 iframe 均加载正确，表头渲染正常",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_transfer_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入流转记录列表",
+      "params": {"top_menu": "借款管理", "group": "流转标管理", "item_rel": "loan/transfer/list"}
+    },
+    {
+      "id": "check_transfer_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验流转记录路由加载",
+      "params": {"actual": "${step_open_transfer_list.data.src}", "expected": "transfer"}
+    },
+    {
+      "id": "step_get_transfer_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取流转记录列表信息"
+    },
+    {
+      "id": "step_open_transfer_loaning",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入流转中列表",
+      "params": {"top_menu": "借款管理", "group": "流转标管理", "item_rel": "loan/transfer/loaning/list"}
+    },
+    {
+      "id": "check_loaning_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验流转中路由加载",
+      "params": {"actual": "${step_open_transfer_loaning.data.src}", "expected": "transfer"}
+    },
+    {
+      "id": "step_open_buyback",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入回购中列表",
+      "params": {"top_menu": "借款管理", "group": "流转标管理", "item_rel": "loan/transfer/buyback/list"}
+    },
+    {
+      "id": "check_buyback_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验回购中路由加载",
+      "params": {"actual": "${step_open_buyback.data.src}", "expected": "transfer"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_transfer_list", "condition": "pass"},
+    {"source": "step_open_transfer_list", "target": "check_transfer_src", "condition": "pass"},
+    {"source": "check_transfer_src", "target": "step_get_transfer_info", "condition": "pass"},
+    {"source": "step_get_transfer_info", "target": "step_open_transfer_loaning", "condition": "pass"},
+    {"source": "step_open_transfer_loaning", "target": "check_loaning_src", "condition": "pass"},
+    {"source": "check_loaning_src", "target": "step_open_buyback", "condition": "pass"},
+    {"source": "step_open_buyback", "target": "check_buyback_src", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_transfer_loan_teardown"}}]}
+}

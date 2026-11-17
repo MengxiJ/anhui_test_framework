@@ -1,0 +1,82 @@
+{
+  "id": "backend/manual_operations",
+  "name": "BACKEND_MANUAL_OP_001",
+  "display_name": "后端：手动操作 - 后台转账/商户充值/商户提现页面校验",
+  "description": "管理员登录后台，依次进入「资金管理 → 手动操作」的后台转账、商户充值、商户提现三个子页面，校验各页面 iframe 加载正确、表单渲染完整。",
+  "category": "backend",
+  "module": "manual",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "后台转账/商户充值/商户提现页面 iframe 均加载正确",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_transfer",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入后台转账页",
+      "params": {"top_menu": "资金管理", "group": "手动操作", "item_rel": "finance/manual/transfer"}
+    },
+    {
+      "id": "check_transfer_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验后台转账路由加载",
+      "params": {"actual": "${step_open_transfer.data.src}", "expected": "manual"}
+    },
+    {
+      "id": "step_open_merchant_recharge",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入商户充值页",
+      "params": {"top_menu": "资金管理", "group": "手动操作", "item_rel": "finance/manual/recharge"}
+    },
+    {
+      "id": "check_merchant_recharge_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验商户充值路由加载",
+      "params": {"actual": "${step_open_merchant_recharge.data.src}", "expected": "manual"}
+    },
+    {
+      "id": "step_open_merchant_withdraw",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入商户提现页",
+      "params": {"top_menu": "资金管理", "group": "手动操作", "item_rel": "finance/manual/withdraw"}
+    },
+    {
+      "id": "check_merchant_withdraw_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验商户提现路由加载",
+      "params": {"actual": "${step_open_merchant_withdraw.data.src}", "expected": "manual"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_transfer", "condition": "pass"},
+    {"source": "step_open_transfer", "target": "check_transfer_src", "condition": "pass"},
+    {"source": "check_transfer_src", "target": "step_open_merchant_recharge", "condition": "pass"},
+    {"source": "step_open_merchant_recharge", "target": "check_merchant_recharge_src", "condition": "pass"},
+    {"source": "check_merchant_recharge_src", "target": "step_open_merchant_withdraw", "condition": "pass"},
+    {"source": "step_open_merchant_withdraw", "target": "check_merchant_withdraw_src", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_manual_operations_teardown"}}]}
+}

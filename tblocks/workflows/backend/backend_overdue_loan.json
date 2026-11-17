@@ -1,0 +1,73 @@
+{
+  "id": "backend/overdue_loan",
+  "name": "BACKEND_OVERDUE_LOAN_001",
+  "display_name": "后端：逾期借款 - 逾期未还/逾期已还列表校验",
+  "description": "管理员登录后台，依次进入「借款管理 → 逾期借款」的逾期未还、逾期已还子页面，校验各列表 iframe 加载正确、表头渲染完整。",
+  "category": "backend",
+  "module": "overdue",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "逾期未还/逾期已还列表 iframe 均加载正确，表头渲染正常",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_overdue_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入逾期未还列表",
+      "params": {"top_menu": "借款管理", "group": "逾期借款", "item_rel": "loan/overdue/list"}
+    },
+    {
+      "id": "check_overdue_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验逾期未还路由加载",
+      "params": {"actual": "${step_open_overdue_list.data.src}", "expected": "overdue"}
+    },
+    {
+      "id": "step_get_overdue_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取逾期未还列表信息"
+    },
+    {
+      "id": "step_open_overdue_paid",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入逾期已还列表",
+      "params": {"top_menu": "借款管理", "group": "逾期借款", "item_rel": "loan/overdue/paid/list"}
+    },
+    {
+      "id": "check_paid_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验逾期已还路由加载",
+      "params": {"actual": "${step_open_overdue_paid.data.src}", "expected": "overdue"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_overdue_list", "condition": "pass"},
+    {"source": "step_open_overdue_list", "target": "check_overdue_src", "condition": "pass"},
+    {"source": "check_overdue_src", "target": "step_get_overdue_info", "condition": "pass"},
+    {"source": "step_get_overdue_info", "target": "step_open_overdue_paid", "condition": "pass"},
+    {"source": "step_open_overdue_paid", "target": "check_paid_src", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_overdue_loan_teardown"}}]}
+}

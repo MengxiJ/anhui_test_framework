@@ -1,0 +1,77 @@
+{
+  "id": "api/recharge_callback_idempotency",
+  "name": "API_RECHARGE_IDEMPOTENCY_001",
+  "display_name": "充值幂等性校验（相同充值参数重复提交，余额仅增加一次）",
+  "description": "对应 TC-API-004。登录后读取充值前余额，以相同金额（100 元）连续提交两次充值，校验充值记录中仅出现一条该金额记录，余额仅增加一次。模拟支付回调重复通知场景下服务端的幂等保证。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 图形验证码固定 8888",
+  "expected": "两次相同充值后，充值记录中 100 元记录不超过 1 条；余额增量为 100 而非 200",
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "get_verifycode",
+      "type": "step",
+      "step_id": "step_account_get_verifycode",
+      "label": "获取充值图形验证码"
+    },
+    {
+      "id": "balance_before",
+      "type": "step",
+      "step_id": "step_get_finance_balance",
+      "label": "读取充值前余额"
+    },
+    {
+      "id": "recharge_first",
+      "type": "step",
+      "step_id": "step_account_recharge",
+      "label": "第一次充值 100 元",
+      "params": {"amount": "100", "valicode": "8888", "payment_type": "chinapnrTrust"}
+    },
+    {
+      "id": "check_first_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "第一次充值业务码 200",
+      "params": {"code": "${recharge_first.data.code}", "expected": 200}
+    },
+    {
+      "id": "recharge_second",
+      "type": "step",
+      "step_id": "step_account_recharge",
+      "label": "第二次相同充值（幂等验证）",
+      "params": {"amount": "100", "valicode": "8888", "payment_type": "chinapnrTrust"}
+    },
+    {
+      "id": "check_second_result",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "第二次充值被幂等处理（业务码非 5xx）",
+      "params": {"code": "${recharge_second.data.code}", "expected": 100}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "get_verifycode", "condition": "pass"},
+    {"source": "get_verifycode", "target": "balance_before", "condition": "pass"},
+    {"source": "balance_before", "target": "recharge_first", "condition": "pass"},
+    {"source": "recharge_first", "target": "check_first_code", "condition": "pass"},
+    {"source": "check_first_code", "target": "recharge_second", "condition": "pass"},
+    {"source": "recharge_second", "target": "check_second_result", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-idempotency", "write_side_effect": "recharge", "note": "相同参数重复充值，验证不重复入账"}
+}

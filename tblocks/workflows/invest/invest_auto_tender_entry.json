@@ -1,0 +1,57 @@
+{
+  "id": "invest/auto_tender_entry",
+  "name": "INVEST_AUTO_TENDER_001",
+  "display_name": "理财管理：自动投标入口可达性校验",
+  "description": "登录后点击「理财管理 → 自动投标」，校验入口可达。未开通托管时应重定向至托管账户页，已开通时展示自动投标设置页。",
+  "category": "invest",
+  "module": "auto_tender",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "自动投标入口正常跳转（托管页或自动投标设置页），不出现 404/500",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_auto_tender",
+      "type": "step",
+      "step_id": "step_open_auto_tender_entry",
+      "label": "打开自动投标入口"
+    },
+    {
+      "id": "check_url_reachable",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验最终 URL 非空（页面可达）",
+      "params": {"actual": "${step_open_auto_tender.data.url_length}", "expected": 0}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_auto_tender", "condition": "pass"},
+    {"source": "step_open_auto_tender", "target": "check_url_reachable", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "invest_auto_tender_entry_teardown"}}
+    ]
+  }
+}

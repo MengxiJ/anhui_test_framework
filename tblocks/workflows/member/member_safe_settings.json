@@ -1,0 +1,78 @@
+{
+  "id": "member/safe_settings",
+  "name": "MEMBER_SAFE_001",
+  "display_name": "账户管理：安全设置页面校验（手机/实名/邮箱/密码认证状态）",
+  "description": "登录后进入「账户管理 → 安全设置」，校验页面展示手机认证、实名认证、邮箱认证、登录密码等安全项及其认证状态（已认证/未认证/已设置）。",
+  "category": "member",
+  "module": "safe",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 该账号已完成手机与实名认证",
+  "expected": "安全设置页含手机认证（已认证）、实名认证（已认证）、登录密码（已设置）等安全项",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_safe",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "打开安全设置页",
+      "params": {"page": "safe"}
+    },
+    {
+      "id": "step_read_safe_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取安全设置页文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_phone_verified",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验手机认证（已认证）",
+      "params": {"actual": "${step_read_safe_text.data.text}", "expected": "手机"}
+    },
+    {
+      "id": "check_realname_verified",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验实名认证",
+      "params": {"actual": "${step_read_safe_text.data.text}", "expected": "实名"}
+    },
+    {
+      "id": "check_login_pwd",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验登录密码项存在",
+      "params": {"actual": "${step_read_safe_text.data.text}", "expected": "密码"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_safe", "condition": "pass"},
+    {"source": "step_open_safe", "target": "step_read_safe_text", "condition": "pass"},
+    {"source": "step_read_safe_text", "target": "check_phone_verified", "condition": "pass"},
+    {"source": "check_phone_verified", "target": "check_realname_verified", "condition": "pass"},
+    {"source": "check_realname_verified", "target": "check_login_pwd", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验安全设置页认证状态展示"}
+}

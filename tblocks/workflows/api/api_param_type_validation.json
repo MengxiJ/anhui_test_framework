@@ -1,0 +1,87 @@
+{
+  "id": "api/param_type_validation",
+  "name": "API_PARAM_TYPE_VAL_001",
+  "display_name": "接口参数类型与范围校验（非法 page / 空 loan_id / 字符串金额）",
+  "description": "对应 TC-API-006。绕过前端直接调用接口，传入非法类型参数：listtender 接口 page 传字符串、loan_id 传不存在值、投标金额传字符串。后端应返回明确错误，不产生脏数据，不返回堆栈信息。",
+  "category": "api",
+  "module": "portal",
+  "priority": "P1",
+  "precondition": "共享教学账号 18800002008 可登录",
+  "expected": "非法参数请求 HTTP 状态非 5xx，响应不包含堆栈 traceback",
+  "nodes": [
+    {
+      "id": "probe_page_string",
+      "type": "step",
+      "step_id": "step_probe_portal_endpoint",
+      "label": "listtender 传入 page=abc",
+      "params": {"path": "/loan/loan/listtender", "data": {"page": "abc", "epage": 5}}
+    },
+    {
+      "id": "check_page_string_status",
+      "type": "check",
+      "check_id": "check_portal_http_status_below",
+      "label": "非法 page 不返回 5xx",
+      "params": {"http_status": "${probe_page_string.data.http_status}", "max_status": 499}
+    },
+    {
+      "id": "check_page_string_no_trace",
+      "type": "check",
+      "check_id": "check_probe_no_db_error",
+      "label": "非法 page 无堆栈泄露",
+      "params": {"body_text": "${probe_page_string.data.body_text}"}
+    },
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "tender_nonexist_loan",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标不存在的 loan_id=99999",
+      "params": {"amount": "100", "loan_id": 99999, "deposit_certificate": -1}
+    },
+    {
+      "id": "check_nonexist_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "不存在标的业务码 100",
+      "params": {"code": "${tender_nonexist_loan.data.code}", "expected": 100}
+    },
+    {
+      "id": "tender_string_amount",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标金额传字符串 xyz",
+      "params": {"amount": "xyz", "loan_id": 1, "deposit_certificate": -1}
+    },
+    {
+      "id": "check_string_amount_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "字符串金额业务码 100",
+      "params": {"code": "${tender_string_amount.data.code}", "expected": 100}
+    }
+  ],
+  "edges": [
+    {"source": "probe_page_string", "target": "check_page_string_status", "condition": "pass"},
+    {"source": "check_page_string_status", "target": "check_page_string_no_trace", "condition": "pass"},
+    {"source": "check_page_string_no_trace", "target": "login", "condition": "pass"},
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "tender_nonexist_loan", "condition": "pass"},
+    {"source": "tender_nonexist_loan", "target": "check_nonexist_code", "condition": "pass"},
+    {"source": "check_nonexist_code", "target": "tender_string_amount", "condition": "pass"},
+    {"source": "tender_string_amount", "target": "check_string_amount_code", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-negative", "write_side_effect": "none", "note": "验证后端参数类型与范围校验，无 5xx 无堆栈泄露"}
+}

@@ -1,0 +1,65 @@
+{
+  "id": "backend/withdraw_verify",
+  "name": "BACKEND_WITHDRAW_VERIFY_001",
+  "display_name": "后端：提现管理 - 提现待审核列表校验",
+  "description": "管理员登录后台，进入「资金管理 → 提现管理 → 待审核」，校验提现审核列表 iframe 加载正确、表头含提现金额/用户/状态等列。",
+  "category": "backend",
+  "module": "withdraw",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "提现审核列表 iframe src 含 finance/withdraw/verify，表头含金额/用户列",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_withdraw_verify",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入提现待审核列表",
+      "params": {"top_menu": "资金管理", "group": "提现管理", "item_rel": "finance/withdraw/verify"}
+    },
+    {
+      "id": "check_withdraw_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验提现审核路由加载",
+      "params": {"actual": "${step_open_withdraw_verify.data.src}", "expected": "finance/withdraw/verify"}
+    },
+    {
+      "id": "step_get_withdraw_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取提现审核列表信息"
+    },
+    {
+      "id": "check_withdraw_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验提现表头含金额",
+      "params": {"actual": "${step_get_withdraw_info.data.headers_text}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_withdraw_verify", "condition": "pass"},
+    {"source": "step_open_withdraw_verify", "target": "check_withdraw_src", "condition": "pass"},
+    {"source": "check_withdraw_src", "target": "step_get_withdraw_info", "condition": "pass"},
+    {"source": "step_get_withdraw_info", "target": "check_withdraw_headers", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_withdraw_verify_teardown"}}]}
+}

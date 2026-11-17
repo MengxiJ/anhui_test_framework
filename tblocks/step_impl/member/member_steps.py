@@ -258,3 +258,23 @@ def step_read_remind_states():
 def step_toggle_remind(checkbox_id):
     """切换提醒复选框。"""
     return lib.step_toggle_remind(checkbox_id)
+
+
+@composer_step(
+    name="step_get_spread_logs",
+    description="打开推广记录页读取表格（ID/用户名/提成方式/资金类型/推广比例/推广总额/提交时间/备注），结果放入 data.headers/data.rows/data.row_count",
+    category="member",
+)
+def step_get_spread_logs():
+    """读取推广记录表格。"""
+    return lib.step_get_spread_logs()
+
+
+@composer_step(
+    name="step_get_attestation_info",
+    description="打开我的认证页读取认证状态文本，结果放入 data.text",
+    category="member",
+)
+def step_get_attestation_info():
+    """读取认证状态信息。"""
+    return lib.step_get_attestation_info()

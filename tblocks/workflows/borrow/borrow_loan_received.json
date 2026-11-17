@@ -1,0 +1,106 @@
+{
+  "id": "borrow/loan_received",
+  "name": "BORROW_RECEIVED_001",
+  "display_name": "核心业务：借款人获得借款（满标放款后状态+资金流水核对）",
+  "description": "借款人登录后进入「我的借款」校验存在「还款中」状态标的（表示满标复审通过、资金已发放），再在交易明细中按「放款」类型筛选，核对账户流水存在放款收入记录，完成「获得借款」核心业务节点验证。",
+  "category": "borrow",
+  "module": "loan_received",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 该会员名下至少有一笔已满标放款（还款中）的借款",
+  "expected": "我的借款列表含「还款中」状态标的；交易明细按「放款」筛选后存在放款流水记录",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "借款人登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_myloan",
+      "type": "step",
+      "step_id": "step_open_url_settled",
+      "label": "打开我的借款页",
+      "params": {"url": "/loan/loan/myloan"}
+    },
+    {
+      "id": "step_read_myloan_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取我的借款页全文",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_loan_repaying_status",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验我的借款含「还款中」状态（资金已发放）",
+      "params": {"actual": "${step_read_myloan_text.data.result}", "expected": "还款中"}
+    },
+    {
+      "id": "step_read_myloan_table",
+      "type": "step",
+      "step_id": "step_get_table_data",
+      "label": "读取借款列表表格",
+      "params": {"by": "css", "value": "table"}
+    },
+    {
+      "id": "check_myloan_table_loaded",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验借款表格可读取",
+      "params": {"actual": "${step_read_myloan_table.data.row_count}", "expected": -1}
+    },
+    {
+      "id": "step_filter_loan_disbursement",
+      "type": "step",
+      "step_id": "step_filter_finance_account_logs",
+      "label": "交易明细按「放款」筛选",
+      "params": {"log_type": "放款"}
+    },
+    {
+      "id": "check_disbursement_log_consistent",
+      "type": "check",
+      "check_id": "check_finance_account_log_filter_consistent",
+      "label": "校验放款流水筛选结果一致",
+      "params": {"expected_type": "放款"}
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "borrow_loan_received_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_myloan", "condition": "pass"},
+    {"source": "step_open_myloan", "target": "step_read_myloan_text", "condition": "pass"},
+    {"source": "step_read_myloan_text", "target": "check_loan_repaying_status", "condition": "pass"},
+    {"source": "check_loan_repaying_status", "target": "step_read_myloan_table", "condition": "pass"},
+    {"source": "step_read_myloan_table", "target": "check_myloan_table_loaded", "condition": "pass"},
+    {"source": "check_myloan_table_loaded", "target": "step_filter_loan_disbursement", "condition": "pass"},
+    {"source": "step_filter_loan_disbursement", "target": "check_disbursement_log_consistent", "condition": "pass"},
+    {"source": "check_disbursement_log_consistent", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "borrow_loan_received_teardown"}}
+    ]
+  }
+}

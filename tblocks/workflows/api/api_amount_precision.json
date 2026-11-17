@@ -1,0 +1,79 @@
+{
+  "id": "api/amount_precision",
+  "name": "API_AMOUNT_PRECISION_001",
+  "display_name": "金额精度一致性校验（两位小数 / 超长小数位处理）",
+  "description": "对应 TC-API-002。验证服务端对金额精度的处理：两位小数金额（如 100.10）应被正常接受或按业务规则处理；超过两位小数（如 100.123）应被拒绝。服务端不得出现浮点精度 artifact（如 100.1000001 或 100.0999999）。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "共享教学账号 18800002008 可登录",
+  "expected": "两位小数金额按业务规则处理；超长小数位被拒绝（业务码 100）；响应无浮点精度 artifact",
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "query_loan",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "获取可投标列表",
+      "params": {"page": 1, "epage": 5}
+    },
+    {
+      "id": "check_loan_list",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "列表至少 1 条可投标",
+      "params": {"items": "${query_loan.data.items}", "min_count": 1}
+    },
+    {
+      "id": "tender_two_decimal",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标 100.10 元（两位小数）",
+      "params": {"amount": "100.10", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_two_decimal_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "响应消息金额无浮点 artifact",
+      "params": {"message": "${tender_two_decimal.data.message}", "expected": ""}
+    },
+    {
+      "id": "tender_three_decimal",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标 100.123 元（超长小数位）",
+      "params": {"amount": "100.123", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_three_decimal_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "超长小数业务码 100（被拒绝）",
+      "params": {"code": "${tender_three_decimal.data.code}", "expected": 100}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "query_loan", "condition": "pass"},
+    {"source": "query_loan", "target": "check_loan_list", "condition": "pass"},
+    {"source": "check_loan_list", "target": "tender_two_decimal", "condition": "pass"},
+    {"source": "tender_two_decimal", "target": "check_two_decimal_msg", "condition": "pass"},
+    {"source": "check_two_decimal_msg", "target": "tender_three_decimal", "condition": "pass"},
+    {"source": "tender_three_decimal", "target": "check_three_decimal_code", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-precision", "write_side_effect": "tender", "note": "验证金额精度处理：两位小数正常、超长小数被拒"}
+}

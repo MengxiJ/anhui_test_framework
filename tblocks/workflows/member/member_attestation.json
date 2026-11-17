@@ -1,0 +1,61 @@
+{
+  "id": "member/attestation",
+  "name": "MEMBER_ATTESTATION_001",
+  "display_name": "借款管理：我的认证信息校验",
+  "description": "切换至借款账户，进入「借款管理 → 我的认证」，校验页面展示实名认证状态（已认证），认证信息正常可读。",
+  "category": "member",
+  "module": "attestation",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 该账号已完成实名认证",
+  "expected": "认证页含「实名认证」且状态为已认证",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_attestation",
+      "type": "step",
+      "step_id": "step_get_attestation_info",
+      "label": "读取我的认证信息"
+    },
+    {
+      "id": "check_attestation_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含「实名认证」",
+      "params": {"actual": "${step_get_attestation.data.text}", "expected": "实名认证"}
+    },
+    {
+      "id": "check_attestation_verified",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验实名认证状态为已认证",
+      "params": {"actual": "${step_get_attestation.data.text}", "expected": "已认证"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_attestation", "condition": "pass"},
+    {"source": "step_get_attestation", "target": "check_attestation_loaded", "condition": "pass"},
+    {"source": "check_attestation_loaded", "target": "check_attestation_verified", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验认证信息展示"}
+}

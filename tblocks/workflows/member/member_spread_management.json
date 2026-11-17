@@ -1,0 +1,70 @@
+{
+  "id": "member/spread_management",
+  "name": "MEMBER_SPREAD_001",
+  "display_name": "推广管理：我的推广页面校验",
+  "description": "登录后进入「推广管理 → 我的推广」，校验推广页展示邀请人数、提成总额、邀请链接等推广核心信息，页面结构完整。",
+  "category": "member",
+  "module": "spread",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "推广页含邀请人数、提成总额、邀请链接等推广信息",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_spread",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "打开我的推广页",
+      "params": {"page": "spread"}
+    },
+    {
+      "id": "step_read_spread_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取推广页文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_spread_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验推广页含「推广」关键字",
+      "params": {"actual": "${step_read_spread_text.data.text}", "expected": "推广"}
+    },
+    {
+      "id": "check_spread_has_invite",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含邀请人数/提成信息",
+      "params": {"actual": "${step_read_spread_text.data.text}", "expected": "邀请"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_spread", "condition": "pass"},
+    {"source": "step_open_spread", "target": "step_read_spread_text", "condition": "pass"},
+    {"source": "step_read_spread_text", "target": "check_spread_loaded", "condition": "pass"},
+    {"source": "check_spread_loaded", "target": "check_spread_has_invite", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验推广管理页核心信息展示"}
+}

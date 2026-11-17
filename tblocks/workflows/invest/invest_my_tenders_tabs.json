@@ -1,0 +1,53 @@
+{
+  "id": "invest/my_tenders_tabs",
+  "name": "INVEST_MYTENDERS_TABS_001",
+  "display_name": "理财管理：我的投资多状态 Tab 查询校验",
+  "description": "登录后进入「理财管理 → 我的投资」，逐一切换回款中/投标中/已结清/已流标四个状态 tab，校验每个 tab 均可正常加载且表格结构完整。",
+  "category": "invest",
+  "module": "mytender",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "四个状态 tab 均可切换，表格表头含投资金额/收益/状态等列",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_all_tabs",
+      "type": "step",
+      "step_id": "step_get_my_tender_all_tabs",
+      "label": "逐 tab 读取我的投资全部记录"
+    },
+    {
+      "id": "check_tabs_loaded",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验多 tab 数据可读取",
+      "params": {"actual": "${step_get_all_tabs.data.tab_count}", "expected": 0}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_all_tabs", "condition": "pass"},
+    {"source": "step_get_all_tabs", "target": "check_tabs_loaded", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验我的投资多状态 tab 切换与数据加载"}
+}

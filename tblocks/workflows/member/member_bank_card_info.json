@@ -1,0 +1,62 @@
+{
+  "id": "member/bank_card_info",
+  "name": "MEMBER_BANK_CARD_001",
+  "display_name": "账户管理：银行卡信息页面校验",
+  "description": "登录后进入「账户管理 → 银行卡信息」，校验页面展示银行卡管理区域。未绑卡时提示添加银行卡并展示添加按钮，已绑卡时展示卡号等信息。",
+  "category": "member",
+  "module": "bank",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "银行卡页正常加载，含「银行卡」关键字与添加银行卡入口",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_bank",
+      "type": "step",
+      "step_id": "step_open_member_page",
+      "label": "打开银行卡信息页",
+      "params": {"page": "bank"}
+    },
+    {
+      "id": "step_read_bank_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取银行卡页文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_bank_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验银行卡页含「银行卡」",
+      "params": {"actual": "${step_read_bank_text.data.text}", "expected": "银行卡"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_bank", "condition": "pass"},
+    {"source": "step_open_bank", "target": "step_read_bank_text", "condition": "pass"},
+    {"source": "step_read_bank_text", "target": "check_bank_loaded", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验银行卡管理页加载"}
+}

@@ -1,0 +1,69 @@
+{
+  "id": "finance/account_logs",
+  "name": "FINANCE_ACCOUNTLOG_001",
+  "display_name": "资金管理：交易记录流水表格校验",
+  "description": "登录后进入「资金管理 → 交易记录」，读取资金流水表格，校验表头含时间/类型/存入/支出/余额等核心列，流水数据可正常展示。",
+  "category": "finance",
+  "module": "accountlog",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "交易记录页表格表头含时间/类型/金额等列，流水可正常读取",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_account_logs",
+      "type": "step",
+      "step_id": "step_get_finance_account_logs",
+      "label": "读取交易记录流水表格"
+    },
+    {
+      "id": "check_logs_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「时间」",
+      "params": {"actual": "${step_get_account_logs.data.headers_text}", "expected": "时间"}
+    },
+    {
+      "id": "check_logs_has_type",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「类型」",
+      "params": {"actual": "${step_get_account_logs.data.headers_text}", "expected": "类型"}
+    },
+    {
+      "id": "check_logs_has_amount",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「余额」",
+      "params": {"actual": "${step_get_account_logs.data.headers_text}", "expected": "余额"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_account_logs", "condition": "pass"},
+    {"source": "step_get_account_logs", "target": "check_logs_headers", "condition": "pass"},
+    {"source": "check_logs_headers", "target": "check_logs_has_type", "condition": "pass"},
+    {"source": "check_logs_has_type", "target": "check_logs_has_amount", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验交易记录流水表结构与数据"}
+}

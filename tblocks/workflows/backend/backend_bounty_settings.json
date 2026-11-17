@@ -1,0 +1,65 @@
+{
+  "id": "backend/bounty_settings",
+  "name": "BACKEND_BOUNTY_SETTINGS_001",
+  "display_name": "后端：红包管理 - 红包设置页面校验",
+  "description": "管理员登录后台，进入「资金管理 → 红包管理 → 红包设置」，校验红包设置页 iframe 加载正确，页面含红包类型/规则配置表单。",
+  "category": "backend",
+  "module": "bounty",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "红包设置页 iframe src 含 finance/bountytype/list，页面正常渲染",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_bounty_settings",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入红包设置页",
+      "params": {"top_menu": "资金管理", "group": "红包管理", "item_rel": "finance/bountytype/list"}
+    },
+    {
+      "id": "check_bounty_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验红包设置路由加载",
+      "params": {"actual": "${step_open_bounty_settings.data.src}", "expected": "bountytype/list"}
+    },
+    {
+      "id": "step_get_bounty_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取红包设置列表信息"
+    },
+    {
+      "id": "check_bounty_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验红包表头含红包关键字",
+      "params": {"actual": "${step_get_bounty_info.data.headers_text}", "expected": "红包"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_bounty_settings", "condition": "pass"},
+    {"source": "step_open_bounty_settings", "target": "check_bounty_src", "condition": "pass"},
+    {"source": "check_bounty_src", "target": "step_get_bounty_info", "condition": "pass"},
+    {"source": "step_get_bounty_info", "target": "check_bounty_headers", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_bounty_settings_teardown"}}]}
+}

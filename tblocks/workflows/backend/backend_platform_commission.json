@@ -1,0 +1,117 @@
+{
+  "id": "backend/platform_commission",
+  "name": "BACKEND_COMMISSION_001",
+  "display_name": "核心业务：平台获得佣金（网站收支+活动结算收入核对）",
+  "description": "管理员登录后台，进入「资金管理 → 收支记录 → 网站收支」校验平台收支列表含收入列且有收入流水记录，再进入「活动结算」校验平台奖励/佣金结算列表可正常加载，完成「平台获得佣金」核心业务节点验证。",
+  "category": "backend",
+  "module": "commission",
+  "priority": "P0",
+  "precondition": "1. 管理员 admin 可登录后台；2. 教学站网站收支列表常态有数据",
+  "expected": "网站收支列表表头含「收入」列且行数 ≥ 1；活动结算列表 iframe 正确加载",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_web_accountlog",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 网站收支列表",
+      "params": {"top_menu": "资金管理", "group": "收支记录", "item_rel": "finance/accountlog/web"}
+    },
+    {
+      "id": "check_web_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验网站收支路由加载",
+      "params": {"actual": "${step_open_web_accountlog.data.src}", "expected": "accountlog/web"}
+    },
+    {
+      "id": "step_get_web_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取网站收支列表信息"
+    },
+    {
+      "id": "check_web_income_column",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验网站收支表头含「收入」列",
+      "params": {"actual": "${step_get_web_info.data.headers_text}", "expected": "收入"}
+    },
+    {
+      "id": "check_web_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验网站收支队列有数据（含佣金/手续费收入）",
+      "params": {"actual": "${step_get_web_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_read_web_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取网站收支页面文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_commission_keyword",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验网站收支含佣金/手续费相关记录",
+      "params": {"actual": "${step_read_web_text.data.result}", "expected": "手续费"}
+    },
+    {
+      "id": "step_open_new_rewards",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入 活动结算列表",
+      "params": {"top_menu": "资金管理", "group": "活动结算", "item_rel": "loan/newRewards/list"}
+    },
+    {
+      "id": "check_rewards_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验活动结算路由加载",
+      "params": {"actual": "${step_open_new_rewards.data.src}", "expected": "newRewards/list"}
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "backend_platform_commission_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_web_accountlog", "condition": "pass"},
+    {"source": "step_open_web_accountlog", "target": "check_web_src", "condition": "pass"},
+    {"source": "check_web_src", "target": "step_get_web_info", "condition": "pass"},
+    {"source": "step_get_web_info", "target": "check_web_income_column", "condition": "pass"},
+    {"source": "check_web_income_column", "target": "check_web_rows", "condition": "pass"},
+    {"source": "check_web_rows", "target": "step_read_web_text", "condition": "pass"},
+    {"source": "step_read_web_text", "target": "check_commission_keyword", "condition": "pass"},
+    {"source": "check_commission_keyword", "target": "step_open_new_rewards", "condition": "pass"},
+    {"source": "step_open_new_rewards", "target": "check_rewards_src", "condition": "pass"},
+    {"source": "check_rewards_src", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "backend_platform_commission_teardown"}}
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "backend/credit_amount_list",
+  "name": "BACKEND_CREDIT_AMOUNT_001",
+  "display_name": "后端：额度管理 - 额度列表校验",
+  "description": "管理员登录后台，进入「借款管理 → 额度管理 → 额度列表」，校验额度列表 iframe 加载正确、表头渲染、列表数据可读。",
+  "category": "backend",
+  "module": "credit",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 教学站额度列表常态有数据",
+  "expected": "额度列表 iframe src 含 loan/amount/list，表头含额度相关列，行数 ≥ 0",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_amount_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入额度列表",
+      "params": {"top_menu": "借款管理", "group": "额度管理", "item_rel": "loan/amount/list"}
+    },
+    {
+      "id": "check_amount_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验额度列表路由加载",
+      "params": {"actual": "${step_open_amount_list.data.src}", "expected": "loan/amount/list"}
+    },
+    {
+      "id": "step_get_amount_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取额度列表信息"
+    },
+    {
+      "id": "check_amount_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验额度表头渲染",
+      "params": {"actual": "${step_get_amount_info.data.headers_text}", "expected": "额度"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_amount_list", "condition": "pass"},
+    {"source": "step_open_amount_list", "target": "check_amount_src", "condition": "pass"},
+    {"source": "check_amount_src", "target": "step_get_amount_info", "condition": "pass"},
+    {"source": "step_get_amount_info", "target": "check_amount_headers", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_credit_amount_list_teardown"}}]}
+}

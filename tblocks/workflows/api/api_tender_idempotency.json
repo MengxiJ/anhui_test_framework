@@ -1,0 +1,79 @@
+{
+  "id": "api/tender_idempotency",
+  "name": "API_TENDER_IDEMPOTENCY_001",
+  "display_name": "投标幂等性校验（相同参数连续提交两次，第二次被拒绝）",
+  "description": "对应 TC-API-003。登录后选定真实可投标，以相同 loan_id + 金额连续提交两次投标。服务端应保证幂等：第二次投标在相同会话内被拒绝（业务码 100），不产生重复扣款或重复计息。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 余额充足；2. 存在可投金额 ≥ 100 的标的",
+  "expected": "第一次投标业务码 200；第二次相同投标业务码 100（幂等拒绝）",
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "query_loan",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "获取可投标列表",
+      "params": {"page": 1, "epage": 5}
+    },
+    {
+      "id": "check_loan_list",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "列表至少 1 条可投标",
+      "params": {"items": "${query_loan.data.items}", "min_count": 1}
+    },
+    {
+      "id": "tender_first",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "第一次投标 100 元",
+      "params": {"amount": "100", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_first_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "第一次投标业务码 200",
+      "params": {"code": "${tender_first.data.code}", "expected": 200}
+    },
+    {
+      "id": "tender_second",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "第二次相同参数投标（幂等验证）",
+      "params": {"amount": "100", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_second_rejected",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "第二次投标被拒绝（业务码 100，幂等生效）",
+      "params": {"code": "${tender_second.data.code}", "expected": 100}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "query_loan", "condition": "pass"},
+    {"source": "query_loan", "target": "check_loan_list", "condition": "pass"},
+    {"source": "check_loan_list", "target": "tender_first", "condition": "pass"},
+    {"source": "tender_first", "target": "check_first_code", "condition": "pass"},
+    {"source": "check_first_code", "target": "tender_second", "condition": "pass"},
+    {"source": "tender_second", "target": "check_second_rejected", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-idempotency", "write_side_effect": "tender", "note": "相同参数连续投标，第二次应被服务端幂等拒绝"}
+}

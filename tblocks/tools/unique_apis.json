@@ -124,6 +124,14 @@
       "tblocks_impl": "tblocks/step_impl/portal",
       "lib_entry": "lib.common.portal.*_step.step_get_article_detail"
     },
+    "step_get_attestation_info": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_attestation_info"
+    },
+    "step_get_autorepay_info": {
+      "tblocks_impl": "tblocks/step_impl/borrow",
+      "lib_entry": "lib.common.borrow.*_step.step_get_autorepay_info"
+    },
     "step_get_backend_loan_list_info": {
       "tblocks_impl": "tblocks/step_impl/backend",
       "lib_entry": "lib.common.backend.*_step.step_get_backend_loan_list_info"
@@ -176,6 +184,10 @@
       "tblocks_impl": "tblocks/step_impl/invest",
       "lib_entry": "lib.common.invest.*_step.step_get_invest_list"
     },
+    "step_get_loan_application_records": {
+      "tblocks_impl": "tblocks/step_impl/borrow",
+      "lib_entry": "lib.common.borrow.*_step.step_get_loan_application_records"
+    },
     "step_get_loan_review_result_text": {
       "tblocks_impl": "tblocks/step_impl/backend",
       "lib_entry": "lib.common.backend.*_step.step_get_loan_review_result_text"
@@ -223,6 +235,10 @@
     "step_get_risk_level": {
       "tblocks_impl": "tblocks/step_impl/invest",
       "lib_entry": "lib.common.invest.*_step.step_get_risk_level"
+    },
+    "step_get_spread_logs": {
+      "tblocks_impl": "tblocks/step_impl/member",
+      "lib_entry": "lib.common.member.*_step.step_get_spread_logs"
     },
     "step_get_table_data": {
       "tblocks_impl": "tblocks/step_impl/browser",

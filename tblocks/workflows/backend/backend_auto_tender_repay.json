@@ -1,0 +1,73 @@
+{
+  "id": "backend/auto_tender_repay",
+  "name": "BACKEND_AUTO_TENDER_REPAY_001",
+  "display_name": "后端：自动投标/自动还款管理列表校验",
+  "description": "管理员登录后台，依次进入「借款管理 → 自动投标 → 自动投标管理」和「自动还款 → 自动还款管理」，校验两个管理列表 iframe 加载正确、表头渲染完整。",
+  "category": "backend",
+  "module": "auto",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "自动投标管理/自动还款管理列表 iframe 均加载正确",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_autotender",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入自动投标管理列表",
+      "params": {"top_menu": "借款管理", "group": "自动投标", "item_rel": "loan/autotender/list"}
+    },
+    {
+      "id": "check_autotender_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验自动投标路由加载",
+      "params": {"actual": "${step_open_autotender.data.src}", "expected": "autotender"}
+    },
+    {
+      "id": "step_get_autotender_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取自动投标管理列表"
+    },
+    {
+      "id": "step_open_autorepay",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入自动还款管理列表",
+      "params": {"top_menu": "借款管理", "group": "自动还款", "item_rel": "loan/autorepay/list"}
+    },
+    {
+      "id": "check_autorepay_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验自动还款路由加载",
+      "params": {"actual": "${step_open_autorepay.data.src}", "expected": "autorepay"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_autotender", "condition": "pass"},
+    {"source": "step_open_autotender", "target": "check_autotender_src", "condition": "pass"},
+    {"source": "check_autotender_src", "target": "step_get_autotender_info", "condition": "pass"},
+    {"source": "step_get_autotender_info", "target": "step_open_autorepay", "condition": "pass"},
+    {"source": "step_open_autorepay", "target": "check_autorepay_src", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_auto_tender_repay_teardown"}}]}
+}

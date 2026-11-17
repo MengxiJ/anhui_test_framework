@@ -1,0 +1,70 @@
+{
+  "id": "fe/balance_login_state",
+  "name": "FE_BALANCE_LOGIN_STATE_001",
+  "display_name": "余额登录态绑定校验（未登录不展示余额，登录后展示）",
+  "description": "对应 TC-FE-013。未登录状态下请求会员中心余额接口应被重定向到登录页（返回 HTML 而非余额 JSON）；登录后同一接口应返回真实余额数据。",
+  "category": "api",
+  "module": "member",
+  "priority": "P1",
+  "precondition": "共享教学账号 18800002008 可登录",
+  "expected": "未登录余额接口返回 HTML 登录壳页；登录后返回 JSON 余额数据",
+  "nodes": [
+    {
+      "id": "balance_anon",
+      "type": "step",
+      "step_id": "step_probe_http_post",
+      "label": "未登录请求会员中心余额",
+      "params": {"path": "/member/member/center", "data": {}, "site": "front"}
+    },
+    {
+      "id": "check_anon_html",
+      "type": "check",
+      "check_id": "check_probe_content_type_contains",
+      "label": "未登录返回 HTML",
+      "params": {"content_type": "${balance_anon.data.content_type}", "expected": "text/html"}
+    },
+    {
+      "id": "check_anon_login",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "未登录被导向登录页",
+      "params": {"body_text": "${balance_anon.data.body_text}", "expected": "member/login"}
+    },
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "balance_loggedin",
+      "type": "step",
+      "step_id": "step_get_finance_balance",
+      "label": "登录后读取余额"
+    },
+    {
+      "id": "check_balance_present",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "登录后余额可读取（≥ 0）",
+      "params": {"actual": "${balance_loggedin.data.balance}", "expected": -1}
+    }
+  ],
+  "edges": [
+    {"source": "balance_anon", "target": "check_anon_html", "condition": "pass"},
+    {"source": "check_anon_html", "target": "check_anon_login", "condition": "pass"},
+    {"source": "check_anon_login", "target": "login", "condition": "pass"},
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "balance_loggedin", "condition": "pass"},
+    {"source": "balance_loggedin", "target": "check_balance_present", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-security", "write_side_effect": "none", "note": "验证余额接口的登录态绑定"}
+}

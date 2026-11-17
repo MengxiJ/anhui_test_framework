@@ -1,0 +1,61 @@
+{
+  "id": "borrow/credit_apply",
+  "name": "BORROW_CREDIT_APPLY_001",
+  "display_name": "借款管理：额度申请提交流程",
+  "description": "切换至借款账户，进入「借款管理 → 申请额度」，提交额度申请（金额、详情、验证码），校验申请提交成功并返回结果提示。",
+  "category": "borrow",
+  "module": "credit",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录；2. 图形验证码固定 8888",
+  "expected": "额度申请提交成功，页面返回申请结果提示",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_apply_credit",
+      "type": "step",
+      "step_id": "step_apply_credit_limit",
+      "label": "提交额度申请",
+      "params": {"amount": "100000", "detail_msg": "自动化测试额度申请", "img_code": "8888"}
+    },
+    {
+      "id": "step_get_apply_result",
+      "type": "step",
+      "step_id": "step_get_credit_apply_result_text",
+      "label": "读取额度申请结果"
+    },
+    {
+      "id": "check_apply_result",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验申请结果含提示信息",
+      "params": {"actual": "${step_get_apply_result.data.result}", "expected": ""}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_apply_credit", "condition": "pass"},
+    {"source": "step_apply_credit", "target": "step_get_apply_result", "condition": "pass"},
+    {"source": "step_get_apply_result", "target": "check_apply_result", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-business", "write_side_effect": "credit_apply", "note": "提交借款额度申请并校验结果"}
+}

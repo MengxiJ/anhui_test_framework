@@ -1,0 +1,85 @@
+{
+  "id": "backend/user_masking",
+  "name": "BACKEND_USER_MASK_001",
+  "display_name": "后台用户列表敏感信息脱敏校验（手机号/身份证号脱敏）",
+  "description": "对应 TC-BE-010。管理员登录后台进入会员管理列表，读取用户表格中的手机号、身份证号等敏感字段，校验其以脱敏形式展示（含 * 号），而非全量明文。",
+  "category": "backend",
+  "module": "member",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 会员管理列表有数据",
+  "expected": "用户列表中手机号、身份证号字段包含 * 脱敏符，不全量明文展示",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_member_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入会员管理列表",
+      "params": {"top_menu": "会员管理", "group": "会员管理", "item_rel": "member/member/list"}
+    },
+    {
+      "id": "check_member_list_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验会员列表路由加载",
+      "params": {"actual": "${step_open_member_list.data.src}", "expected": "member"}
+    },
+    {
+      "id": "step_get_member_list_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取会员列表信息"
+    },
+    {
+      "id": "check_member_list_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验会员列表有数据",
+      "params": {"actual": "${step_get_member_list_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_read_phone_cells",
+      "type": "step",
+      "step_id": "step_get_elements_text",
+      "label": "读取手机号列文本",
+      "params": {"by": "css", "value": "td:nth-child(3)", "limit": 5}
+    },
+    {
+      "id": "check_phone_masked",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验手机号含脱敏符 *",
+      "params": {"actual": "${step_read_phone_cells.data.text}", "expected": "*"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_member_list", "condition": "pass"},
+    {"source": "step_open_member_list", "target": "check_member_list_src", "condition": "pass"},
+    {"source": "check_member_list_src", "target": "step_get_member_list_info", "condition": "pass"},
+    {"source": "step_get_member_list_info", "target": "check_member_list_rows", "condition": "pass"},
+    {"source": "check_member_list_rows", "target": "step_read_phone_cells", "condition": "pass"},
+    {"source": "step_read_phone_cells", "target": "check_phone_masked", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "user_masking_teardown"}}
+    ]
+  }
+}

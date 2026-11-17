@@ -84,3 +84,23 @@ def step_publish_borrow(
 def step_get_borrow_result_text():
     """读取发标结果文本。"""
     return lib.step_get_borrow_result_text()
+
+
+@composer_step(
+    name="step_get_loan_application_records",
+    description="打开我的借款申请页读取申请记录表格，结果放入 data.headers/data.rows/data.row_count",
+    category="borrow",
+)
+def step_get_loan_application_records():
+    """读取借款申请记录表格。"""
+    return lib.step_get_loan_application_records()
+
+
+@composer_step(
+    name="step_get_autorepay_info",
+    description="打开自动还款设置页读取页面文本，结果放入 data.text",
+    category="borrow",
+)
+def step_get_autorepay_info():
+    """读取自动还款设置信息。"""
+    return lib.step_get_autorepay_info()

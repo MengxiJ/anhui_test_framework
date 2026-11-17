@@ -1,0 +1,53 @@
+{
+  "id": "borrow/autorepay",
+  "name": "BORROW_AUTOREPAY_001",
+  "display_name": "借款管理：自动还款设置页面校验",
+  "description": "切换至借款账户，进入「借款管理 → 自动还款」，校验自动还款设置页正常加载，展示自动还款开关与相关说明。",
+  "category": "borrow",
+  "module": "autorepay",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "自动还款页含「自动还款」关键字，页面正常渲染",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_autorepay",
+      "type": "step",
+      "step_id": "step_get_autorepay_info",
+      "label": "读取自动还款设置页"
+    },
+    {
+      "id": "check_autorepay_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含「自动还款」",
+      "params": {"actual": "${step_get_autorepay.data.text}", "expected": "自动还款"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_autorepay", "condition": "pass"},
+    {"source": "step_get_autorepay", "target": "check_autorepay_loaded", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验自动还款设置页加载"}
+}

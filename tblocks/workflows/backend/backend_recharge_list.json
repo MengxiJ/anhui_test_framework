@@ -1,0 +1,73 @@
+{
+  "id": "backend/recharge_list",
+  "name": "BACKEND_RECHARGE_LIST_001",
+  "display_name": "后端：充值管理 - 全部充值记录校验",
+  "description": "管理员登录后台，进入「资金管理 → 充值管理 → 全部充值」，校验充值记录列表 iframe 加载正确、表头含充值金额/状态/时间等列、数据可读。",
+  "category": "backend",
+  "module": "recharge",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 教学站充值记录常态有数据",
+  "expected": "充值列表 iframe src 含 finance/recharge/list，表头含金额/状态列",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_recharge_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入全部充值列表",
+      "params": {"top_menu": "资金管理", "group": "充值管理", "item_rel": "finance/recharge/list"}
+    },
+    {
+      "id": "check_recharge_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值列表路由加载",
+      "params": {"actual": "${step_open_recharge_list.data.src}", "expected": "finance/recharge/list"}
+    },
+    {
+      "id": "step_get_recharge_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取充值列表信息"
+    },
+    {
+      "id": "check_recharge_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验充值表头含金额",
+      "params": {"actual": "${step_get_recharge_info.data.headers_text}", "expected": "金额"}
+    },
+    {
+      "id": "check_recharge_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验充值列表有数据",
+      "params": {"actual": "${step_get_recharge_info.data.row_count}", "expected": 0}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_recharge_list", "condition": "pass"},
+    {"source": "step_open_recharge_list", "target": "check_recharge_src", "condition": "pass"},
+    {"source": "check_recharge_src", "target": "step_get_recharge_info", "condition": "pass"},
+    {"source": "step_get_recharge_info", "target": "check_recharge_headers", "condition": "pass"},
+    {"source": "check_recharge_headers", "target": "check_recharge_rows", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_recharge_list_teardown"}}]}
+}

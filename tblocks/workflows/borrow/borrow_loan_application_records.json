@@ -1,0 +1,61 @@
+{
+  "id": "borrow/loan_application_records",
+  "name": "BORROW_APPLY_RECORDS_001",
+  "display_name": "借款管理：借款申请记录查询校验",
+  "description": "切换至借款账户，进入「借款管理 → 我的借款申请」，读取申请历史记录表格，校验表头含申请金额/状态/时间等核心列。",
+  "category": "borrow",
+  "module": "apply",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "借款申请记录表头含金额/状态/时间等列，表格可正常读取",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_apply_records",
+      "type": "step",
+      "step_id": "step_get_loan_application_records",
+      "label": "读取借款申请记录表格"
+    },
+    {
+      "id": "check_records_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「金额」",
+      "params": {"actual": "${step_get_apply_records.data.headers_text}", "expected": "金额"}
+    },
+    {
+      "id": "check_records_has_status",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「状态」",
+      "params": {"actual": "${step_get_apply_records.data.headers_text}", "expected": "状态"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_apply_records", "condition": "pass"},
+    {"source": "step_get_apply_records", "target": "check_records_headers", "condition": "pass"},
+    {"source": "check_records_headers", "target": "check_records_has_status", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验借款申请记录表格结构"}
+}

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from lib.common.browser.utils.browser_manager import BrowserManager
 from lib.common.framework.step_singletons import current_device_id, get_browser
 from lib.common.member.utils.member_manager import MemberManager
 from lib.common.result_helper import step_result
 from lib.core import instance_manager
+from lib.core.project_config import BASE_URL
 
 _CORE_PREFIX = "member_core"
 
@@ -300,4 +302,39 @@ def step_toggle_remind(
         f"复选框 {checkbox_id} 切换前={info.get('before')}，"
         f"提交={info.get('submitted')}，提示={info.get('result_text')!r}",
         dict(info),
+    )
+
+
+# ---- 推广记录 ----
+def step_get_spread_logs(device_id: Optional[str] = None) -> Dict[str, Any]:
+    """打开推广记录页读取表格（ID/用户名/提成方式/资金类型/推广比例/推广总额/提交时间/备注）。"""
+    browser = BrowserManager(get_browser(device_id))
+    browser.open_url_settled(BASE_URL + "/member/spread/spreadLog")
+    table = browser.get_table_data("css", "table", timeout=10)
+    headers_text = " ".join(str(h) for h in table.get("headers", []))
+    return step_result(
+        "step_get_spread_logs",
+        True,
+        f"读取推广记录: {table.get('row_count', 0)} 行，表头: {table.get('headers', [])}",
+        {
+            "result": table.get("row_count", 0),
+            "headers": table.get("headers", []),
+            "headers_text": headers_text,
+            "rows": table.get("rows", []),
+            "row_count": table.get("row_count", 0),
+        },
+    )
+
+
+# ---- 我的认证 ----
+def step_get_attestation_info(device_id: Optional[str] = None) -> Dict[str, Any]:
+    """打开我的认证页读取认证状态文本（实名认证等）。"""
+    browser = BrowserManager(get_browser(device_id))
+    browser.open_url_settled(BASE_URL + "/member/attestations/index")
+    text = browser.get_text("tag_name", "body") or ""
+    return step_result(
+        "step_get_attestation_info",
+        True,
+        f"已读取认证页文本，含「认证」={('认证' in text)}",
+        {"result": text, "text": text},
     )

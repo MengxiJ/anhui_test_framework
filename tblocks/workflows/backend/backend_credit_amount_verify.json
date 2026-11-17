@@ -1,0 +1,73 @@
+{
+  "id": "backend/credit_amount_verify",
+  "name": "BACKEND_CREDIT_VERIFY_001",
+  "display_name": "后端：额度管理 - 额度申请审核/申请记录列表校验",
+  "description": "管理员登录后台，依次进入「借款管理 → 额度管理」的额度申请审核、额度申请记录两个子页面，校验各列表 iframe 加载正确、表头渲染完整。",
+  "category": "backend",
+  "module": "credit",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台",
+  "expected": "额度申请审核/申请记录列表 iframe 均加载正确，表头含金额/状态列",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_verify_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入额度申请审核列表",
+      "params": {"top_menu": "借款管理", "group": "额度管理", "item_rel": "loan/amount/verify/list"}
+    },
+    {
+      "id": "check_verify_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验额度审核路由加载",
+      "params": {"actual": "${step_open_verify_list.data.src}", "expected": "amount/verify"}
+    },
+    {
+      "id": "step_get_verify_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取额度审核列表信息"
+    },
+    {
+      "id": "step_open_apply_record",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入额度申请记录列表",
+      "params": {"top_menu": "借款管理", "group": "额度管理", "item_rel": "loan/amount/apply/list"}
+    },
+    {
+      "id": "check_apply_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验申请记录路由加载",
+      "params": {"actual": "${step_open_apply_record.data.src}", "expected": "amount/apply"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_verify_list", "condition": "pass"},
+    {"source": "step_open_verify_list", "target": "check_verify_src", "condition": "pass"},
+    {"source": "check_verify_src", "target": "step_get_verify_info", "condition": "pass"},
+    {"source": "step_get_verify_info", "target": "step_open_apply_record", "condition": "pass"},
+    {"source": "step_open_apply_record", "target": "check_apply_src", "condition": "pass"}
+  ],
+  "metadata": {"teardown_hooks": [{"step_id": "step_capture_screenshot", "params": {"file_name": "backend_credit_amount_verify_teardown"}}]}
+}

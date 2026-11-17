@@ -1,0 +1,119 @@
+{
+  "id": "api/tender_amount_boundary",
+  "name": "API_TENDER_BOUNDARY_001",
+  "display_name": "投标金额业务边界校验（低于最低/超过最高/超过可投/超长小数）",
+  "description": "对应 TC-FE-003~007、TC-API-001。先从投资列表取一个真实可投标的 loan_id，再以登录态提交多种业务边界金额：1元（低于最低投标金额）、999999999元（超过最高投标金额/可投金额）、100.123元（超长小数位精度超限）。服务端应在业务规则校验阶段返回业务码 100，不生成投标订单、不冻结资金。",
+  "category": "api",
+  "module": "trust",
+  "priority": "P0",
+  "precondition": "1. 共享教学账号 18800002008 可登录；2. 投资列表存在可投标的",
+  "expected": "三种边界金额投标业务码均为 100，消息包含金额相关提示，无资金变动",
+  "nodes": [
+    {
+      "id": "login",
+      "type": "step",
+      "step_id": "step_account_login",
+      "label": "会员登录建立会话",
+      "params": {"keywords": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "check_login",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "登录业务码 200",
+      "params": {"code": "${login.data.code}", "expected": 200}
+    },
+    {
+      "id": "query_loan",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "获取可投标列表",
+      "params": {"page": 1, "epage": 5}
+    },
+    {
+      "id": "check_loan_list",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "列表至少 1 条可投标",
+      "params": {"items": "${query_loan.data.items}", "min_count": 1}
+    },
+    {
+      "id": "tender_below_min",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标 1 元（低于最低投标金额）",
+      "params": {"amount": "1", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_below_min_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "低于最低金额业务码 100",
+      "params": {"code": "${tender_below_min.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_below_min_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示金额低于最低投标",
+      "params": {"message": "${tender_below_min.data.message}", "expected": "金额"}
+    },
+    {
+      "id": "tender_above_max",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标 999999999 元（超过最高/可投金额）",
+      "params": {"amount": "999999999", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_above_max_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "超过最高金额业务码 100",
+      "params": {"code": "${tender_above_max.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_above_max_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示金额超过上限",
+      "params": {"message": "${tender_above_max.data.message}", "expected": "金额"}
+    },
+    {
+      "id": "tender_bad_precision",
+      "type": "step",
+      "step_id": "step_account_tender",
+      "label": "投标 100.123 元（超长小数位）",
+      "params": {"amount": "100.123", "loan_id": "${query_loan.data.items[0].id}", "deposit_certificate": -1}
+    },
+    {
+      "id": "check_bad_precision_code",
+      "type": "check",
+      "check_id": "check_account_business_code",
+      "label": "超长小数业务码 100",
+      "params": {"code": "${tender_bad_precision.data.code}", "expected": 100}
+    },
+    {
+      "id": "check_bad_precision_msg",
+      "type": "check",
+      "check_id": "check_account_message_contains",
+      "label": "提示金额格式或精度问题",
+      "params": {"message": "${tender_bad_precision.data.message}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "login", "target": "check_login", "condition": "pass"},
+    {"source": "check_login", "target": "query_loan", "condition": "pass"},
+    {"source": "query_loan", "target": "check_loan_list", "condition": "pass"},
+    {"source": "check_loan_list", "target": "tender_below_min", "condition": "pass"},
+    {"source": "tender_below_min", "target": "check_below_min_code", "condition": "pass"},
+    {"source": "check_below_min_code", "target": "check_below_min_msg", "condition": "pass"},
+    {"source": "check_below_min_msg", "target": "tender_above_max", "condition": "pass"},
+    {"source": "tender_above_max", "target": "check_above_max_code", "condition": "pass"},
+    {"source": "check_above_max_code", "target": "check_above_max_msg", "condition": "pass"},
+    {"source": "check_above_max_msg", "target": "tender_bad_precision", "condition": "pass"},
+    {"source": "tender_bad_precision", "target": "check_bad_precision_code", "condition": "pass"},
+    {"source": "check_bad_precision_code", "target": "check_bad_precision_msg", "condition": "pass"}
+  ],
+  "metadata": {"layer": "api-boundary", "write_side_effect": "none", "note": "业务边界校验前置拦截，不生成订单不冻结资金"}
+}

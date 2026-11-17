@@ -5,9 +5,11 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from lib.common.borrow.utils.borrow_manager import BorrowManager
+from lib.common.browser.utils.browser_manager import BrowserManager
 from lib.common.framework.step_singletons import current_device_id, get_browser
 from lib.common.result_helper import step_result
 from lib.core import instance_manager
+from lib.core.project_config import BASE_URL
 
 _CORE_PREFIX = "borrow_core"
 
@@ -81,5 +83,40 @@ def step_get_borrow_result_text(device_id: Optional[str] = None) -> Dict[str, An
         "step_get_borrow_result_text",
         True,
         f"发标结果文本: {text}",
+        {"result": text, "text": text},
+    )
+
+
+# ---- 借款申请记录 ----
+def step_get_loan_application_records(device_id: Optional[str] = None) -> Dict[str, Any]:
+    """打开我的借款申请页读取申请记录表格。"""
+    browser = BrowserManager(get_browser(device_id))
+    browser.open_url_settled(BASE_URL + "/loan/apply/myapplylist")
+    table = browser.get_table_data("css", "table", timeout=10)
+    headers_text = " ".join(str(h) for h in table.get("headers", []))
+    return step_result(
+        "step_get_loan_application_records",
+        True,
+        f"读取借款申请记录: {table.get('row_count', 0)} 行，表头: {table.get('headers', [])}",
+        {
+            "result": table.get("row_count", 0),
+            "headers": table.get("headers", []),
+            "headers_text": headers_text,
+            "rows": table.get("rows", []),
+            "row_count": table.get("row_count", 0),
+        },
+    )
+
+
+# ---- 自动还款 ----
+def step_get_autorepay_info(device_id: Optional[str] = None) -> Dict[str, Any]:
+    """打开自动还款设置页读取页面文本（自动还款开关状态等）。"""
+    browser = BrowserManager(get_browser(device_id))
+    browser.open_url_settled(BASE_URL + "/loan/autorepay/index")
+    text = browser.get_text("tag_name", "body") or ""
+    return step_result(
+        "step_get_autorepay_info",
+        True,
+        f"已读取自动还款页文本，含「自动还款」={('自动还款' in text)}",
         {"result": text, "text": text},
     )

@@ -864,6 +864,24 @@
     "pre_conditions": [],
     "post_conditions": []
   },
+  "step_get_attestation_info": {
+    "id": "step_get_attestation_info",
+    "name": "step_get_attestation_info",
+    "description": "打开我的认证页读取认证状态文本，结果放入 data.text",
+    "category": "member",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "step_get_autorepay_info": {
+    "id": "step_get_autorepay_info",
+    "name": "step_get_autorepay_info",
+    "description": "打开自动还款设置页读取页面文本，结果放入 data.text",
+    "category": "borrow",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
   "step_get_backend_loan_list_info": {
     "id": "step_get_backend_loan_list_info",
     "name": "step_get_backend_loan_list_info",
@@ -1067,6 +1085,15 @@
     "pre_conditions": [],
     "post_conditions": []
   },
+  "step_get_loan_application_records": {
+    "id": "step_get_loan_application_records",
+    "name": "step_get_loan_application_records",
+    "description": "打开我的借款申请页读取申请记录表格，结果放入 data.headers/data.rows/data.row_count",
+    "category": "borrow",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
   "step_get_loan_review_result_text": {
     "id": "step_get_loan_review_result_text",
     "name": "step_get_loan_review_result_text",
@@ -1194,6 +1221,15 @@
     "name": "step_get_risk_level",
     "description": "读取风险测评等级（会员中心优先，回退测评结果页），等级文本放入 data.level_text",
     "category": "invest",
+    "params": {},
+    "pre_conditions": [],
+    "post_conditions": []
+  },
+  "step_get_spread_logs": {
+    "id": "step_get_spread_logs",
+    "name": "step_get_spread_logs",
+    "description": "打开推广记录页读取表格（ID/用户名/提成方式/资金类型/推广比例/推广总额/提交时间/备注），结果放入 data.headers/data.rows/data.row_count",
+    "category": "member",
     "params": {},
     "pre_conditions": [],
     "post_conditions": []
@@ -1509,8 +1545,12 @@
           "借款中管理",
           "满标管理",
           "额度管理",
+          "流转标管理",
           "债权转让",
+          "逾期借款",
           "借贷记录",
+          "自动投标",
+          "自动还款",
           "资金管理",
           "充值管理",
           "账号管理",
@@ -1533,6 +1573,21 @@
           "loan/full/list",
           "loan/fullpass/list",
           "loan/amount/list",
+          "loan/amount/verify/list",
+          "loan/amount/apply/list",
+          "loan/amount/log/list",
+          "loan/transfer/list",
+          "loan/transfer/loaning/list",
+          "loan/transfer/buyback/list",
+          "loan/transfer/done/list",
+          "loan/transfer/fail/list",
+          "loan/overdue/list",
+          "loan/overdue/paid/list",
+          "loan/overdue/advance/list",
+          "loan/autotender/list",
+          "loan/autotender/log/list",
+          "loan/autorepay/list",
+          "loan/autorepay/log/list",
           "loan/tender/list",
           "loan/repayperiod/list",
           "loan/recover/list",
@@ -1554,6 +1609,9 @@
           "finance/accountlog/member",
           "finance/bountytype/list",
           "finance/bounty/list",
+          "finance/manual/transfer",
+          "finance/manual/recharge",
+          "finance/manual/withdraw",
           "loan/newRewards/list"
         ],
         "description": "子菜单项 iframe 路径（rel 属性）"

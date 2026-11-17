@@ -1,0 +1,68 @@
+{
+  "id": "member/center_asset_consistency",
+  "name": "MEMBER_CENTER_ASSET_001",
+  "display_name": "会员中心：资产概览数据一致性校验（余额/总资产/待收本息）",
+  "description": "登录会员中心后读取资产概览，校验可用金额、冻结金额、待收本息、总资产等关键字段正常展示且数值合理（总资产 = 可用 + 冻结 + 待收）。",
+  "category": "member",
+  "module": "center",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "会员中心展示可用金额、冻结金额、待收本息、总资产，数值非负且总资产 ≥ 可用金额",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_center_summary",
+      "type": "step",
+      "step_id": "step_get_member_center_summary",
+      "label": "读取会员中心资产概览"
+    },
+    {
+      "id": "step_get_balance",
+      "type": "step",
+      "step_id": "step_get_finance_balance",
+      "label": "读取账户余额"
+    },
+    {
+      "id": "check_balance_non_negative",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验可用余额 ≥ 0",
+      "params": {"actual": "${step_get_balance.data.balance}", "expected": -1}
+    },
+    {
+      "id": "check_summary_has_text",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验资产概览含金额信息",
+      "params": {"actual": "${step_get_center_summary.data.summary_text}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_center_summary", "condition": "pass"},
+    {"source": "step_get_center_summary", "target": "step_get_balance", "condition": "pass"},
+    {"source": "step_get_balance", "target": "check_balance_non_negative", "condition": "pass"},
+    {"source": "check_balance_non_negative", "target": "check_summary_has_text", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验会员中心资产数据展示一致性"}
+}

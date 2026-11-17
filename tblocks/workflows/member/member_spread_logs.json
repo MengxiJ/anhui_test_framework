@@ -1,0 +1,69 @@
+{
+  "id": "member/spread_logs",
+  "name": "MEMBER_SPREAD_LOGS_001",
+  "display_name": "推广管理：推广记录查询表格校验",
+  "description": "登录后进入「推广管理 → 推广记录」，读取推广记录表格，校验表头含 ID/用户名/提成方式/资金类型/推广比例/推广总额/提交时间/备注等核心列。",
+  "category": "member",
+  "module": "spread",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "推广记录表头含用户名/推广总额/提交时间等列，表格可正常读取",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_spread_logs",
+      "type": "step",
+      "step_id": "step_get_spread_logs",
+      "label": "读取推广记录表格"
+    },
+    {
+      "id": "check_logs_headers",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「用户名」",
+      "params": {"actual": "${step_get_spread_logs.data.headers_text}", "expected": "用户名"}
+    },
+    {
+      "id": "check_logs_has_amount",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「推广总额」",
+      "params": {"actual": "${step_get_spread_logs.data.headers_text}", "expected": "推广总额"}
+    },
+    {
+      "id": "check_logs_has_time",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验表头含「提交时间」",
+      "params": {"actual": "${step_get_spread_logs.data.headers_text}", "expected": "时间"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_spread_logs", "condition": "pass"},
+    {"source": "step_get_spread_logs", "target": "check_logs_headers", "condition": "pass"},
+    {"source": "check_logs_headers", "target": "check_logs_has_amount", "condition": "pass"},
+    {"source": "check_logs_has_amount", "target": "check_logs_has_time", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验推广记录表格结构"}
+}

@@ -1,0 +1,96 @@
+{
+  "id": "invest/receive_actual",
+  "name": "INVEST_RECEIVE_ACTUAL_001",
+  "display_name": "核心业务：投资人获取本息（收款计划本金利息+已结清投资核对）",
+  "description": "投资人登录后进入「理财管理 → 我的收款计划」校验表头含应收本金/应收利息列且有回款记录，再进入「我的投资 → 已结清」tab 校验存在已结清投资标的，完成「投资人获取本息」核心业务节点验证。",
+  "category": "invest",
+  "module": "receive",
+  "priority": "P0",
+  "precondition": "1. 会员 18800002008 可登录；2. 该会员名下有已回款或已结清的投资记录",
+  "expected": "收款计划表头含「应收本金」「应收利息」列；我的投资「已结清」tab 表格结构完整",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "投资人登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_receive_plan",
+      "type": "step",
+      "step_id": "step_get_receive_plan",
+      "label": "读取我的收款计划"
+    },
+    {
+      "id": "check_plan_principal_column",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验收款计划表头含「应收本金」",
+      "params": {"actual": "${step_get_receive_plan.data.headers_text}", "expected": "本金"}
+    },
+    {
+      "id": "check_plan_interest_column",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验收款计划表头含「应收利息」",
+      "params": {"actual": "${step_get_receive_plan.data.headers_text}", "expected": "利息"}
+    },
+    {
+      "id": "check_plan_loaded",
+      "type": "check",
+      "check_id": "check_receive_plan_loaded",
+      "label": "校验收款计划结构完整"
+    },
+    {
+      "id": "step_get_settled_tenders",
+      "type": "step",
+      "step_id": "step_get_my_tenders",
+      "label": "读取我的投资「已结清」tab",
+      "params": {"tab": "已结清"}
+    },
+    {
+      "id": "check_settled_loaded",
+      "type": "check",
+      "check_id": "check_my_tenders_table_loaded",
+      "label": "校验已结清投资表格结构",
+      "params": {"tab": "已结清"}
+    },
+    {
+      "id": "step_screenshot_final",
+      "type": "step",
+      "step_id": "step_capture_screenshot",
+      "label": "留存结果截图",
+      "params": {"file_name": "invest_receive_actual_final"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_receive_plan", "condition": "pass"},
+    {"source": "step_get_receive_plan", "target": "check_plan_principal_column", "condition": "pass"},
+    {"source": "check_plan_principal_column", "target": "check_plan_interest_column", "condition": "pass"},
+    {"source": "check_plan_interest_column", "target": "check_plan_loaded", "condition": "pass"},
+    {"source": "check_plan_loaded", "target": "step_get_settled_tenders", "condition": "pass"},
+    {"source": "step_get_settled_tenders", "target": "check_settled_loaded", "condition": "pass"},
+    {"source": "check_settled_loaded", "target": "step_screenshot_final", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "invest_receive_actual_teardown"}}
+    ]
+  }
+}

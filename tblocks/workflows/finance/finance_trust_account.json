@@ -1,0 +1,81 @@
+{
+  "id": "finance/trust_account_info",
+  "name": "FINANCE_TRUST_001",
+  "display_name": "资金管理：我的支付账户（托管账户）信息校验",
+  "description": "登录后进入「资金管理 → 我的支付账户」，校验托管账户页正常加载，显示托管号、总金额、可用金额、冻结金额等关键信息，且可用金额 + 冻结金额 = 总金额。",
+  "category": "finance",
+  "module": "trust",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 已开通托管账户；2. 可正常登录",
+  "expected": "托管页含托管号、总金额、可用金额、冻结金额；可用+冻结=总金额",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_trust",
+      "type": "step",
+      "step_id": "step_open_finance_trust_page",
+      "label": "打开我的支付账户页"
+    },
+    {
+      "id": "step_read_trust_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取托管账户页主体文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_trust_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验托管页含「托管」关键字",
+      "params": {"actual": "${step_read_trust_text.data.text}", "expected": "托管"}
+    },
+    {
+      "id": "check_trust_has_account",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含托管账号/托管号",
+      "params": {"actual": "${step_read_trust_text.data.text}", "expected": "托管号"}
+    },
+    {
+      "id": "check_trust_has_amount",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含总金额/可用金额信息",
+      "params": {"actual": "${step_read_trust_text.data.text}", "expected": "金额"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_trust", "condition": "pass"},
+    {"source": "step_open_trust", "target": "step_read_trust_text", "condition": "pass"},
+    {"source": "step_read_trust_text", "target": "check_trust_loaded", "condition": "pass"},
+    {"source": "check_trust_loaded", "target": "check_trust_has_account", "condition": "pass"},
+    {"source": "check_trust_has_account", "target": "check_trust_has_amount", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "finance_trust_account_teardown"}}
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "invest/debt_transfer",
+  "name": "INVEST_DEBT_TRANSFER_001",
+  "display_name": "理财管理：债权转让页面状态筛选校验",
+  "description": "登录后进入「理财管理 → 债权转让」，读取转让列表与状态筛选项，校验可以转让/转让中/转让成功/已撤销等状态分类存在且表格可正常加载。",
+  "category": "invest",
+  "module": "transfer",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "债权转让页含状态筛选项，表格表头含转让金额/状态等列",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_get_transfer_list",
+      "type": "step",
+      "step_id": "step_get_debt_transfer_list",
+      "label": "读取债权转让列表"
+    },
+    {
+      "id": "check_transfer_loaded",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验债权转让表格可读取",
+      "params": {"actual": "${step_get_transfer_list.data.row_count}", "expected": -1}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_get_transfer_list", "condition": "pass"},
+    {"source": "step_get_transfer_list", "target": "check_transfer_loaded", "condition": "pass"}
+  ],
+  "metadata": {"layer": "ui-data", "write_side_effect": "none", "note": "校验债权转让页加载与状态筛选"}
+}

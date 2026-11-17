@@ -1,0 +1,63 @@
+{
+  "id": "fe/sensitive_info_prompt",
+  "name": "FE_SENSITIVE_PROMPT_001",
+  "display_name": "敏感信息录入警示持续可见校验（首页/风险评测/投资页）",
+  "description": "对应 TC-FE-015。教学环境专项：首页、风险评测页、投资页等关键页面应持续展示『请勿录入个人敏感信息』类提示，而非仅在首次进入时闪现。本用例通过 HTTP 抓取各关键页面，校验页面源码中包含敏感信息警示文案。",
+  "category": "portal",
+  "module": "site",
+  "priority": "P1",
+  "precondition": "前台站点 8081 可访问",
+  "expected": "首页、投资列表页 HTML 中包含敏感信息警示文案",
+  "nodes": [
+    {
+      "id": "get_home",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "抓取前台首页",
+      "params": {"path": "/", "site": "front"}
+    },
+    {
+      "id": "check_home_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "首页 HTTP 200",
+      "params": {"http_status": "${get_home.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_home_sensitive_prompt",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "首页含敏感信息警示",
+      "params": {"body_text": "${get_home.data.body_text}", "expected": "敏感"}
+    },
+    {
+      "id": "get_invest_page",
+      "type": "step",
+      "step_id": "step_probe_http_get",
+      "label": "抓取投资列表页",
+      "params": {"path": "/loan/loan/list", "site": "front"}
+    },
+    {
+      "id": "check_invest_status",
+      "type": "check",
+      "check_id": "check_probe_http_status",
+      "label": "投资页 HTTP 200",
+      "params": {"http_status": "${get_invest_page.data.http_status}", "expected": 200}
+    },
+    {
+      "id": "check_invest_sensitive_prompt",
+      "type": "check",
+      "check_id": "check_probe_content_contains",
+      "label": "投资页含敏感信息警示",
+      "params": {"body_text": "${get_invest_page.data.body_text}", "expected": "敏感"}
+    }
+  ],
+  "edges": [
+    {"source": "get_home", "target": "check_home_status", "condition": "pass"},
+    {"source": "check_home_status", "target": "check_home_sensitive_prompt", "condition": "pass"},
+    {"source": "check_home_sensitive_prompt", "target": "get_invest_page", "condition": "pass"},
+    {"source": "get_invest_page", "target": "check_invest_status", "condition": "pass"},
+    {"source": "check_invest_status", "target": "check_invest_sensitive_prompt", "condition": "pass"}
+  ],
+  "metadata": {"layer": "portal-security", "write_side_effect": "none", "note": "教学环境敏感信息警示可见性校验"}
+}

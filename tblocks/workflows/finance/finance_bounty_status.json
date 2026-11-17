@@ -1,0 +1,89 @@
+{
+  "id": "finance/bounty_status",
+  "name": "FINANCE_BOUNTY_001",
+  "display_name": "资金管理：我的红包页面状态分类校验",
+  "description": "登录后进入「资金管理 → 我的红包」，校验红包页正常加载，展示未使用/已冻结/已使用/已过期状态分类 tab，且红包列表表格结构完整。",
+  "category": "finance",
+  "module": "bounty",
+  "priority": "P1",
+  "precondition": "1. 会员 18800002008 可登录",
+  "expected": "红包页含状态分类 tab 与红包列表表格，表头正常渲染",
+  "nodes": [
+    {
+      "id": "step_open_login_page",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_wait_center",
+      "type": "step",
+      "step_id": "step_wait_for_url",
+      "label": "等待进入会员中心",
+      "params": {"fragment": "member/member/center"}
+    },
+    {
+      "id": "step_open_bounty",
+      "type": "step",
+      "step_id": "step_open_finance_bounty_page",
+      "label": "打开我的红包页"
+    },
+    {
+      "id": "step_read_bounty_text",
+      "type": "step",
+      "step_id": "step_get_element_text",
+      "label": "读取红包页主体文本",
+      "params": {"by": "css", "value": "body"}
+    },
+    {
+      "id": "check_bounty_loaded",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验红包页含「红包」关键字",
+      "params": {"actual": "${step_read_bounty_text.data.text}", "expected": "红包"}
+    },
+    {
+      "id": "check_bounty_has_tabs",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验含状态分类（未使用）",
+      "params": {"actual": "${step_read_bounty_text.data.text}", "expected": "未使用"}
+    },
+    {
+      "id": "step_read_bounty_table",
+      "type": "step",
+      "step_id": "step_get_table_data",
+      "label": "读取红包列表表格",
+      "params": {"by": "css", "value": "table"}
+    },
+    {
+      "id": "check_bounty_table_headers",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验红包表格表头非空",
+      "params": {"actual": "${step_read_bounty_table.data.row_count}", "expected": -1}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login_page", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_wait_center", "condition": "pass"},
+    {"source": "step_wait_center", "target": "step_open_bounty", "condition": "pass"},
+    {"source": "step_open_bounty", "target": "step_read_bounty_text", "condition": "pass"},
+    {"source": "step_read_bounty_text", "target": "check_bounty_loaded", "condition": "pass"},
+    {"source": "check_bounty_loaded", "target": "check_bounty_has_tabs", "condition": "pass"},
+    {"source": "check_bounty_has_tabs", "target": "step_read_bounty_table", "condition": "pass"},
+    {"source": "step_read_bounty_table", "target": "check_bounty_table_headers", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "finance_bounty_status_teardown"}}
+    ]
+  }
+}

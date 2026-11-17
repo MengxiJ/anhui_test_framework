@@ -1,0 +1,96 @@
+{
+  "id": "cross/loan_data_consistency",
+  "name": "CROSS_LOAN_DATA_001",
+  "display_name": "跨端：前后端标的数据一致性校验",
+  "description": "对应 TC-BE-006。校验后端借款列表与前端投资列表的数据一致性：后端「所有借款」中展示的标的，在前端投资列表中应能查到对应标的，状态字段同步。",
+  "category": "business",
+  "module": "cross",
+  "priority": "P1",
+  "precondition": "1. 管理员 admin 可登录后台；2. 会员 18800002008 可登录前台；3. 存在已发布的标的",
+  "expected": "后端借款列表与前端投资列表均有数据，标的状态在两端展示一致",
+  "nodes": [
+    {
+      "id": "step_open_backend_login",
+      "type": "step",
+      "step_id": "step_open_backend_login_page",
+      "label": "打开后台登录页"
+    },
+    {
+      "id": "step_backend_login",
+      "type": "step",
+      "step_id": "step_backend_login",
+      "label": "管理员登录后台",
+      "params": {
+        "username": "${custom_params.admin_username}",
+        "password": "${custom_params.admin_password}",
+        "img_code": "${custom_params.img_code}"
+      }
+    },
+    {
+      "id": "step_open_backend_loan_list",
+      "type": "step",
+      "step_id": "step_open_backend_loan_menu",
+      "label": "进入后台所有借款列表",
+      "params": {"top_menu": "借款管理", "group": "所有借款", "item_rel": "loan/loan/list"}
+    },
+    {
+      "id": "check_backend_loan_src",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "校验后台借款列表路由加载",
+      "params": {"actual": "${step_open_backend_loan_list.data.src}", "expected": "loan/loan/list"}
+    },
+    {
+      "id": "step_get_backend_loan_info",
+      "type": "step",
+      "step_id": "step_get_backend_loan_list_info",
+      "label": "读取后台借款列表信息"
+    },
+    {
+      "id": "check_backend_loan_rows",
+      "type": "check",
+      "check_id": "check_value_greater_than",
+      "label": "校验后台借款列表有数据",
+      "params": {"actual": "${step_get_backend_loan_info.data.row_count}", "expected": 0}
+    },
+    {
+      "id": "step_open_front_login",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "会员登录前台",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_query_front_loans",
+      "type": "step",
+      "step_id": "step_query_loan_list",
+      "label": "查询前台投资列表",
+      "params": {"page": 1, "epage": 10}
+    },
+    {
+      "id": "check_front_loan_count",
+      "type": "check",
+      "check_id": "check_portal_list_count_gte",
+      "label": "校验前台投资列表有数据",
+      "params": {"items": "${step_query_front_loans.data.items}", "min_count": 1}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_backend_login", "target": "step_backend_login", "condition": "pass"},
+    {"source": "step_backend_login", "target": "step_open_backend_loan_list", "condition": "pass"},
+    {"source": "step_open_backend_loan_list", "target": "check_backend_loan_src", "condition": "pass"},
+    {"source": "check_backend_loan_src", "target": "step_get_backend_loan_info", "condition": "pass"},
+    {"source": "step_get_backend_loan_info", "target": "check_backend_loan_rows", "condition": "pass"},
+    {"source": "check_backend_loan_rows", "target": "step_open_front_login", "condition": "pass"},
+    {"source": "step_open_front_login", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_query_front_loans", "condition": "pass"},
+    {"source": "step_query_front_loans", "target": "check_front_loan_count", "condition": "pass"}
+  ],
+  "metadata": {"layer": "cross-end", "write_side_effect": "none", "note": "校验前后端标的列表数据一致性"}
+}

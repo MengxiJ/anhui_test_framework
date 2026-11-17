@@ -1,0 +1,134 @@
+{
+  "id": "backend/loan_publish_validation",
+  "name": "BACKEND_LOAN_PUB_VAL_001",
+  "display_name": "发标表单校验（必填项为空 / 非法数值拦截）",
+  "description": "对应 TC-BE-004、TC-BE-005。前台发标表单提交时，借款金额为空、年利率为 -1 或 1000%、期限为 0 等非法输入应被前端/服务端拦截，不生成标的。",
+  "category": "backend",
+  "module": "borrow",
+  "priority": "P1",
+  "precondition": "1. 借款人 18800002008 已登录；2. 图形验证码固定 8888",
+  "expected": "非法输入提交后页面提示校验错误，不生成新标的",
+  "nodes": [
+    {
+      "id": "step_open_login",
+      "type": "step",
+      "step_id": "step_open_member_login_page",
+      "label": "打开前台登录页"
+    },
+    {
+      "id": "step_member_login",
+      "type": "step",
+      "step_id": "step_member_login",
+      "label": "借款人登录",
+      "params": {"phone": "18800002008", "password": "Aa123456"}
+    },
+    {
+      "id": "step_open_loan_index",
+      "type": "step",
+      "step_id": "step_open_loan_index",
+      "label": "打开个人借款页"
+    },
+    {
+      "id": "publish_empty_amount",
+      "type": "step",
+      "step_id": "step_publish_borrow",
+      "label": "发标：借款金额为空",
+      "params": {
+        "title": "校验-空金额",
+        "amount": "",
+        "apr": "5",
+        "repay_type": "到期还本还息",
+        "period": "1个月",
+        "validate": "3天",
+        "valicode": "8888"
+      }
+    },
+    {
+      "id": "get_empty_amount_result",
+      "type": "step",
+      "step_id": "step_get_borrow_result_text",
+      "label": "读取空金额提交结果"
+    },
+    {
+      "id": "check_empty_amount_blocked",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "空金额被拦截（提示金额）",
+      "params": {"actual": "${get_empty_amount_result.data.result}", "expected": "金额"}
+    },
+    {
+      "id": "publish_bad_apr",
+      "type": "step",
+      "step_id": "step_publish_borrow",
+      "label": "发标：年利率 -1%",
+      "params": {
+        "title": "校验-负利率",
+        "amount": "200",
+        "apr": "-1",
+        "repay_type": "到期还本还息",
+        "period": "1个月",
+        "validate": "3天",
+        "valicode": "8888"
+      }
+    },
+    {
+      "id": "get_bad_apr_result",
+      "type": "step",
+      "step_id": "step_get_borrow_result_text",
+      "label": "读取负利率提交结果"
+    },
+    {
+      "id": "check_bad_apr_blocked",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "负利率被拦截（提示利率）",
+      "params": {"actual": "${get_bad_apr_result.data.result}", "expected": "利率"}
+    },
+    {
+      "id": "publish_oversize_apr",
+      "type": "step",
+      "step_id": "step_publish_borrow",
+      "label": "发标：年利率 1000%",
+      "params": {
+        "title": "校验-超高利率",
+        "amount": "200",
+        "apr": "1000",
+        "repay_type": "到期还本还息",
+        "period": "1个月",
+        "validate": "3天",
+        "valicode": "8888"
+      }
+    },
+    {
+      "id": "get_oversize_apr_result",
+      "type": "step",
+      "step_id": "step_get_borrow_result_text",
+      "label": "读取超高利率提交结果"
+    },
+    {
+      "id": "check_oversize_apr_blocked",
+      "type": "check",
+      "check_id": "check_text_contains",
+      "label": "超高利率被拦截",
+      "params": {"actual": "${get_oversize_apr_result.data.result}", "expected": "利率"}
+    }
+  ],
+  "edges": [
+    {"source": "step_open_login", "target": "step_member_login", "condition": "pass"},
+    {"source": "step_member_login", "target": "step_open_loan_index", "condition": "pass"},
+    {"source": "step_open_loan_index", "target": "publish_empty_amount", "condition": "pass"},
+    {"source": "publish_empty_amount", "target": "get_empty_amount_result", "condition": "pass"},
+    {"source": "get_empty_amount_result", "target": "check_empty_amount_blocked", "condition": "pass"},
+    {"source": "check_empty_amount_blocked", "target": "publish_bad_apr", "condition": "pass"},
+    {"source": "publish_bad_apr", "target": "get_bad_apr_result", "condition": "pass"},
+    {"source": "get_bad_apr_result", "target": "check_bad_apr_blocked", "condition": "pass"},
+    {"source": "check_bad_apr_blocked", "target": "publish_oversize_apr", "condition": "pass"},
+    {"source": "publish_oversize_apr", "target": "get_oversize_apr_result", "condition": "pass"},
+    {"source": "get_oversize_apr_result", "target": "check_oversize_apr_blocked", "condition": "pass"}
+  ],
+  "metadata": {
+    "teardown_hooks": [
+      {"step_id": "step_capture_screenshot", "params": {"file_name": "loan_publish_validation_teardown"}}
+    ]
+  }
+}
