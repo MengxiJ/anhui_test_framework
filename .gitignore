@@ -55,3 +55,7 @@ test_output.txt
 # Config files with secrets
 .env
 local_config.py
+
+# 个人学习/面试文档（不进仓库）
+导学-*.md
+面经-*.md
