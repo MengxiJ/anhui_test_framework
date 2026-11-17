@@ -122,7 +122,7 @@ T-Blocks 层  （薄封装 + 注册表：将 JSON 中的节点名映射到具体
 | 后台界面（界面测试）    | 借款管理手风琴菜单 6 个列表入口巡检：所有借款、初审标、正在借款、满标待审、还款中、额度列表；逐级校验 iframe 路由、表头渲染与数据行存在性                                                                                                                                                 |
 | 未授权访问         | 未登录访问后台受保护接口统一重定向登录页，无管理内容泄露                                                                                                                                                                                               |
 
-> 后台页面为「列表 iframe + 审核弹窗二级 iframe」的嵌套结构，框架在页面对象层统一处理
+> 后台页面为「列表 iframe + 审核弹窗二级 iframe」的嵌套结构，框架在业务库 Manager 层统一处理
 > 框架切换、手风琴菜单防折叠与 JS 点击兜底；跨站点业务链（前台发标 → 后台审核）复用
 > 同一浏览器顺序会话，真实还原运营人员操作路径。
 > 标的完整生命周期由业务链拼合覆盖：**发标 → 初审通过**（BUSINESS\_LOAN\_001）、
@@ -253,15 +253,22 @@ Start-ScheduledTask -TaskName 'TBlocks Nightly Regression'  # 立即试跑
 ## 目录结构
 
 ```
-├── lib/                # 业务库：10 个业务域（会员/资金/理财/后台/接口/探针/压测…）
-│   └── common/<域>/    #   每个域一个 Manager 类 + 步骤/检查入口函数
+├── lib/                    # 业务库：10 个业务域的实现层
+│   ├── core/               #   核心底座（BasePage 基类 / 实例管理 / HTTP 客户端 / 配置 / 日志）
+│   └── common/<域>/        #   每个业务域的三层结构：
+│       ├── <域>_step.py    #     步骤入口函数（无装饰器，获取 Manager 单例调方法）
+│       ├── <域>_check.py   #     检查入口函数（同上）
+│       └── utils/<域>_manager.py  # Manager 类（继承 BasePage，元素定位器+业务方法合一）
 ├── tblocks/
-│   ├── step_impl/      # 117 个步骤节点的薄封装
-│   ├── check_impl/     # 77 个检查节点的薄封装
-│   ├── workflows/      # 55 个 JSON 工作流（smoke/api/ui/business/backend 等 14 个目录）
-│   └── utils/          # 引擎：执行器 / 变量解析 / pytest 插件 / 静态校验
-├── scripts/            # 一键冒烟、一键回归脚本
-└── old_framework/      # 第一代 PageObject 项目（独立可运行）
+│   ├── step_impl/          # 117 个步骤节点的薄封装（@composer_step 装饰器注册到注册表）
+│   ├── check_impl/         # 77 个检查节点的薄封装（@composer_check 装饰器注册到注册表）
+│   ├── workflows/          # 55 个 JSON 工作流（smoke/api/ui/business/backend 等 14 个目录）
+│   ├── utils/              # 引擎：执行器 / 变量解析 / pytest 插件 / 注册表 / 静态校验模型
+│   ├── tools/              # 工具：原子节点 catalog 生成、工作流静态校验（gate）
+│   └── tblocks_debugger.py # 调试 CLI：单节点/序列执行、gate 校验
+├── scripts/                # 一键冒烟、一键回归、PDF 报告生成脚本
+├── .github/workflows/      # GitHub Actions 定时回归流水线
+└── old_framework/          # 第一代 PageObject 项目（独立可运行，对照两代方案差异）
 ```
 
 ## 关于 old\_framework/
